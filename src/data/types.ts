@@ -23,6 +23,8 @@ export interface StoneSpec {
 export interface Driver {
   id: string;
   name: string;
+  email?: string;
+  password?: string;
   phone: string;
   lorryId: string | null;
   status: 'active' | 'idle' | 'off-duty';
@@ -79,12 +81,34 @@ export interface WorkerPayment {
   note?: string;
 }
 
+export type ExpenseCategory =
+  | 'fuel'
+  | 'toll'
+  | 'maintenance'
+  | 'police_rto'
+  | 'worker_hamali'
+  | 'bata_food'
+  | 'other';
+
 // Flexible expense/maintenance line item — label + amount, owner-reviewable.
 export interface ExpenseLine {
   id: string;
   label: string;
   amount: number;
   review: ExpenseReview;
+  category?: ExpenseCategory;
+  receiptUrl?: string; // photo/thumbnail of driver's handwritten paper
+  notes?: string;
+  recordedAt?: string;
+}
+
+export interface LoadingPartyPayment {
+  id: string;
+  loadingPartyId: string;
+  amountPaid: number;
+  paidBy: 'owner' | 'driver';
+  status: 'paid' | 'pending';
+  paymentMode?: 'cash' | 'phonepe' | 'bank_transfer' | 'unspecified';
 }
 
 export interface Trip {
@@ -99,7 +123,13 @@ export interface Trip {
   stoneLines: StoneLine[];
   workerPayments: WorkerPayment[];
   expenses: ExpenseLine[];
+  loadingPartyPayments?: LoadingPartyPayment[];
   amountPaid: number; // by the unloading party so far
+  partyToDriverCash?: number;
+  partyToOwnerPhonePe?: number;
+  damagedPieces?: number;
+  damageDeduction?: number;
+  orderId?: string;
 }
 
 export interface ActivityEvent {
@@ -167,15 +197,15 @@ export function lineAmount(line: StoneLine): number {
 }
 
 export function tripRevenue(trip: Trip): number {
-  return trip.stoneLines.reduce((sum, l) => sum + lineAmount(l), 0);
+  return (trip.stoneLines || []).reduce((sum, l) => sum + lineAmount(l), 0);
 }
 
 export function tripWorkerTotal(trip: Trip): number {
-  return trip.workerPayments.reduce((sum, w) => sum + w.amount, 0);
+  return (trip.workerPayments || []).reduce((sum, w) => sum + w.amount, 0);
 }
 
 export function tripExpenseTotal(trip: Trip): number {
-  return trip.expenses.reduce((sum, e) => sum + e.amount, 0);
+  return (trip.expenses || []).reduce((sum, e) => sum + e.amount, 0);
 }
 
 export function tripNet(trip: Trip): number {
@@ -183,7 +213,7 @@ export function tripNet(trip: Trip): number {
 }
 
 export function tripSqft(trip: Trip): number {
-  return trip.stoneLines.reduce((sum, l) => sum + lineTotalSqft(l), 0);
+  return (trip.stoneLines || []).reduce((sum, l) => sum + lineTotalSqft(l), 0);
 }
 
 export function tripPending(trip: Trip): number {
@@ -201,11 +231,11 @@ export function orderLineAmount(line: OrderLine): number {
 }
 
 export function orderTotal(order: Order): number {
-  return order.lines.reduce((sum, l) => sum + orderLineAmount(l), 0);
+  return (order.lines || []).reduce((sum, l) => sum + orderLineAmount(l), 0);
 }
 
 export function orderSqft(order: Order): number {
-  return order.lines.reduce((sum, l) => sum + orderLineTotalSqft(l), 0);
+  return (order.lines || []).reduce((sum, l) => sum + orderLineTotalSqft(l), 0);
 }
 
 export function orderPending(order: Order): number {

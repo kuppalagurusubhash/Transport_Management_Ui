@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, Link } from 'react-router-dom';
-import { MenuIcon, ExternalLinkIcon } from 'lucide-react';
+import { MenuIcon, ExternalLinkIcon, TruckIcon, UserIcon } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { NotificationBell } from './NotificationBell';
 export function DashboardLayout() {
@@ -26,6 +26,16 @@ export function DashboardLayout() {
           </div>
 
           <div className="flex items-center gap-3">
+            <Link
+              to="/driver"
+              className="hidden items-center gap-2 rounded-md border border-ink-700 px-3 py-2 text-xs font-medium text-neutral-300 transition-colors hover:text-white sm:inline-flex">
+              <UserIcon className="h-4 w-4" /> Driver Portal
+            </Link>
+            <Link
+              to="/loading"
+              className="hidden items-center gap-2 rounded-md border border-ink-700 px-3 py-2 text-xs font-medium text-neutral-300 transition-colors hover:text-white sm:inline-flex">
+              <TruckIcon className="h-4 w-4" /> Loading Portal
+            </Link>
             <Link
               to="/buyer"
               className="hidden items-center gap-2 rounded-md border border-ink-700 px-3 py-2 text-xs font-medium text-neutral-300 transition-colors hover:text-white sm:inline-flex">

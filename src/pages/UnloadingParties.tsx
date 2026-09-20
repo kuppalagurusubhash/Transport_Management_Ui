@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { unloadingParties, formatINR } from '../data/mockData';
+import { formatINR } from '../utils/helpers';
 import { orderTotal, orderPending } from '../data/types';
 import { useOrders } from '../store/OrdersContext';
 import { PageHeader } from '../components/layout/PageHeader';
 export function UnloadingParties() {
-  const { orders } = useOrders();
+  const { orders, unloadingParties } = useOrders();
   const rows = unloadingParties.map((p) => {
     const partyOrders = orders.filter((o) => o.unloadingPartyId === p.id);
     return {
@@ -38,6 +38,13 @@ export function UnloadingParties() {
                 </tr>
               </thead>
               <tbody>
+                {rows.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="px-4 py-10 text-center text-sm text-neutral-500">
+                      No unloading parties (Kerala buyers) registered in database.
+                    </td>
+                  </tr>
+                )}
                 {rows.map((p, i) =>
                 <motion.tr
                   key={p.id}

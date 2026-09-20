@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "npx vite",
+    "dev": "npx vite --host",
     "build": "npx vite build",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "preview": "npx vite preview"
@@ -18,7 +18,9 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.2",
-    "recharts": "^2.12.7"
+    "recharts": "^2.12.7",
+    "socket.io-client": "^4.8.3",
+    "tesseract.js": "^7.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.18",

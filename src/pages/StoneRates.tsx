@@ -1,26 +1,73 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { stoneSpecs as seedSpecs } from '../data/mockData';
+import { PlusIcon } from 'lucide-react';
 import type { StoneSpec } from '../data/types';
 import { PageHeader } from '../components/layout/PageHeader';
+import { useOrders } from '../store/OrdersContext';
+import { AddStoneRateModal } from '../components/ui/AddStoneRateModal';
+
 export function StoneRates() {
-  const [specs, setSpecs] = useState<StoneSpec[]>(seedSpecs);
-  const updateRate = (id: string, rate: number) =>
-  setSpecs((prev) =>
-  prev.map((s) =>
-  s.id === id ?
-  {
-    ...s,
-    ratePerSqft: rate
-  } :
-  s
-  )
-  );
+  const { stoneSpecs, updateStoneRate } = useOrders();
+  const [specs, setSpecs] = useState<StoneSpec[]>([]);
+  const [isModified, setIsModified] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  useEffect(() => {
+    setSpecs(stoneSpecs || []);
+  }, [stoneSpecs]);
+
+  const updateRate = (id: string, rate: number) => {
+    setSpecs((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, ratePerSqft: rate } : s))
+    );
+    setIsModified(true);
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const modified = specs.filter((s) => {
+        const original = stoneSpecs.find((orig) => orig.id === s.id);
+        return original && original.ratePerSqft !== s.ratePerSqft;
+      });
+
+      for (const s of modified) {
+        await updateStoneRate(s.id, s.ratePerSqft);
+      }
+      setIsModified(false);
+    } catch (err) {
+      console.error('Failed to save stone rates:', err);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="min-h-full">
       <PageHeader
         title="Stone Rates"
-        subtitle="Rate per square foot by size, thickness & finish" />
+        subtitle="Rate per square foot by size, thickness & finish"
+        action={
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              className="inline-flex items-center gap-2 rounded-md bg-gold px-3.5 py-2 text-sm font-semibold text-ink-950 transition-colors hover:bg-gold-400"
+            >
+              <PlusIcon className="h-4 w-4" /> Add Stone Rate
+            </button>
+            {isModified && (
+              <button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="inline-flex items-center gap-2 rounded-md border border-ink-700 bg-ink-950 px-3.5 py-2 text-sm font-semibold text-neutral-350 transition-colors hover:border-gold hover:text-gold disabled:opacity-50"
+              >
+                {isSaving ? 'Saving...' : 'Save Changes'}
+              </button>
+            )}
+          </div>
+        }
+      />
       
       <div className="p-6 sm:p-8">
         <div className="overflow-hidden rounded-lg border border-ink-700">
@@ -37,6 +84,13 @@ export function StoneRates() {
                 </tr>
               </thead>
               <tbody>
+                {specs.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="px-4 py-10 text-center text-sm text-neutral-500">
+                      No stone rates configured in database. Click "Add Stone Rate" to create one.
+                    </td>
+                  </tr>
+                )}
                 {specs.map((s, i) =>
                 <motion.tr
                   key={s.id}
@@ -83,6 +137,11 @@ export function StoneRates() {
           Edit any rate inline — changes apply to new load calculations.
         </p>
       </div>
+
+      <AddStoneRateModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+      />
     </div>);
 
 }

@@ -1,10 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { lorries, driverById } from '../../data/mockData';
+import { useOrders } from '../../store/OrdersContext';
 import { StatusDot, statusLabel } from '../ui/StatusDot';
 import { SectionLabel } from '../ui/Card';
 export function FleetPanel() {
+  const { lorries, drivers } = useOrders();
   const navigate = useNavigate();
   return (
     <div className="flex h-full flex-col">
@@ -18,7 +19,7 @@ export function FleetPanel() {
 
       <ul className="ti-scroll flex-1 overflow-y-auto py-2">
         {lorries.map((lorry, i) => {
-          const driver = driverById(lorry.driverId);
+          const driver = drivers.find((d) => d.id === lorry.driverId);
           return (
             <motion.li
               key={lorry.id}

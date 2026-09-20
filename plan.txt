@@ -1,0 +1,34 @@
+Hi i am having transport business in the andhar and kerala karnataka 
+
+i need to prepare software for my transport business 
+
+parties : 100 parties  means 100 user will be there 
+me and owner : 2 members 
+loading parties : 30 parties 
+lorry drivers : 70 members 
+
+here we transport the the black stone where we have different size of stones 
+example 2*2 40mm , 50mm , 30mm , etc
+3*3 40mm , 50 , 30mm etc 
+polish , rough ,  
+etc .
+rate for stones : different different  17, 18 ,19 , 20 .
+senerior : we will get order from kerala from different parties but we will load the lorry based on the loaction  we will buy stones ramapuram with different parties to one lorry
+loading the stones workers payment also we will will only give 
+in this there is calculation where 
+2*2 50mm 
+2*2=4sqft * 40pices =160sqft * 19rupess = 3040rupess 
+additional they will give some amount for worker like 7000 or there wish they give some amouth that we have to pay to the workers  
+
+
+we have lorries of 20 we may add or we may sale one after one 
+we have maintains cost for one lorry on bases of one trip we have check and those information will be filled by the drivers and owner will cross check the bills and expensives and where we cant predicit the exact values and coloums for the expensives so driver can only see where to go and where to unload and how much sqfeet and how many stones we can unload for one party thats all 
+
+where unload parties means kerala parties 
+if he is from palakad dist example 2*2 50mm we sold them to the 40 rupess for square feet 
+2*2=4sqft 50mm 40 pices 
+4sqft*40pices =160sqft * 40 rupess =6400 rupess we have to get this is the calculation we need to do 
+if it is waynadu district it will go for 49 rupess kannur 50 rupess likes this 
+he has to pay that amount and he can order for the application only where he can in there order for histpry of orders 
+
+me as owner i have to control the all the working logs of driver and dashbaord for the owner and lorry waise logs and loading waise logs and analytics and unloading waise and drivers and locations of lorries and party waise amonths and pending amount and more information that should be aviable in the owner dashboard and loading parties amounts pending and paid amount logs and lorry waise logs and like to whom it went and where it is went and driver names and maintains cost details and proper and each and everry information should be shown in the dashboard of the owner pages 

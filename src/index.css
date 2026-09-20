@@ -13,9 +13,50 @@
 }
 body {
   font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background-color: #141414;
+  background: radial-gradient(circle at 0% 0%, #150f2b 0%, #0d0c11 50%, #08090d 100%);
   color: #e8e8e8;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
 }
+
+/* Glowing glassmorphic background accent blobs */
+body::before {
+  content: '';
+  position: fixed;
+  top: -10%;
+  left: -10%;
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -10%;
+  right: -10%;
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.03) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Apply backdrop blur globally to all ink panels */
+.bg-ink-950,
+.bg-ink-900,
+.bg-ink-850,
+.bg-ink-800,
+aside,
+header,
+.glass-panel {
+  backdrop-filter: blur(20px) saturate(120%);
+  -webkit-backdrop-filter: blur(20px) saturate(120%);
+}
+
 /* Slim dark scrollbars */
 .ti-scroll::-webkit-scrollbar {
   width: 6px;
@@ -25,9 +66,9 @@ body {
   background: transparent;
 }
 .ti-scroll::-webkit-scrollbar-thumb {
-  background: #2a2a2a;
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
 }
 .ti-scroll::-webkit-scrollbar-thumb:hover {
-  background: #3a3a3a;
+  background: rgba(255, 255, 255, 0.2);
 }
