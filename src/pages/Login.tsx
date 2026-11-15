@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { authApi } from '../api/index';
 import { useOrders } from '../store/OrdersContext';
+import { InstallAppButton } from '../components/layout/InstallAppButton';
 
 export function Login() {
   const navigate = useNavigate();
@@ -132,6 +133,11 @@ export function Login() {
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="z-10 w-full max-w-md space-y-5 sm:space-y-6 rounded-2xl border border-ink-800 bg-ink-900/75 p-5 sm:p-8 shadow-[0_0_50px_rgba(0,0,0,0.8)] backdrop-blur-xl relative"
         >
+          {/* Install App Button on Login Card */}
+          <div className="absolute top-4 left-4">
+            <InstallAppButton variant="auth" />
+          </div>
+
           {/* Live Server Connection Indicator */}
           <div className="absolute top-4 right-4 flex items-center gap-1.5 rounded-full px-2.5 py-1 bg-ink-950/80 border border-ink-800 text-[10px] font-semibold">
             {isBackendOnline === null ? (
@@ -153,15 +159,15 @@ export function Login() {
           </div>
 
           {/* Header */}
-          <div className="text-center pt-2">
-            <motion.div
+          <div className="text-center pt-5">
+            <motion.img
+              src="/app-logo.jpg"
+              alt="Trans IA Logo"
               initial={{ scale: 0.8, rotate: -5 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-              className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-gold-600 to-gold text-ink-950 font-black text-2xl mb-3 shadow-[0_4px_20px_rgba(212,175,55,0.3)] hover:scale-105 transition-transform cursor-default"
-            >
-              TA
-            </motion.div>
+              className="mx-auto h-20 w-20 rounded-2xl object-cover border-2 border-gold/50 mb-3 shadow-[0_6px_28px_rgba(212,175,55,0.35)] hover:scale-105 transition-transform"
+            />
             <h2 className="text-3xl font-extrabold tracking-tight bg-gradient-to-b from-white to-neutral-300 bg-clip-text text-transparent">
               TRANS IA
             </h2>

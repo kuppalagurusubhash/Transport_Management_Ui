@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/((?!assets/|fleet/|catalog/|app-logo\\.jpg|apple-touch-icon\\.png|favicon\\.png|icon-192\\.png|icon-512\\.png|manifest\\.json|sw\\.js|login_bg\\.jpg|fleet_showcase_bg\\.png|fleet_stage_backdrop\\.jpg).*)",
+      "destination": "/index.html"
+    }
+  ]
+}

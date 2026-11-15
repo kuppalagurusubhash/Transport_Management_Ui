@@ -18,6 +18,7 @@ import {
 
 
 import { useOrders } from '../../store/OrdersContext';
+import { InstallAppButton } from './InstallAppButton';
 
 interface NavItem {
   to: string;
@@ -139,9 +140,11 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         <div className="absolute inset-x-6 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-[#F5B82E]/35 to-transparent blur-[0.5px] pointer-events-none" />
 
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#F5B82E] via-[#E2A621] to-[#C98A14] font-black text-[#05090D] shadow-[0_4px_15px_rgba(245,184,46,0.3)] text-base tracking-tighter">
-            SB
-          </div>
+          <img
+            src="/app-logo.jpg"
+            alt="Trans IA Logo"
+            className="h-11 w-11 rounded-xl object-cover border border-[#F5B82E]/50 shadow-[0_4px_15px_rgba(245,184,46,0.3)] shrink-0"
+          />
           <div className="leading-tight">
             <p className="text-sm font-black tracking-wide text-white">
               SRI SAI BABA
@@ -229,8 +232,9 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       </div>
 
       {/* User Account Footer Profile */}
-        <div className="border-t border-white/10 p-3.5 bg-[#040608]/80 backdrop-blur-md pb-safe">
-          <div className="flex items-center justify-between gap-3">
+      <div className="border-t border-white/10 p-3.5 bg-[#040608]/80 backdrop-blur-md pb-safe">
+        <InstallAppButton variant="sidebar" />
+        <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#F5B82E]/20 to-[#C98A14]/30 border border-[#F5B82E]/40 text-[#F5B82E] text-sm font-bold shadow-inner">
                 👑

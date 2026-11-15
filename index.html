@@ -3,21 +3,130 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.json" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#05090D" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Trans IA" />
   <title>SRI SAI BABA — Transport & Stone Logistics</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
     href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
+  <style>
+    @keyframes bootSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes bootBar {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(200%); }
+    }
+    .boot-splash {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100dvh;
+      width: 100%;
+      background: radial-gradient(circle at center, #0c141d 0%, #05090d 75%);
+      color: #f5f5f5;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+    .boot-ring-wrap {
+      position: relative;
+      width: 112px;
+      height: 112px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .boot-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 9999px;
+      border: 2px solid rgba(245, 184, 46, 0.15);
+      border-top-color: #F5B82E;
+      border-right-color: rgba(245, 184, 46, 0.5);
+      animation: bootSpin 1.4s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite;
+      box-shadow: 0 0 28px rgba(245, 184, 46, 0.25);
+    }
+    .boot-logo {
+      width: 76px;
+      height: 76px;
+      border-radius: 18px;
+      object-fit: cover;
+      border: 2px solid rgba(245, 184, 46, 0.65);
+      box-shadow: 0 0 30px rgba(245, 184, 46, 0.35);
+    }
+    .boot-title {
+      margin-top: 20px;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #ffffff;
+    }
+    .boot-title span {
+      color: #F5B82E;
+    }
+    .boot-sub {
+      margin-top: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(245, 184, 46, 0.8);
+    }
+    .boot-track {
+      margin-top: 18px;
+      width: 220px;
+      height: 5px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+    .boot-bar {
+      width: 50%;
+      height: 100%;
+      border-radius: 9999px;
+      background: linear-gradient(90deg, transparent, #F5B82E, #fcd34d);
+      animation: bootBar 1.3s ease-in-out infinite;
+    }
+  </style>
+  <script>
+    window.__deferredPwaPrompt = null;
+    window.addEventListener('beforeinstallprompt', function (e) {
+      e.preventDefault();
+      window.__deferredPwaPrompt = e;
+      window.dispatchEvent(new CustomEvent('pwa-install-available'));
+    });
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/sw.js').catch(function () {});
+      });
+    }
+  </script>
 </head>
 
 <body class="bg-[#05090D] text-[#F5F5F5] antialiased selection:bg-[#F5B82E]/30 selection:text-[#F5B82E]">
-  <div id="root"></div>
+  <div id="root">
+    <div class="boot-splash">
+      <div class="boot-ring-wrap">
+        <div class="boot-ring"></div>
+        <img src="/app-logo.jpg" alt="Trans IA" class="boot-logo" />
+      </div>
+      <div class="boot-title">SRI SAI BABA — <span>TRANS IA</span></div>
+      <div class="boot-sub">Initializing Fleet Command Center...</div>
+      <div class="boot-track"><div class="boot-bar"></div></div>
+    </div>
+  </div>
   <script type="module" src="/src/index.tsx"></script>
 </body>
 

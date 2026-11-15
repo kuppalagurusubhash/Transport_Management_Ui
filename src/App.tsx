@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom
 import { motion } from 'framer-motion';
 import { OrdersProvider } from './store/OrdersContext';
 import { DashboardLayout } from './components/layout/DashboardLayout';
+import { LuxuryLoader } from './components/ui/LuxuryLoader';
+import { NotFound } from './pages/NotFound';
 
 // Helper for loading named export page components via React.lazy
 const lazyPage = <T extends Record<string, any>>(
@@ -30,13 +32,8 @@ const Expenses = lazyPage(() => import('./pages/Expenses'), 'Expenses');
 const Payments = lazyPage(() => import('./pages/Payments'), 'Payments');
 const Reports = lazyPage(() => import('./pages/Reports'), 'Reports');
 
-function PageLoader() {
-  return (
-    <div className="flex min-h-[50vh] w-full flex-col items-center justify-center gap-3">
-      <div className="h-10 w-10 animate-spin rounded-full border-2 border-[#F5B82E]/20 border-t-[#F5B82E]" />
-      <span className="text-xs font-semibold tracking-wider uppercase text-neutral-400">Loading Module...</span>
-    </div>
-  );
+function PageLoader({ fullScreen = false }: { fullScreen?: boolean }) {
+  return <LuxuryLoader fullScreen={fullScreen} />;
 }
 
 function Page({ children }: { children: React.ReactNode }) {
@@ -68,7 +65,7 @@ export function App() {
   return (
     <OrdersProvider>
       <BrowserRouter>
-        <Suspense fallback={<PageLoader />}>
+        <Suspense fallback={<PageLoader fullScreen />}>
           <Routes>
             {/* Login & Register screens */}
             <Route path="/login" element={<Login />} />
@@ -217,8 +214,8 @@ export function App() {
               </Route>
             </Route>
 
-            {/* Catch-all fallback */}
-            <Route path="*" element={<Navigate to="/" replace />} />
+            {/* Catch-all 404 Not Found Page */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </BrowserRouter>
