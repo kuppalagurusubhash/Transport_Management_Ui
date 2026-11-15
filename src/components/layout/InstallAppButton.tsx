@@ -38,7 +38,7 @@ export function InstallAppButton({ variant = 'header' }: InstallAppButtonProps) 
     setIsIOS(iosDevice);
 
     const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault();
+      // Do NOT call e.preventDefault() so the browser address bar Install icon stays visible
       const promptEvent = e as BeforeInstallPromptEvent;
       window.__deferredPwaPrompt = promptEvent;
       setDeferredPrompt(promptEvent);

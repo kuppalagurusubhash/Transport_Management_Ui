@@ -1,7 +1,35 @@
 {
+  "headers": [
+    {
+      "source": "/manifest.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/manifest+json"
+        }
+      ]
+    },
+    {
+      "source": "/sw.js",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript"
+        },
+        {
+          "key": "Service-Worker-Allowed",
+          "value": "/"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    }
+  ],
   "rewrites": [
     {
-      "source": "/((?!assets/|fleet/|catalog/|app-logo\\.jpg|apple-touch-icon\\.png|favicon\\.png|icon-192\\.png|icon-512\\.png|manifest\\.json|sw\\.js|login_bg\\.jpg|fleet_showcase_bg\\.png|fleet_stage_backdrop\\.jpg).*)",
+      "source": "/((?!assets/|fleet/|catalog/|.*\\..*).*)",
       "destination": "/index.html"
     }
   ]

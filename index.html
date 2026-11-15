@@ -103,13 +103,13 @@
   <script>
     window.__deferredPwaPrompt = null;
     window.addEventListener('beforeinstallprompt', function (e) {
-      e.preventDefault();
+      // Do NOT call e.preventDefault() so Chrome/Edge also displays the native Install icon in the URL address bar
       window.__deferredPwaPrompt = e;
       window.dispatchEvent(new CustomEvent('pwa-install-available'));
     });
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {
-        navigator.serviceWorker.register('/sw.js').catch(function () {});
+        navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(function () {});
       });
     }
   </script>

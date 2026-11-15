@@ -105,3 +105,4 @@ export function LuxuryLoader({ fullScreen = false, label }: LuxuryLoaderProps) {
     </div>
   );
 }
+
