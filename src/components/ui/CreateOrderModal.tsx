@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { XIcon, PlusIcon, Trash2Icon, ShoppingBagIcon } from 'lucide-react';
+import { XIcon, PlusIcon, Trash2Icon, ShoppingBagIcon, GlobeIcon, PencilIcon } from 'lucide-react';
 import { useOrders } from '../../store/OrdersContext';
 import { sizeToSqft, formatINR } from '../../utils/helpers';
 import { Finish, OrderLine } from '../../data/types';
@@ -16,7 +16,7 @@ interface DraftLine {
 }
 
 export function CreateOrderModal({ isOpen, onClose }: CreateOrderModalProps) {
-  const { unloadingParties, districtRates, placeOrder } = useOrders();
+  const { unloadingParties, districtRates, stoneSpecs, placeOrder } = useOrders();
 
   const sellableSpecs = useMemo(() => {
     return Array.from(
@@ -30,6 +30,8 @@ export function CreateOrderModal({ isOpen, onClose }: CreateOrderModalProps) {
   }, [districtRates]);
 
   const [selectedBuyerId, setSelectedBuyerId] = useState('');
+  const [orderSource, setOrderSource] = useState<'manual' | 'online'>('manual');
+  const [notes, setNotes] = useState('');
   const [lines, setLines] = useState<DraftLine[]>([
     {
       key: 'k1',
@@ -65,6 +67,7 @@ export function CreateOrderModal({ isOpen, onClose }: CreateOrderModalProps) {
           ...l,
           spec: { size: '2x2', thickness: '40mm', finish: 'polish' },
           rate: 0,
+          ramapuramRate: 0,
           sqftPerPiece: 0,
           totalSqft: 0,
           amount: 0,
@@ -78,18 +81,25 @@ export function CreateOrderModal({ isOpen, onClose }: CreateOrderModalProps) {
             r.thickness === spec.thickness &&
             r.finish === spec.finish
         )?.ratePerSqft ?? 0;
+      const ramapuramRate = (stoneSpecs || []).find(
+        (s) =>
+          s.size === spec.size &&
+          s.thickness === spec.thickness &&
+          s.finish === spec.finish
+      )?.ratePerSqft ?? 0;
       const sqftPerPiece = sizeToSqft[spec.size] ?? 0;
       const totalSqft = sqftPerPiece * l.pieces;
       return {
         ...l,
         spec,
         rate,
+        ramapuramRate,
         sqftPerPiece,
         totalSqft,
         amount: totalSqft * rate,
       };
     });
-  }, [lines, selectedBuyer, districtRates, sellableSpecs]);
+  }, [lines, selectedBuyer, districtRates, stoneSpecs, sellableSpecs]);
 
   const total = computedLines.reduce((s, l) => s + l.amount, 0);
 
@@ -141,10 +151,13 @@ export function CreateOrderModal({ isOpen, onClose }: CreateOrderModalProps) {
       unloadingPartyId: selectedBuyerId,
       district: selectedBuyer.district,
       lines: orderLines,
+      source: orderSource,
+      notes: notes.trim() || undefined,
     });
 
     onClose();
   };
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
@@ -166,6 +179,39 @@ export function CreateOrderModal({ isOpen, onClose }: CreateOrderModalProps) {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
+          {/* Order Channel / Source Toggle */}
+          <div>
+            <label className="block text-xs uppercase tracking-wider text-neutral-400 font-bold mb-1.5">
+              Order Source / Channel
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setOrderSource('manual')}
+                className={`flex items-center justify-center gap-2 p-2.5 rounded-lg border text-xs font-bold transition-all cursor-pointer ${
+                  orderSource === 'manual'
+                    ? 'border-[#F5B82E] bg-[#F5B82E]/15 text-[#F5B82E] shadow-[0_0_12px_rgba(245,184,46,0.25)]'
+                    : 'border-white/10 bg-white/5 text-neutral-400 hover:border-white/20'
+                }`}
+              >
+                <PencilIcon className="h-4 w-4" />
+                <span>Direct / Office Booking (Created by Us)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setOrderSource('online')}
+                className={`flex items-center justify-center gap-2 p-2.5 rounded-lg border text-xs font-bold transition-all cursor-pointer ${
+                  orderSource === 'online'
+                    ? 'border-cyan-400 bg-cyan-500/15 text-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.25)]'
+                    : 'border-white/10 bg-white/5 text-neutral-400 hover:border-white/20'
+                }`}
+              >
+                <GlobeIcon className="h-4 w-4" />
+                <span>Online Order (Received via Web / Portal)</span>
+              </button>
+            </div>
+          </div>
+
           {/* Select Buyer */}
           <div>
             <label className="block text-xs uppercase tracking-wider text-neutral-500 font-bold mb-1.5">
@@ -241,16 +287,26 @@ export function CreateOrderModal({ isOpen, onClose }: CreateOrderModalProps) {
                   <button
                     type="button"
                     onClick={() => removeLine(l.key)}
-                    className="flex h-9 w-9 items-center justify-center rounded-md border border-ink-800 text-neutral-500 transition-colors hover:text-red-300"
+                    className="flex h-9 w-9 items-center justify-center rounded-md border border-ink-800 text-neutral-500 transition-colors hover:text-red-300 cursor-pointer"
                     aria-label="Remove line"
                   >
                     <Trash2Icon className="h-4 w-4" />
                   </button>
                 </div>
-                <div className="mt-3 flex items-center justify-between border-t border-ink-800/60 pt-3 text-xs">
-                  <span className="font-mono text-neutral-400">
-                    {l.sqftPerPiece} sqft × {l.pieces} pcs = {l.totalSqft} sqft × ₹{l.rate}
-                  </span>
+
+                {/* Calculation row with Ramapuram base price & district price */}
+                <div className="mt-3 flex flex-wrap items-center justify-between border-t border-ink-800/60 pt-3 text-xs gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-mono text-neutral-400">
+                      {l.sqftPerPiece} sqft × {l.pieces} pcs = {l.totalSqft} sqft × ₹{l.rate}
+                      <span className="text-[10px] text-emerald-400 font-sans ml-1">({selectedBuyer.district} selling rate)</span>
+                    </span>
+                    {l.ramapuramRate > 0 && (
+                      <span className="rounded bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 text-[10px] font-mono text-amber-400">
+                        Ramapuram Base: ₹{l.ramapuramRate}/sqft
+                      </span>
+                    )}
+                  </div>
                   <span className="text-sm font-bold text-gold">
                     {formatINR(l.amount)}
                   </span>
@@ -261,11 +317,26 @@ export function CreateOrderModal({ isOpen, onClose }: CreateOrderModalProps) {
             <button
               type="button"
               onClick={addLine}
-              className="inline-flex items-center gap-2 rounded-md border border-dashed border-ink-700 px-3 py-2 text-xs font-medium text-neutral-400 transition-colors hover:text-white hover:border-ink-500"
+              className="inline-flex items-center gap-2 rounded-md border border-dashed border-ink-700 px-3 py-2 text-xs font-medium text-neutral-400 transition-colors hover:text-white hover:border-ink-500 cursor-pointer"
             >
               <PlusIcon className="h-4 w-4" /> Add another stone specification
             </button>
           </div>
+
+          {/* Notes */}
+          <div>
+            <label className="block text-xs uppercase tracking-wider text-neutral-400 font-bold mb-1.5">
+              Order Remarks / Reference (Optional)
+            </label>
+            <textarea
+              rows={2}
+              placeholder="e.g. Received over phone call, urgently needed for Palakkad project..."
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="w-full rounded-md border border-ink-700 bg-ink-900 px-3 py-2 text-xs text-white placeholder-neutral-500 focus:border-gold focus:outline-none"
+            />
+          </div>
+
 
           {/* Footer Actions */}
           <div className="mt-6 flex items-center justify-between border-t border-ink-800 pt-5">

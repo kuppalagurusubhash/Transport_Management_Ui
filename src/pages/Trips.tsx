@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { RefreshCwIcon, Filter, Truck, Calendar, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { RefreshCwIcon, Filter, Truck, Calendar, X, ChevronLeft, ChevronRight, ShieldCheck, Printer } from 'lucide-react';
 import { formatINR } from '../utils/helpers';
 import { tripSqft, type Trip, type UnloadingParty, type DistrictRate } from '../data/types';
 import { PageHeader } from '../components/layout/PageHeader';
 import { TripStatusBadge } from '../components/ui/Badge';
 import { tripsApi, lorriesApi, driversApi, unloadingPartiesApi, districtRatesApi } from '../api/index';
 import type { Lorry, Driver } from '../data/types';
+import { KeralaDeliveryAuditModal } from '../components/ui/KeralaDeliveryAuditModal';
+import { TripPdfReportModal } from '../components/trip/TripPdfReportModal';
 
 export function Trips() {
   const [trips, setTrips] = useState<Trip[]>([]);
@@ -16,6 +18,8 @@ export function Trips() {
   const [unloadingParties, setUnloadingParties] = useState<UnloadingParty[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [auditingTrip, setAuditingTrip] = useState<Trip | null>(null);
+  const [pdfTrip, setPdfTrip] = useState<Trip | null>(null);
 
   const [districtRates, setDistrictRates] = useState<DistrictRate[]>([]);
 
@@ -221,22 +225,23 @@ export function Trips() {
         {!loading && (
           <div className="overflow-hidden rounded-lg border border-ink-700 bg-ink-900">
             <div className="ti-scroll overflow-x-auto">
-              <table className="w-full min-w-[820px] text-left text-sm">
+              <table className="w-full min-w-[950px] text-left text-sm">
                 <thead>
                   <tr className="border-b border-ink-700 bg-ink-950 text-xs uppercase tracking-[0.08em] text-neutral-500">
-                    <th className="px-4 py-3 font-medium">Trip</th>
+                    <th className="px-4 py-3 font-medium">Trip ID</th>
                     <th className="px-4 py-3 font-medium">Lorry / Driver</th>
-                    <th className="px-4 py-3 font-medium">Route</th>
-                    <th className="px-4 py-3 font-medium">Sqft</th>
-                    <th className="px-4 py-3 text-right font-medium">Revenue</th>
+                    <th className="px-4 py-3 font-medium">Outbound Leg</th>
+                    <th className="px-4 py-3 font-medium">Return Leg &amp; Cargo</th>
+                    <th className="px-4 py-3 text-right font-medium">Total Rev</th>
                     <th className="px-4 py-3 text-right font-medium">Pending</th>
-                    <th className="px-4 py-3 font-medium">Status</th>
+                    <th className="px-4 py-3 font-medium">Journey Stage</th>
+                    <th className="px-4 py-3 text-center font-medium">Audit &amp; Details</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredTrips.length === 0 && (
                     <tr>
-                      <td colSpan={7} className="px-4 py-10 text-center text-sm text-neutral-500">
+                      <td colSpan={8} className="px-4 py-10 text-center text-sm text-neutral-500">
                         No trips match the active filters or found in the database.
                       </td>
                     </tr>
@@ -245,6 +250,9 @@ export function Trips() {
                     const lorry = lorries.find((l) => l.id === trip.lorryId);
                     const driver = drivers.find((d) => d.id === trip.driverId);
                     const dest = unloadingParties.find((p) => p.id === trip.unloadingPartyId);
+                    const isSand = trip.returnPlan === 'sand_return' || !!trip.returnSandLoad;
+                    const isDirect = trip.returnPlan === 'direct_return' || !!trip.directReturnDetails;
+
                     return (
                       <motion.tr
                         key={trip.id}
@@ -256,31 +264,73 @@ export function Trips() {
                         <td className="px-4 py-4">
                           <Link
                             to={`/trips/${trip.id}`}
-                            className="font-semibold text-white hover:text-gold"
+                            className="font-bold text-white hover:text-gold flex items-center gap-1.5 font-mono"
                           >
                             {trip.code}
                           </Link>
                           <p className="text-xs text-neutral-600">{trip.date}</p>
                         </td>
                         <td className="px-4 py-4">
-                          <p className="text-white">{lorry?.plate ?? trip.lorryId}</p>
+                          <p className="text-white font-medium font-mono">{lorry?.plate ?? trip.lorryId}</p>
                           <p className="text-xs text-neutral-500">{driver?.name ?? trip.driverId}</p>
                         </td>
                         <td className="px-4 py-4 text-neutral-400">
-                          {trip.origin} → {dest?.name ?? trip.unloadingPartyId}
-                          <p className="text-xs text-neutral-600">{dest?.district}</p>
+                          <span className="text-white font-medium">{trip.origin} → {dest?.district || 'Kerala'}</span>
+                          <p className="text-xs text-neutral-600">{tripSqft(trip).toLocaleString('en-IN')} sqft stone</p>
                         </td>
-                        <td className="px-4 py-4 text-neutral-300">
-                          {tripSqft(trip).toLocaleString('en-IN')}
+                        <td className="px-4 py-4">
+                          {isSand ? (
+                            <div>
+                              <span className="text-xs font-bold text-orange-300">
+                                {trip.returnSandLoad?.loadingLocation || 'Mangalore'} → L&amp;T Factory
+                              </span>
+                              <p className="text-[11px] text-neutral-400 font-mono">
+                                Sand: {trip.returnSandLoad?.weightTons || 24.5} Ton
+                              </p>
+                            </div>
+                          ) : isDirect ? (
+                            <div>
+                              <span className="text-xs font-semibold text-blue-300">
+                                Kerala → Kadapa Base
+                              </span>
+                              <p className="text-[11px] text-neutral-500 font-mono">
+                                Direct Return (Empty)
+                              </p>
+                            </div>
+                          ) : (
+                            <span className="text-xs text-neutral-500 italic">
+                              Return Pending
+                            </span>
+                          )}
                         </td>
-                        <td className="px-4 py-4 text-right font-semibold text-gold">
-                          {formatINR(getTripRevenue(trip))}
+                        <td className="px-4 py-4 text-right font-semibold text-gold font-mono">
+                          {formatINR(getTripRevenue(trip) + (trip.returnSandLoad ? (trip.returnSandLoad.weightTons * (trip.returnSandLoad.ratePerTon || 0)) : 0))}
                         </td>
-                        <td className="px-4 py-4 text-right text-neutral-350">
+                        <td className="px-4 py-4 text-right text-neutral-350 font-mono">
                           {getTripPending(trip) > 0 ? formatINR(getTripPending(trip)) : '—'}
                         </td>
                         <td className="px-4 py-4">
                           <TripStatusBadge status={trip.status} />
+                        </td>
+                        <td className="px-4 py-4 text-center">
+                          <div className="inline-flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => setPdfTrip(trip)}
+                              title="Print / Save Full Trip PDF Report"
+                              className="inline-flex items-center gap-1 rounded-lg bg-ink-800 border border-ink-700 px-2 py-1 text-xs font-bold text-neutral-300 hover:text-gold hover:border-gold/40 transition-all cursor-pointer"
+                            >
+                              <Printer className="h-3.5 w-3.5" />
+                              <span className="hidden sm:inline">PDF</span>
+                            </button>
+                            <Link
+                              to={`/trips/${trip.id}`}
+                              className="inline-flex items-center gap-1 rounded-lg bg-gold/10 border border-gold/30 px-2.5 py-1 text-xs font-bold text-gold hover:bg-gold/20 hover:scale-105 transition-all"
+                            >
+                              <ShieldCheck className="h-3.5 w-3.5" />
+                              <span>View &amp; Audit</span>
+                            </Link>
+                          </div>
                         </td>
                       </motion.tr>
                     );
@@ -351,6 +401,29 @@ export function Trips() {
           </div>
         )}
       </div>
+
+      {/* Kerala Unloading & Delivery Audit Modal */}
+      {auditingTrip && (
+        <KeralaDeliveryAuditModal
+          trip={auditingTrip}
+          isOpen={Boolean(auditingTrip)}
+          onClose={() => setAuditingTrip(null)}
+          onSuccess={fetchData}
+        />
+      )}
+
+      {/* Full Trip PDF Report Modal */}
+      {pdfTrip && (
+        <TripPdfReportModal
+          trip={pdfTrip}
+          isOpen={Boolean(pdfTrip)}
+          onClose={() => setPdfTrip(null)}
+          lorries={lorries}
+          drivers={drivers}
+          unloadingParties={unloadingParties}
+          districtRates={districtRates}
+        />
+      )}
     </div>
   );
 }

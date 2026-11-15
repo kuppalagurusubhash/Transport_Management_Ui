@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 
-const WS_URL = import.meta.env.VITE_WS_URL || `http://${window.location.hostname}:9090`;
+const RAW_WS_URL = import.meta.env.VITE_WS_URL || 'https://transport-management-backend-xmzn.onrender.com';
+const WS_URL = RAW_WS_URL.replace(/\/+$/, '');
 
 export type SocketEventHandlers = {
   onOrderCreated?: (data: unknown) => void;
@@ -17,7 +18,7 @@ export function useSocket(handlers: SocketEventHandlers = {}) {
 
   useEffect(() => {
     const socket = io(WS_URL, {
-      transports: ['websocket'],
+      transports: ['websocket', 'polling'],
       reconnectionAttempts: 5
     });
 

@@ -26,9 +26,9 @@ export function Login() {
     const checkBackend = async () => {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 2500);
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
         
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:9090/api';
+        const apiUrl = (import.meta.env.VITE_API_URL || 'https://transport-management-backend-xmzn.onrender.com/api').replace(/\/+$/, '');
         await fetch(`${apiUrl}/drivers`, { 
           method: 'GET',
           signal: controller.signal 
@@ -70,10 +70,7 @@ export function Login() {
         
         await syncDatabase().catch(() => {});
 
-        if (role === 'driver') navigate('/driver');
-        else if (role === 'loading') navigate('/loading');
-        else if (role === 'buyer') navigate('/buyer');
-        else navigate('/');
+        navigate('/');
       } else {
         setError(res.message || 'Login failed. Please check credentials.');
         setLoading(false);

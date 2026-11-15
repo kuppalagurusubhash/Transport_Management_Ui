@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeftIcon, Filter, Calendar, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeftIcon, Filter, Calendar, X, ChevronLeft, ChevronRight, Download, FileText } from 'lucide-react';
 import { formatINR } from '../utils/helpers';
 import { useOrders } from '../store/OrdersContext';
 import { PageHeader } from '../components/layout/PageHeader';
 import { Card, SectionLabel } from '../components/ui/Card';
 import { LoadingPartyModal } from '../components/ui/LoadingPartyModal';
+import { PartyStatementModal } from '../components/ui/PartyStatementModal';
+import { ledgerApi } from '../api';
 import { type Trip } from '../data/types';
 
 export function LoadingPartyDetail() {
@@ -14,6 +16,7 @@ export function LoadingPartyDetail() {
   const party = loadingParties.find(p => p.id === partyId);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLumpSumModalOpen, setIsLumpSumModalOpen] = useState(false);
+  const [isStatementModalOpen, setIsStatementModalOpen] = useState(false);
   const [lumpSumAmount, setLumpSumAmount] = useState('');
   const [lumpSumMode, setLumpSumMode] = useState<'cash' | 'phonepe' | 'bank_transfer' | 'unspecified'>('phonepe');
 
@@ -312,20 +315,30 @@ export function LoadingPartyDetail() {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsStatementModalOpen(true)}
+                className="rounded-md border border-ink-700 bg-ink-950 px-3.5 py-1.5 text-xs font-semibold text-neutral-350 transition-colors hover:border-gold hover:text-gold flex items-center gap-1.5"
+              >
+                <FileText className="h-3.5 w-3.5 text-gold" />
+                Ledger Statement
+              </button>
+              <a
+                href={ledgerApi.getStatementPdfUrl(party.id, { role: 'supplier' })}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-md bg-gold px-3.5 py-1.5 text-xs font-bold text-ink-950 transition-colors hover:bg-gold-400 flex items-center gap-1.5 shadow-md"
+              >
+                <Download className="h-3.5 w-3.5" />
+                Statement PDF
+              </a>
               {party.pending > 0 && (
                 <button
                   onClick={() => setIsLumpSumModalOpen(true)}
-                  className="rounded-md bg-gold px-3.5 py-1.5 text-xs font-bold text-ink-950 transition-colors hover:bg-gold-400 flex items-center gap-1.5 shadow-md"
+                  className="rounded-md bg-ink-800 px-3.5 py-1.5 text-xs font-semibold text-neutral-300 transition-colors hover:bg-ink-700 flex items-center gap-1.5"
                 >
-                  Settle Balance (Lump-Sum)
+                  Settle Balance
                 </button>
               )}
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="rounded-md border border-ink-700 bg-ink-950 px-3.5 py-1.5 text-xs font-semibold text-neutral-350 transition-colors hover:border-gold hover:text-gold"
-              >
-                Edit Quarry
-              </button>
             </div>
           </div>
         }
@@ -784,6 +797,17 @@ export function LoadingPartyDetail() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Authoritative Party Statement Modal */}
+      {isStatementModalOpen && party && (
+        <PartyStatementModal
+          isOpen={isStatementModalOpen}
+          onClose={() => setIsStatementModalOpen(false)}
+          partyId={party.id}
+          partyName={party.name}
+          role="supplier"
+        />
       )}
     </div>
   );

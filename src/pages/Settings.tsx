@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   UserIcon, 
@@ -10,19 +11,33 @@ import {
   CheckCircle2Icon, 
   AlertCircleIcon, 
   ShieldAlertIcon, 
-  ActivityIcon,
-  BellIcon,
-  GlobeIcon
+  WalletCardsIcon,
+  PlusIcon,
+  CoinsIcon
 } from 'lucide-react';
 import { authApi } from '../api/index';
+import { useOrders } from '../store/OrdersContext';
+import { districts } from '../utils/helpers';
+import type { DistrictRate } from '../data/types';
+import { AddDistrictRateModal } from '../components/ui/AddDistrictRateModal';
 
 export function Settings() {
-  const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'preferences'>('profile');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState<'profile' | 'pricing' | 'security' | 'preferences'>(
+    (searchParams.get('tab') as any) || 'pricing'
+  );
   
   // Feedback Messages
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Orders Context for Rates & Pricing
+  const { districtRates, updateDistrictRate, stoneSpecs } = useOrders();
+  const [rates, setRates] = useState<DistrictRate[]>([]);
+  const [isRatesModified, setIsRatesModified] = useState(false);
+  const [isSavingRates, setIsSavingRates] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   // Profile Form States
   const [username, setUsername] = useState('');
@@ -44,6 +59,24 @@ export function Settings() {
   const [driverNotification, setDriverNotification] = useState(true);
   const [buyerNotification, setBuyerNotification] = useState(false);
   const [fuelAlertThreshold, setFuelAlertThreshold] = useState('15');
+
+  // Sync Rates from Context
+  useEffect(() => {
+    setRates(districtRates || []);
+  }, [districtRates]);
+
+  // Sync tab from URL
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab && ['profile', 'pricing', 'security', 'preferences'].includes(tab)) {
+      setActiveTab(tab as any);
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (tab: 'profile' | 'pricing' | 'security' | 'preferences') => {
+    setActiveTab(tab);
+    setSearchParams({ tab });
+  };
 
   // Load profile from server or fallback to localStorage
   useEffect(() => {
@@ -161,27 +194,111 @@ export function Settings() {
     localStorage.setItem('owner_driver_notifications', String(driverNotification));
     localStorage.setItem('owner_buyer_notifications', String(buyerNotification));
     localStorage.setItem('owner_fuel_threshold', fuelAlertThreshold);
-    triggerToast('success', 'Preferences saved successfully! Refresh page to apply formatting.');
+    triggerToast('success', 'System preferences saved locally!');
+  };
+
+  // ── Rates & Pricing Helpers ──────────────────────────────────────────────
+  const sellableSpecs = useMemo(() => {
+    return Array.from(
+      new Map(
+        districtRates.map((r) => [
+          `${r.size}-${r.thickness}-${r.finish}`,
+          { size: r.size, thickness: r.thickness, finish: r.finish }
+        ])
+      ).values()
+    );
+  }, [districtRates]);
+
+  const getRamapuramPrice = (size: string, thickness: string, finish: string) => {
+    const s = (stoneSpecs || []).find(
+      (spec) => spec.size === size && spec.thickness === thickness && spec.finish === finish
+    );
+    return s?.ratePerSqft ?? 0;
+  };
+
+  const rateFor = (
+    district: string,
+    size: string,
+    thickness: string,
+    finish: string
+  ) =>
+    rates.find(
+      (r) =>
+        r.district === district &&
+        r.size === size &&
+        r.thickness === thickness &&
+        r.finish === finish
+    );
+
+  const updateRate = (id: string, value: number) => {
+    setRates((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, ratePerSqft: value } : r))
+    );
+    setIsRatesModified(true);
+  };
+
+  const handleSaveRates = async () => {
+    setIsSavingRates(true);
+    try {
+      const modified = rates.filter((r) => {
+        const original = districtRates.find((orig) => orig.id === r.id);
+        return original && original.ratePerSqft !== r.ratePerSqft;
+      });
+
+      for (const r of modified) {
+        await updateDistrictRate(r.id, r.ratePerSqft);
+      }
+      setIsRatesModified(false);
+      triggerToast('success', 'District & Ramapuram rates updated successfully!');
+    } catch (err) {
+      console.error('Failed to save district rates:', err);
+      triggerToast('error', 'Failed to save rate updates.');
+    } finally {
+      setIsSavingRates(false);
+    }
   };
 
   return (
-    <div className="flex h-full min-w-0 flex-col bg-ink-900 font-sans">
-      {/* Header */}
+    <div className="min-h-full flex flex-col">
+      {/* Page Header */}
       <header className="border-b border-ink-700 bg-ink-950 px-6 py-5 sm:px-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-extrabold tracking-tight text-white sm:text-[28px]">
-              Settings
+              Settings &amp; Configuration
             </h1>
-            <p className="mt-0.5 text-sm text-neutral-500">
-              Manage your owner profile, account credentials, and system configurations
+            <p className="mt-0.5 text-sm text-neutral-400">
+              Manage quarry procurement rates, Kerala district selling prices, user profile, security, and portal preferences
             </p>
           </div>
+
+          {activeTab === 'pricing' && (
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setIsAddModalOpen(true)}
+                className="inline-flex items-center gap-2 rounded-xl bg-gold px-4 py-2 text-xs font-bold text-ink-950 transition-all hover:bg-gold-400 shadow-md cursor-pointer"
+              >
+                <PlusIcon className="h-4 w-4" /> Add District Rate
+              </button>
+              {isRatesModified && (
+                <button
+                  type="button"
+                  onClick={handleSaveRates}
+                  disabled={isSavingRates}
+                  className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 px-4 py-2 text-xs font-bold text-ink-950 transition-all shadow-md disabled:opacity-50 cursor-pointer"
+                >
+                  <SaveIcon className="h-4 w-4" />
+                  {isSavingRates ? 'Saving Rates...' : 'Save Rate Changes'}
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </header>
 
       {/* Main Settings Container */}
-      <div className="ti-scroll flex-1 overflow-y-auto p-6 sm:p-8 max-w-4xl space-y-6">
+      <div className="ti-scroll flex-1 overflow-y-auto p-6 sm:p-8 space-y-6">
         
         {/* Toast Alerts */}
         <AnimatePresence mode="wait">
@@ -190,7 +307,7 @@ export function Settings() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-300 flex items-center gap-2.5"
+              className="rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-300 flex items-center gap-2.5 max-w-4xl"
             >
               <CheckCircle2Icon className="h-5 w-5 text-green-400 shrink-0" />
               <span>{successMsg}</span>
@@ -202,7 +319,7 @@ export function Settings() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300 flex items-center gap-2.5"
+              className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300 flex items-center gap-2.5 max-w-4xl"
             >
               <AlertCircleIcon className="h-5 w-5 text-red-400 shrink-0" />
               <span>{errorMsg}</span>
@@ -211,12 +328,24 @@ export function Settings() {
         </AnimatePresence>
 
         {/* Settings Tab Selectors */}
-        <div className="flex border-b border-ink-800 gap-2 overflow-x-auto pb-px">
+        <div className="flex border-b border-ink-800 gap-2 overflow-x-auto pb-px max-w-6xl">
           <button
-            onClick={() => setActiveTab('profile')}
-            className={`flex items-center gap-2 px-4 py-2.5 border-b-2 text-sm font-semibold transition-all shrink-0 ${
+            onClick={() => handleTabChange('pricing')}
+            className={`flex items-center gap-2 px-4 py-2.5 border-b-2 text-sm font-semibold transition-all shrink-0 cursor-pointer ${
+              activeTab === 'pricing'
+                ? 'border-gold text-gold bg-gold/10 rounded-t-lg'
+                : 'border-transparent text-neutral-400 hover:text-white hover:bg-ink-850/50'
+            }`}
+          >
+            <WalletCardsIcon className="h-4 w-4" />
+            Rates &amp; Pricing Matrix
+          </button>
+
+          <button
+            onClick={() => handleTabChange('profile')}
+            className={`flex items-center gap-2 px-4 py-2.5 border-b-2 text-sm font-semibold transition-all shrink-0 cursor-pointer ${
               activeTab === 'profile'
-                ? 'border-gold text-gold bg-gold/5'
+                ? 'border-gold text-gold bg-gold/10 rounded-t-lg'
                 : 'border-transparent text-neutral-400 hover:text-white hover:bg-ink-850/50'
             }`}
           >
@@ -225,10 +354,10 @@ export function Settings() {
           </button>
           
           <button
-            onClick={() => setActiveTab('security')}
-            className={`flex items-center gap-2 px-4 py-2.5 border-b-2 text-sm font-semibold transition-all shrink-0 ${
+            onClick={() => handleTabChange('security')}
+            className={`flex items-center gap-2 px-4 py-2.5 border-b-2 text-sm font-semibold transition-all shrink-0 cursor-pointer ${
               activeTab === 'security'
-                ? 'border-gold text-gold bg-gold/5'
+                ? 'border-gold text-gold bg-gold/10 rounded-t-lg'
                 : 'border-transparent text-neutral-400 hover:text-white hover:bg-ink-850/50'
             }`}
           >
@@ -237,10 +366,10 @@ export function Settings() {
           </button>
           
           <button
-            onClick={() => setActiveTab('preferences')}
-            className={`flex items-center gap-2 px-4 py-2.5 border-b-2 text-sm font-semibold transition-all shrink-0 ${
+            onClick={() => handleTabChange('preferences')}
+            className={`flex items-center gap-2 px-4 py-2.5 border-b-2 text-sm font-semibold transition-all shrink-0 cursor-pointer ${
               activeTab === 'preferences'
-                ? 'border-gold text-gold bg-gold/5'
+                ? 'border-gold text-gold bg-gold/10 rounded-t-lg'
                 : 'border-transparent text-neutral-400 hover:text-white hover:bg-ink-850/50'
             }`}
           >
@@ -250,252 +379,374 @@ export function Settings() {
         </div>
 
         {/* Tab Contents */}
-        <div className="bg-ink-950/40 rounded-xl border border-ink-800 p-6 backdrop-blur-md">
+        <div className="pt-2">
+
+          {/* ═════════════════════════════════════════════════════════════════════ */}
+          {/* TAB: RATES & PRICING MATRIX                                         */}
+          {/* ═════════════════════════════════════════════════════════════════════ */}
+          {activeTab === 'pricing' && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-6"
+            >
+              {/* Architecture Explanation Banner */}
+              <div className="rounded-2xl border border-gold/30 bg-gold/5 p-4 flex flex-wrap items-center justify-between gap-4 max-w-6xl shadow-inner">
+                <div className="space-y-1">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-gold flex items-center gap-2">
+                    <CoinsIcon className="h-4 w-4" />
+                    Ramapuram Procurement vs Kerala Destination Rate Matrix
+                  </h4>
+                  <p className="text-xs text-neutral-300 leading-relaxed">
+                    <strong className="text-amber-400">Our Base Cost (Ramapuram Quarry):</strong> Procurement purchase cost per sqft at the Kadapa quarry yard.
+                    <br />
+                    <strong className="text-emerald-400">District Order Price:</strong> Selling rate automatically billed to buyers when orders are created for Kerala districts.
+                  </p>
+                </div>
+                <div className="flex items-center gap-3 text-xs">
+                  <div className="rounded-xl bg-ink-950/80 border border-white/10 px-3.5 py-2 text-center">
+                    <span className="text-[10px] text-neutral-400 block uppercase font-medium">Base Quarry</span>
+                    <span className="font-mono font-bold text-amber-400">Ramapuram, Kadapa</span>
+                  </div>
+                  <div className="rounded-xl bg-ink-950/80 border border-white/10 px-3.5 py-2 text-center">
+                    <span className="text-[10px] text-neutral-400 block uppercase font-medium">Destinations</span>
+                    <span className="font-mono font-bold text-emerald-400">14 Kerala Districts</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Matrix Table Card */}
+              <div className="overflow-hidden rounded-2xl border border-ink-700 bg-ink-900/60 shadow-xl max-w-6xl">
+                <div className="ti-scroll overflow-x-auto">
+                  <table className="w-full min-w-[840px] text-left text-sm">
+                    <thead>
+                      <tr className="border-b border-ink-700 bg-ink-950 text-xs uppercase tracking-[0.08em] text-neutral-400">
+                        <th className="sticky left-0 z-10 bg-ink-950 px-4 py-3.5 font-bold text-white">
+                          Stone Specification
+                        </th>
+                        <th className="px-4 py-3.5 font-black text-amber-400 border-r border-ink-800 bg-amber-500/10 text-right">
+                          Procurement Rate (Ramapuram)
+                        </th>
+                        {districts.map((d) => (
+                          <th key={d} className="px-4 py-3.5 text-right font-semibold text-neutral-300">
+                            {d}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-ink-800 font-mono text-xs">
+                      {sellableSpecs.map((spec) => {
+                        const ramapuramRate = getRamapuramPrice(spec.size, spec.thickness, spec.finish);
+
+                        return (
+                          <tr
+                            key={`${spec.size}-${spec.thickness}-${spec.finish}`}
+                            className="transition-colors hover:bg-ink-800/40"
+                          >
+                            <td className="sticky left-0 z-10 bg-ink-900 px-4 py-3 font-sans font-medium text-white border-r border-ink-800">
+                              <span className="font-bold">{spec.size}</span>
+                              <span className="text-neutral-400 ml-1">({spec.thickness})</span>
+                              <span className="ml-2 rounded bg-ink-800 px-1.5 py-0.5 text-[10px] uppercase text-neutral-300 font-semibold">
+                                {spec.finish}
+                              </span>
+                            </td>
+
+                            <td className="px-4 py-3 text-right font-bold text-amber-400 border-r border-ink-800 bg-amber-500/5">
+                              ₹{ramapuramRate.toFixed(2)}/sqft
+                            </td>
+
+                            {districts.map((d) => {
+                              const r = rateFor(d, spec.size, spec.thickness, spec.finish);
+
+                              return (
+                                <td key={d} className="px-3 py-2 text-right">
+                                  {r ? (
+                                    <div className="flex items-center justify-end gap-1">
+                                      <span className="text-neutral-500 font-mono text-[11px]">₹</span>
+                                      <input
+                                        type="number"
+                                        step="0.5"
+                                        value={r.ratePerSqft}
+                                        onChange={(e) => updateRate(r.id, parseFloat(e.target.value) || 0)}
+                                        className="w-16 rounded border border-ink-700 bg-ink-950 px-2 py-1 text-right font-mono text-xs text-white focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold transition-all"
+                                      />
+                                    </div>
+                                  ) : (
+                                    <span className="text-neutral-600">—</span>
+                                  )}
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {isRatesModified && (
+                  <div className="p-3 bg-amber-500/10 border-t border-amber-500/30 flex items-center justify-between text-xs text-amber-300">
+                    <span>⚠️ You have unsaved rate adjustments.</span>
+                    <button
+                      type="button"
+                      onClick={handleSaveRates}
+                      disabled={isSavingRates}
+                      className="rounded-lg bg-gold hover:bg-gold-400 text-ink-950 font-bold px-3 py-1 text-xs transition-all cursor-pointer"
+                    >
+                      {isSavingRates ? 'Saving...' : 'Apply & Save Rate Changes'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+
+          {/* ═════════════════════════════════════════════════════════════════════ */}
+          {/* TAB: PROFILE SETTINGS                                               */}
+          {/* ═════════════════════════════════════════════════════════════════════ */}
           {activeTab === 'profile' && (
             <motion.form
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               onSubmit={handleUpdateProfile}
-              className="space-y-6"
+              className="rounded-2xl border border-ink-700 bg-ink-900/60 p-6 space-y-6 max-w-3xl shadow-xl"
             >
-              <div className="border-b border-ink-800 pb-3">
-                <h3 className="text-base font-bold text-white">Owner Profile Information</h3>
-                <p className="text-xs text-neutral-500 mt-0.5">
+              <div>
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <UserIcon className="h-5 w-5 text-gold" />
+                  Owner Profile Details
+                </h3>
+                <p className="text-xs text-neutral-400 mt-1">
                   Update your contact info and personal settings visible to other portal entities.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="space-y-1">
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-400">
-                    Username / Login Email
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-400 mb-1.5">
+                    Username (Login Identifier)
                   </label>
                   <input
                     type="text"
                     disabled
                     value={username}
-                    className="w-full rounded-lg border border-ink-700 bg-ink-900/60 py-2 px-3 text-sm text-neutral-400 cursor-not-allowed outline-none"
+                    className="w-full rounded-lg border border-ink-800 bg-ink-950/80 py-2.5 px-3 text-sm text-neutral-500 cursor-not-allowed"
                   />
-                  <p className="text-[10px] text-neutral-600">Username cannot be changed as it uniquely identifies your account.</p>
+                  <span className="text-[10px] text-neutral-600">Fixed system account name.</span>
                 </div>
 
-                <div className="space-y-1">
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-400">
-                    System Role
-                  </label>
-                  <div className="w-full flex items-center justify-between rounded-lg border border-ink-700 bg-ink-900/60 py-2 px-3">
-                    <span className="text-sm font-bold text-neutral-300 uppercase tracking-wide">
-                      {userRole}
-                    </span>
-                    <span className="rounded bg-gold/10 text-gold px-2 py-0.5 text-[10px] font-black uppercase border border-gold/20">
-                      Primary Admin
-                    </span>
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-400">
-                    Full Name <span className="text-red-500">*</span>
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-400 mb-1.5">
+                    Account Role
                   </label>
                   <input
                     type="text"
-                    required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Enter your full name"
-                    className="w-full rounded-lg border border-ink-700 bg-ink-950/40 py-2 px-3 text-sm text-white placeholder-neutral-600 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold transition-all"
+                    disabled
+                    value={userRole.toUpperCase()}
+                    className="w-full rounded-lg border border-ink-800 bg-ink-950/80 py-2.5 px-3 text-sm text-gold font-bold cursor-not-allowed"
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-400">
-                    Contact Phone Number
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                    Display / Full Name
+                  </label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    placeholder="Sri Sai Baba Owner"
+                    className="w-full rounded-lg border border-ink-700 bg-ink-950/40 py-2.5 px-3 text-sm text-white focus:border-gold focus:outline-none transition-colors"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                    Contact Phone (WhatsApp)
                   </label>
                   <input
                     type="text"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+91 XXXXX XXXXX"
-                    className="w-full rounded-lg border border-ink-700 bg-ink-950/40 py-2 px-3 text-sm text-white placeholder-neutral-600 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold transition-all"
+                    placeholder="+91 98480 22338"
+                    className="w-full rounded-lg border border-ink-700 bg-ink-950/40 py-2.5 px-3 text-sm text-white focus:border-gold focus:outline-none transition-colors font-mono"
                   />
                 </div>
               </div>
 
-              <div className="flex justify-end pt-3">
+              <div className="flex justify-end pt-3 border-t border-ink-800">
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex items-center gap-2 rounded-lg bg-gold hover:opacity-90 active:scale-[0.98] text-ink-950 py-2 px-4 text-xs font-extrabold transition-all disabled:opacity-50"
+                  className="flex items-center gap-2 rounded-xl bg-gold hover:opacity-90 active:scale-[0.98] text-ink-950 py-2.5 px-5 text-xs font-extrabold transition-all shadow-md disabled:opacity-50 cursor-pointer"
                 >
                   <SaveIcon className="h-4 w-4" />
-                  {loading ? 'Saving...' : 'Save Profile Details'}
+                  {loading ? 'Saving Profile...' : 'Save Profile Changes'}
                 </button>
               </div>
             </motion.form>
           )}
 
+          {/* ═════════════════════════════════════════════════════════════════════ */}
+          {/* TAB: PASSWORD & SECURITY                                            */}
+          {/* ═════════════════════════════════════════════════════════════════════ */}
           {activeTab === 'security' && (
             <motion.form
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               onSubmit={handlePasswordChange}
-              className="space-y-6"
+              className="rounded-2xl border border-ink-700 bg-ink-900/60 p-6 space-y-6 max-w-3xl shadow-xl"
             >
-              <div className="border-b border-ink-800 pb-3 flex items-center justify-between">
-                <div>
-                  <h3 className="text-base font-bold text-white">Password &amp; Access Control</h3>
-                  <p className="text-xs text-neutral-500 mt-0.5">
-                    Maintain secure access parameters for your transport control dashboard.
-                  </p>
-                </div>
-                <ShieldAlertIcon className="h-7 w-7 text-amber-500/80 shrink-0" />
+              <div>
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <LockIcon className="h-5 w-5 text-gold" />
+                  Update Credentials &amp; Security Key
+                </h3>
+                <p className="text-xs text-neutral-400 mt-1">
+                  Ensure strong passwords containing numbers and symbols to secure owner dashboard functions.
+                </p>
               </div>
 
-              <div className="space-y-4 max-w-md">
-                <div className="space-y-1">
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-400">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
                     Current Password
                   </label>
                   <div className="relative">
                     <input
                       type={showCurrent ? 'text' : 'password'}
-                      required
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
+                      required
                       placeholder="••••••••"
-                      className="w-full rounded-lg border border-ink-700 bg-ink-950/40 py-2 pl-3 pr-10 text-sm text-white placeholder-neutral-600 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold transition-all"
+                      className="w-full rounded-lg border border-ink-700 bg-ink-950/40 py-2.5 px-3 pr-10 text-sm text-white focus:border-gold focus:outline-none"
                     />
                     <button
                       type="button"
                       onClick={() => setShowCurrent(!showCurrent)}
-                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-neutral-500 hover:text-neutral-300"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white"
                     >
                       {showCurrent ? <EyeOffIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
                     </button>
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-400">
-                    New Password
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showNew ? 'text' : 'password'}
-                      required
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className="w-full rounded-lg border border-ink-700 bg-ink-950/40 py-2 pl-3 pr-10 text-sm text-white placeholder-neutral-600 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold transition-all"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowNew(!showNew)}
-                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-neutral-500 hover:text-neutral-300"
-                    >
-                      {showNew ? <EyeOffIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
-                    </button>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                      New Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showNew ? 'text' : 'password'}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        required
+                        placeholder="••••••••"
+                        className="w-full rounded-lg border border-ink-700 bg-ink-950/40 py-2.5 px-3 pr-10 text-sm text-white focus:border-gold focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNew(!showNew)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white"
+                      >
+                        {showNew ? <EyeOffIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
+                      </button>
+                    </div>
                   </div>
-                </div>
 
-                <div className="space-y-1">
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-400">
-                    Confirm New Password
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showConfirm ? 'text' : 'password'}
-                      required
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className="w-full rounded-lg border border-ink-700 bg-ink-950/40 py-2 pl-3 pr-10 text-sm text-white placeholder-neutral-600 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold transition-all"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirm(!showConfirm)}
-                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-neutral-500 hover:text-neutral-300"
-                    >
-                      {showConfirm ? <EyeOffIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
-                    </button>
+                  <div>
+                    <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                      Confirm New Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showConfirm ? 'text' : 'password'}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                        placeholder="••••••••"
+                        className="w-full rounded-lg border border-ink-700 bg-ink-950/40 py-2.5 px-3 pr-10 text-sm text-white focus:border-gold focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirm(!showConfirm)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white"
+                      >
+                        {showConfirm ? <EyeOffIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="flex justify-end pt-3">
+              <div className="flex justify-end pt-3 border-t border-ink-800">
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex items-center gap-2 rounded-lg bg-gold hover:opacity-90 active:scale-[0.98] text-ink-950 py-2 px-4 text-xs font-extrabold transition-all disabled:opacity-50"
+                  className="flex items-center gap-2 rounded-xl bg-gold hover:opacity-90 active:scale-[0.98] text-ink-950 py-2.5 px-5 text-xs font-extrabold transition-all shadow-md disabled:opacity-50 cursor-pointer"
                 >
-                  <LockIcon className="h-4 w-4" />
-                  {loading ? 'Changing...' : 'Change Account Password'}
+                  <ShieldAlertIcon className="h-4 w-4" />
+                  {loading ? 'Changing Password...' : 'Change Password'}
                 </button>
               </div>
             </motion.form>
           )}
 
+          {/* ═════════════════════════════════════════════════════════════════════ */}
+          {/* TAB: SYSTEM PREFERENCES                                             */}
+          {/* ═════════════════════════════════════════════════════════════════════ */}
           {activeTab === 'preferences' && (
             <motion.form
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               onSubmit={handleSavePreferences}
-              className="space-y-6"
+              className="rounded-2xl border border-ink-700 bg-ink-900/60 p-6 space-y-6 max-w-3xl shadow-xl"
             >
-              <div className="border-b border-ink-800 pb-3">
-                <h3 className="text-base font-bold text-white">System Defaults &amp; Rules</h3>
-                <p className="text-xs text-neutral-500 mt-0.5">
+              <div>
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <SlidersIcon className="h-5 w-5 text-gold" />
+                  Logistics &amp; Operational Preferences
+                </h3>
+                <p className="text-xs text-neutral-400 mt-1">
                   Customize fallback rates, formatting symbols, alert thresholds, and automation settings.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                {/* Visual Settings Group */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2.5 text-xs font-bold uppercase tracking-wider text-gold">
-                    <GlobeIcon className="h-4 w-4 shrink-0" />
-                    Localization &amp; Interface
-                  </div>
-                  
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-semibold text-neutral-400">
-                      Standard Currency Symbol
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-neutral-400 mb-1.5">
+                      Default Currency Display
                     </label>
                     <select
                       value={currency}
                       onChange={(e) => setCurrency(e.target.value)}
-                      className="w-full rounded-lg border border-ink-700 bg-ink-900 py-2 px-2.5 text-sm text-white focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold"
+                      className="w-full rounded-lg border border-ink-700 bg-ink-950/40 py-2.5 px-3 text-sm text-white focus:border-gold focus:outline-none"
                     >
-                      <option value="₹">Indian Rupee (₹)</option>
-                      <option value="$">US Dollar ($)</option>
-                      <option value="€">Euro (€)</option>
+                      <option value="₹">INR (₹) - Indian Rupee</option>
+                      <option value="$">USD ($) - US Dollar</option>
+                      <option value="AED">AED (د.إ) - UAE Dirham</option>
                     </select>
                   </div>
 
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-semibold text-neutral-400">
-                      Default Trip Status After Creation
+                  <div>
+                    <label className="block text-xs font-semibold text-neutral-400 mb-1.5">
+                      New Assignment Default Status
                     </label>
                     <select
                       value={defaultTripStatus}
                       onChange={(e) => setDefaultTripStatus(e.target.value)}
-                      className="w-full rounded-lg border border-ink-700 bg-ink-900 py-2 px-2.5 text-sm text-white focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold"
+                      className="w-full rounded-lg border border-ink-700 bg-ink-950/40 py-2.5 px-3 text-sm text-white focus:border-gold focus:outline-none"
                     >
-                      <option value="loading">Loading (default)</option>
-                      <option value="in-transit">In Transit</option>
-                      <option value="scheduled">Scheduled / Dispatch pending</option>
+                      <option value="loading">Loading Stage (Quarry)</option>
+                      <option value="in-transit">In-Transit (Dispatched)</option>
                     </select>
                   </div>
                 </div>
 
-                {/* Operations & Automation */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2.5 text-xs font-bold uppercase tracking-wider text-gold">
-                    <ActivityIcon className="h-4 w-4 shrink-0" />
-                    System Rules &amp; Thresholds
-                  </div>
-                  
+                <div className="border-t border-ink-800 pt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="block text-xs font-semibold text-neutral-400">
                       Low Fuel Warning Level (%)
@@ -508,12 +759,12 @@ export function Settings() {
                       onChange={(e) => setFuelAlertThreshold(e.target.value)}
                       className="w-full rounded-lg border border-ink-700 bg-ink-950/40 py-2 px-3 text-sm text-white focus:border-gold focus:outline-none"
                     />
-                    <p className="text-[10px] text-neutral-600">Triggers UI maintenance alert for fleets dropping below this level.</p>
+                    <p className="text-[10px] text-neutral-500">Triggers UI alert for vehicles dropping below this percentage.</p>
                   </div>
 
                   <div className="space-y-2">
                     <span className="block text-xs font-semibold text-neutral-400">
-                      Auto-Notifications &amp; Dispatches
+                      Auto-Notifications &amp; WhatsApp Alerts
                     </span>
                     <div className="space-y-2 pt-1">
                       <label className="flex items-center gap-2.5 cursor-pointer select-none">
@@ -524,7 +775,7 @@ export function Settings() {
                           className="accent-gold h-4 w-4"
                         />
                         <span className="text-xs text-neutral-300">
-                          Notify driver when trip is dispatched
+                          Auto-notify driver via WhatsApp on trip dispatch
                         </span>
                       </label>
                       
@@ -536,7 +787,7 @@ export function Settings() {
                           className="accent-gold h-4 w-4"
                         />
                         <span className="text-xs text-neutral-300">
-                          Auto-email unloading buyer when lorry is en route
+                          Auto-notify buyer when vehicle is en-route
                         </span>
                       </label>
                     </div>
@@ -547,7 +798,7 @@ export function Settings() {
               <div className="flex justify-end pt-3 border-t border-ink-800">
                 <button
                   type="submit"
-                  className="flex items-center gap-2 rounded-lg bg-gold hover:opacity-90 active:scale-[0.98] text-ink-950 py-2 px-4 text-xs font-extrabold transition-all"
+                  className="flex items-center gap-2 rounded-xl bg-gold hover:opacity-90 active:scale-[0.98] text-ink-950 py-2.5 px-5 text-xs font-extrabold transition-all shadow-md cursor-pointer"
                 >
                   <SaveIcon className="h-4 w-4" />
                   Save System Preferences
@@ -558,6 +809,14 @@ export function Settings() {
         </div>
         
       </div>
+
+      {/* Add District Rate Modal */}
+      {isAddModalOpen && (
+        <AddDistrictRateModal
+          isOpen={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

@@ -16,9 +16,18 @@ import {
   type DistrictRate,
   type LoadingPartyPayment,
   type ExpenseCategory,
-  type ExpenseLine
+  type ExpenseLine,
+  type ReturnPlanType,
+  type ReturnSandLoad,
+  type ReturnSandUnload,
+  type DirectReturnDetails,
+  type VehicleReturnDetails,
+  type FinalTripAuditData,
+  type TripStatus
 } from '../data/types';
+import { mockLorries, mockDrivers } from '../data/mockData';
 import { ordersApi, tripsApi, lorriesApi, driversApi, notificationsApi, loadingPartiesApi, unloadingPartiesApi, stoneRatesApi, districtRatesApi } from '../api/index';
+
 interface OrdersContextValue {
   orders: Order[];
   notifications: AppNotification[];
@@ -49,6 +58,7 @@ interface OrdersContextValue {
   updateLorry: (id: string, updates: Partial<Lorry>) => void;
   addDriver: (driverData: Omit<Driver, 'id' | 'tripsCompleted'>) => void;
   updateDriver: (id: string, updates: Partial<Driver>) => void;
+  deleteDriver: (id: string, customToken?: string) => Promise<{ success: boolean; message?: string }>;
   addLoadingParty: (partyData: Omit<LoadingParty, 'id' | 'totalPurchased' | 'paid' | 'pending'> & { supervisorUsername?: string }) => void;
   updateLoadingParty: (id: string, updates: Partial<LoadingParty>) => void;
   deleteLoadingParty: (id: string) => void;
@@ -56,6 +66,23 @@ interface OrdersContextValue {
   addBatchExpensesToTrip: (tripId: string, expenses: Array<{ label: string; amount: number; category?: ExpenseCategory; receiptUrl?: string; notes?: string }>) => void;
   setExpenseReviewStatus: (tripId: string, expenseId: string, review: ExpenseReview) => void;
   updateTripPayments: (tripId: string, partyToDriverCash: number, partyToOwnerPhonePe: number, damagedPieces?: number, damageDeduction?: number) => void;
+  auditTripDelivery: (
+    tripId: string,
+    auditData: {
+      unloadingPartyId?: string;
+      unloadingLocation?: string;
+      unloadedPieces?: number;
+      damagedPieces?: number;
+      damageDeduction?: number;
+      shortageDeduction?: number;
+      partyToDriverCash?: number;
+      partyToOwnerPhonePe?: number;
+      auditNote?: string;
+      auditStatus?: 'pending_audit' | 'audited' | 'verified' | 'disputed';
+      auditedBy?: string;
+      markDelivered?: boolean;
+    }
+  ) => Promise<void>;
   updateLoadingPartyPayments: (tripId: string, payments: LoadingPartyPayment[]) => void;
   batchUpdateLoadingPartyPayments: (updates: { tripId: string; payments: LoadingPartyPayment[] }[]) => void;
   updateStoneRate: (id: string, rate: number) => void;
@@ -63,6 +90,12 @@ interface OrdersContextValue {
   addStoneRate: (stoneRateData: Omit<StoneSpec, 'id'>) => Promise<void>;
   addDistrictRate: (districtRateData: Omit<DistrictRate, 'id'>) => Promise<void>;
   completeTrip: (tripId: string) => void;
+  setReturnPlan: (tripId: string, plan: ReturnPlanType) => Promise<void>;
+  saveReturnSandLoading: (tripId: string, data: ReturnSandLoad) => Promise<void>;
+  saveReturnSandUnloading: (tripId: string, data: ReturnSandUnload) => Promise<void>;
+  saveDirectReturn: (tripId: string, data: DirectReturnDetails) => Promise<void>;
+  saveVehicleBaseReturn: (tripId: string, data: VehicleReturnDetails) => Promise<void>;
+  completeFinalTripAudit: (tripId: string, auditData: FinalTripAuditData) => Promise<void>;
   syncDatabase: () => Promise<void>;
 }
 
@@ -75,8 +108,8 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [trips, setTrips] = useState<Trip[]>([]);
-  const [lorries, setLorries] = useState<Lorry[]>([]);
-  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [lorries, setLorries] = useState<Lorry[]>(mockLorries);
+  const [drivers, setDrivers] = useState<Driver[]>(mockDrivers);
   const [loadingParties, setLoadingParties] = useState<LoadingParty[]>([]);
   const [unloadingParties, setUnloadingParties] = useState<UnloadingParty[]>([]);
   const [stoneSpecs, setStoneSpecs] = useState<StoneSpec[]>([]);
@@ -288,6 +321,17 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
     if (!order) return;
 
     setTrips((prev) => {
+      // Find latest previous trip for this driver/lorry to inherit carried forward cash float
+      const prevDriverTrip = prev.find(
+        (t) =>
+          (t.driverId === driverId || t.lorryId === lorryId) &&
+          (t.status === 'completed' || t.status === 'delivered' || t.status === 'returned_to_base' || !!t.finalAudit)
+      );
+      const openingBalance =
+        prevDriverTrip?.driverClosingBalanceForwarded ??
+        prevDriverTrip?.finalAudit?.driverClosingBalanceForwarded ??
+        0;
+
       const tripCode = `TRP-${1043 + prev.length}`;
       const newTrip: Trip = {
         id: `t-${Date.now()}`,
@@ -302,6 +346,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
         workerPayments: [],
         expenses: [],
         amountPaid: 0,
+        driverOpeningBalance: openingBalance,
         orderId
       };
 
@@ -670,6 +715,25 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const deleteDriver = useCallback(async (id: string, customToken?: string) => {
+    // 1. Unassign lorry from this driver in local state
+    setLorries((prev) =>
+      prev.map((l) => (l.driverId === id ? { ...l, driverId: null } : l))
+    );
+
+    // 2. Remove driver from local state
+    setDrivers((prev) => prev.filter((d) => d.id !== id));
+
+    // 3. Call backend API
+    try {
+      const res = await driversApi.delete(id, customToken);
+      return res;
+    } catch (err: any) {
+      console.warn('[OrdersContext] Backend driver delete error:', err.message);
+      throw err;
+    }
+  }, []);
+
   const addLoadingParty = useCallback((partyData: Omit<LoadingParty, 'id' | 'totalPurchased' | 'paid' | 'pending'> & { supervisorUsername?: string }) => {
     const partyId = `lp${Date.now()}`;
     const newParty: LoadingParty = {
@@ -968,6 +1032,136 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const auditTripDelivery = useCallback(async (
+    tripId: string,
+    auditData: {
+      unloadingPartyId?: string;
+      unloadingLocation?: string;
+      unloadedPieces?: number;
+      damagedPieces?: number;
+      damageDeduction?: number;
+      shortageDeduction?: number;
+      partyToDriverCash?: number;
+      partyToOwnerPhonePe?: number;
+      auditNote?: string;
+      auditStatus?: 'pending_audit' | 'audited' | 'verified' | 'disputed';
+      auditedBy?: string;
+      markDelivered?: boolean;
+    }
+  ) => {
+    let updatedTrip: Trip | null = null;
+    let orderIdToUpdate: string | undefined;
+    let nextTrips: Trip[] = [];
+
+    const cash = Number(auditData.partyToDriverCash || 0);
+    const phonepe = Number(auditData.partyToOwnerPhonePe || 0);
+    const totalCollected = cash + phonepe;
+    const damaged = Number(auditData.damagedPieces || 0);
+    const damageDed = Number(auditData.damageDeduction || 0);
+    const shortageDed = Number(auditData.shortageDeduction || 0);
+
+    setTrips((prev) => {
+      const updated = prev.map((t) => {
+        if (t.id !== tripId) return t;
+        orderIdToUpdate = t.orderId;
+
+        const newStatus = auditData.markDelivered 
+          ? (t.status === 'paid' ? 'paid' : 'delivered')
+          : t.status;
+
+        updatedTrip = {
+          ...t,
+          unloadingPartyId: auditData.unloadingPartyId || t.unloadingPartyId,
+          unloadingLocation: auditData.unloadingLocation || t.unloadingLocation,
+          unloadedPieces: auditData.unloadedPieces !== undefined ? auditData.unloadedPieces : t.unloadedPieces,
+          damagedPieces: damaged,
+          damageDeduction: damageDed,
+          shortageDeduction: shortageDed,
+          partyToDriverCash: cash,
+          partyToOwnerPhonePe: phonepe,
+          amountPaid: totalCollected,
+          auditNote: auditData.auditNote || t.auditNote,
+          auditStatus: auditData.auditStatus || 'audited',
+          auditedAt: new Date().toISOString(),
+          auditedBy: auditData.auditedBy || 'Admin Auditor',
+          status: newStatus
+        };
+        return updatedTrip;
+      });
+      nextTrips = updated;
+      return updated;
+    });
+
+    // Persist to backend database
+    if (updatedTrip) {
+      try {
+        await tripsApi.update(tripId, {
+          unloadingPartyId: (updatedTrip as Trip).unloadingPartyId,
+          unloadingLocation: (updatedTrip as Trip).unloadingLocation,
+          unloadedPieces: (updatedTrip as Trip).unloadedPieces,
+          damagedPieces: (updatedTrip as Trip).damagedPieces,
+          damageDeduction: (updatedTrip as Trip).damageDeduction,
+          shortageDeduction: (updatedTrip as Trip).shortageDeduction,
+          partyToDriverCash: (updatedTrip as Trip).partyToDriverCash,
+          partyToOwnerPhonePe: (updatedTrip as Trip).partyToOwnerPhonePe,
+          amountPaid: (updatedTrip as Trip).amountPaid,
+          auditNote: (updatedTrip as Trip).auditNote,
+          auditStatus: (updatedTrip as Trip).auditStatus,
+          auditedAt: (updatedTrip as Trip).auditedAt,
+          auditedBy: (updatedTrip as Trip).auditedBy,
+          status: (updatedTrip as Trip).status
+        });
+      } catch (err: any) {
+        console.warn('[OrdersContext Fallback] Could not persist delivery audit to database:', err.message);
+      }
+
+      // Add audit log notification for owner
+      const targetTrip = updatedTrip as Trip;
+      setNotifications((prev) => [
+        {
+          id: `notif-${Date.now()}`,
+          title: `Delivery Audit Saved: #${targetTrip.code}`,
+          body: `Unloaded in ${targetTrip.unloadingLocation || 'Kerala'} — ${targetTrip.unloadedPieces} sound pcs, ${targetTrip.damagedPieces || 0} damaged, ₹${(targetTrip.amountPaid || 0).toLocaleString('en-IN')} collected.`,
+          time: 'Just now',
+          read: false,
+          kind: 'payment'
+        },
+        ...prev
+      ]);
+    }
+
+    // Sync corresponding order if exists
+    if (orderIdToUpdate) {
+      const targetOrderId = orderIdToUpdate;
+      setOrders((prevOrders) =>
+        prevOrders.map((o) => {
+          if (o.id !== targetOrderId) return o;
+
+          const orderTrips = nextTrips.filter((t) => t.orderId === targetOrderId);
+          const totalOrderPaid = orderTrips.reduce((sum, t) => {
+            const c = t.id === tripId ? cash : (t.partyToDriverCash || 0);
+            const p = t.id === tripId ? phonepe : (t.partyToOwnerPhonePe || 0);
+            const d = t.id === tripId ? (damageDed + shortageDed) : ((t.damageDeduction || 0) + (t.shortageDeduction || 0));
+            return sum + c + p + d;
+          }, 0);
+
+          const isPaid = totalOrderPaid >= orderTotal(o);
+          const newOrderStatus: OrderStatus = isPaid ? 'paid' : o.status;
+
+          ordersApi.updateStatus(targetOrderId, newOrderStatus, totalOrderPaid).catch(err => {
+            console.warn('[OrdersContext Fallback] Could not update order payments/status on backend database:', err.message);
+          });
+
+          return {
+            ...o,
+            amountPaid: totalOrderPaid,
+            status: newOrderStatus
+          };
+        })
+      );
+    }
+  }, []);
+
   const updateLoadingPartyPayments = useCallback((tripId: string, payments: LoadingPartyPayment[]) => {
     let updatedTrip: Trip | null = null;
 
@@ -1131,6 +1325,151 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
     setNotifications((prev) => [notif, ...prev]);
   }, []);
 
+  const setReturnPlan = useCallback(async (tripId: string, plan: ReturnPlanType) => {
+    const nextStatus: TripStatus = plan === 'sand_return' ? 'return_sand_loading' : 'direct_return';
+    setTrips((prev) =>
+      prev.map((t) => {
+        if (t.id !== tripId) return t;
+        return {
+          ...t,
+          returnPlan: plan,
+          status: nextStatus
+        };
+      })
+    );
+    try {
+      await tripsApi.update(tripId, { returnPlan: plan, status: nextStatus });
+    } catch (err: any) {
+      console.warn('Could not update return plan:', err.message);
+    }
+  }, []);
+
+  const saveReturnSandLoading = useCallback(async (tripId: string, data: ReturnSandLoad) => {
+    setTrips((prev) =>
+      prev.map((t) => {
+        if (t.id !== tripId) return t;
+        return {
+          ...t,
+          returnSandLoad: data,
+          returnPlan: 'sand_return',
+          status: 'return_loaded'
+        };
+      })
+    );
+    try {
+      await tripsApi.update(tripId, { returnSandLoad: data, returnPlan: 'sand_return', status: 'return_loaded' });
+    } catch (err: any) {
+      console.warn('Could not update return sand load:', err.message);
+    }
+  }, []);
+
+  const saveReturnSandUnloading = useCallback(async (tripId: string, data: ReturnSandUnload) => {
+    setTrips((prev) =>
+      prev.map((t) => {
+        if (t.id !== tripId) return t;
+        return {
+          ...t,
+          returnSandUnload: data,
+          status: 'sand_unloaded'
+        };
+      })
+    );
+    try {
+      await tripsApi.update(tripId, { returnSandUnload: data, status: 'sand_unloaded' });
+    } catch (err: any) {
+      console.warn('Could not update return sand unload:', err.message);
+    }
+  }, []);
+
+  const saveDirectReturn = useCallback(async (tripId: string, data: DirectReturnDetails) => {
+    setTrips((prev) =>
+      prev.map((t) => {
+        if (t.id !== tripId) return t;
+        return {
+          ...t,
+          directReturnDetails: data,
+          returnPlan: 'direct_return',
+          status: 'direct_return'
+        };
+      })
+    );
+    try {
+      await tripsApi.update(tripId, { directReturnDetails: data, returnPlan: 'direct_return', status: 'direct_return' });
+    } catch (err: any) {
+      console.warn('Could not update direct return:', err.message);
+    }
+  }, []);
+
+  const saveVehicleBaseReturn = useCallback(async (tripId: string, data: VehicleReturnDetails) => {
+    setTrips((prev) =>
+      prev.map((t) => {
+        if (t.id !== tripId) return t;
+        return {
+          ...t,
+          vehicleReturnDetails: data,
+          status: 'returned_to_base'
+        };
+      })
+    );
+    try {
+      await tripsApi.update(tripId, { vehicleReturnDetails: data, status: 'returned_to_base' });
+    } catch (err: any) {
+      console.warn('Could not update vehicle base return:', err.message);
+    }
+  }, []);
+
+  const completeFinalTripAudit = useCallback(async (tripId: string, auditData: FinalTripAuditData) => {
+    let targetTrip: Trip | null = null;
+    setTrips((prev) =>
+      prev.map((t) => {
+        if (t.id !== tripId) return t;
+        setLorries((lorriesPrev) =>
+          lorriesPrev.map((l) => (l.id === t.lorryId ? { ...l, status: 'idle', location: 'Depot — Kadapa' } : l))
+        );
+        setDrivers((driversPrev) =>
+          driversPrev.map((d) => (d.id === t.driverId ? { ...d, status: 'idle' } : d))
+        );
+        targetTrip = {
+          ...t,
+          finalAudit: auditData,
+          status: 'completed',
+          completedDate: auditData.completedDate,
+          completedTime: auditData.completedTime,
+          completedBy: auditData.auditedBy || 'Owner'
+        };
+        return targetTrip;
+      })
+    );
+
+    try {
+      await tripsApi.update(tripId, {
+        finalAudit: auditData,
+        status: 'completed',
+        completedDate: auditData.completedDate,
+        completedTime: auditData.completedTime,
+        completedBy: auditData.auditedBy || 'Owner'
+      });
+      if (targetTrip) {
+        lorriesApi.update((targetTrip as Trip).lorryId, { status: 'idle', location: 'Depot — Kadapa' }).catch(() => {});
+        driversApi.update((targetTrip as Trip).driverId, { status: 'idle' }).catch(() => {});
+      }
+    } catch (err: any) {
+      console.warn('Could not persist final trip audit:', err.message);
+    }
+
+    setNotifications((prev) => [
+      {
+        id: `notif-audit-${Date.now()}`,
+        title: `Round Trip Completed & Audited`,
+        body: `Trip #${tripId} closed. Vehicle returned to Kadapa base and full P&L verified.`,
+        time: 'Just now',
+        read: false,
+        kind: 'payment'
+      },
+      ...prev
+    ]);
+  }, []);
+
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
@@ -1156,6 +1495,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
         updateLorry,
         addDriver,
         updateDriver,
+        deleteDriver,
         addLoadingParty,
         updateLoadingParty,
         deleteLoadingParty,
@@ -1163,9 +1503,16 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
         addBatchExpensesToTrip,
         setExpenseReviewStatus,
         updateTripPayments,
+        auditTripDelivery,
         updateLoadingPartyPayments,
         batchUpdateLoadingPartyPayments,
         completeTrip,
+        setReturnPlan,
+        saveReturnSandLoading,
+        saveReturnSandUnloading,
+        saveDirectReturn,
+        saveVehicleBaseReturn,
+        completeFinalTripAudit,
         stoneSpecs,
         districtRates,
         updateStoneRate,

@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@emotion/react": "^11.13.3",
+    "@types/three": "^0.186.0",
     "date-fns": "^4.0.0",
     "framer-motion": "^11.5.4",
     "lucide-react": "0.522.0",
@@ -20,7 +21,8 @@
     "react-router-dom": "^6.26.2",
     "recharts": "^2.12.7",
     "socket.io-client": "^4.8.3",
-    "tesseract.js": "^7.0.0"
+    "tesseract.js": "^7.0.0",
+    "three": "^0.186.1"
   },
   "devDependencies": {
     "@types/node": "^20.11.18",

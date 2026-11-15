@@ -46,7 +46,7 @@ export function Register() {
     const initData = async () => {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 2500);
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
         
         // Fetch drivers and unloading parties to populate selectors
         const [driversRes, unloadingRes] = await Promise.all([
@@ -119,10 +119,7 @@ export function Register() {
 
           await syncDatabase();
 
-          if (mappedRole === 'driver') navigate('/driver');
-          else if (mappedRole === 'loading') navigate('/loading');
-          else if (mappedRole === 'buyer') navigate('/buyer');
-          else navigate('/');
+          navigate('/');
         }, 1200);
       } else {
         setError(res.message || 'Registration failed. Check inputs.');

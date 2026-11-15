@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
 import { formatINR } from '../utils/helpers';
@@ -9,12 +9,13 @@ import {
   orderSqft,
   orderLineAmount,
   orderLineTotalSqft,
-  type OrderStatus } from
+  type OrderStatus,
+  type TripStatus } from
 '../data/types';
 import { useOrders } from '../store/OrdersContext';
 import { PageHeader } from '../components/layout/PageHeader';
 import { OrderStatusBadge } from '../components/ui/Badge';
-import { TruckIcon, UserIcon, CheckIcon, XIcon, PlusIcon, ChevronDown, ChevronUp, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
+import { TruckIcon, UserIcon, CheckIcon, XIcon, PlusIcon, ChevronDown, ChevronUp, Filter, ChevronLeft, ChevronRight, PackageOpenIcon } from 'lucide-react';
 
 const statusFlow: OrderStatus[] = [
   'placed',
@@ -37,6 +38,7 @@ const filters: Array<{
 ];
 
 export function Orders() {
+  const navigate = useNavigate();
   const { orders, setOrderStatus, assignOrderToLorry, lorries, drivers, unloadingParties, trips } = useOrders();
   const [filter, setFilter] = useState<'all' | OrderStatus>('all');
   const [isCreateOrderOpen, setIsCreateOrderOpen] = useState(false);
@@ -77,16 +79,23 @@ export function Orders() {
     if (lorry && lorry.driverId) {
       setSelectedDriverId(lorry.driverId);
     } else {
-      setSelectedDriverId('');
+      const matchedDriver = drivers.find((d) => d.lorryId === lorryId || d.id === lorry?.driverId);
+      if (matchedDriver) {
+        setSelectedDriverId(matchedDriver.id);
+      } else {
+        setSelectedDriverId('');
+      }
     }
   };
 
   const handleAssignSubmit = (orderId: string) => {
     if (!selectedLorryId || !selectedDriverId) return;
+    const targetLorry = selectedLorryId;
     assignOrderToLorry(orderId, selectedLorryId, selectedDriverId);
     setAssigningOrderId(null);
     setSelectedLorryId('');
     setSelectedDriverId('');
+    navigate(`/loading?lorryId=${targetLorry}`);
   };
 
   const totalValue = orders.reduce((sum, o) => sum + orderTotal(o), 0);
@@ -380,15 +389,20 @@ export function Orders() {
                             </span>
                           )}
 
+                          {orderTrips.length > 0 && orderTrips.some(t => t.status === 'loading') && (
+                            <Link
+                              to={`/loading?tripId=${orderTrips.find(t => t.status === 'loading')?.id}&lorryId=${orderTrips.find(t => t.status === 'loading')?.lorryId}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="rounded-md bg-amber-500/20 border border-amber-400/40 px-3 py-1.5 text-xs font-bold text-amber-300 transition-colors hover:bg-amber-500/30 flex items-center gap-1.5"
+                            >
+                              <PackageOpenIcon className="h-3.5 w-3.5" />
+                              Fill Loading Details
+                            </Link>
+                          )}
+
                           {order.status === 'confirmed' && hasRemaining && !isAssigning && orderTrips.length === 0 && (
                             <span className="text-xs text-amber-300 bg-amber-400/10 border border-amber-400/20 px-2.5 py-1.5 rounded-md font-semibold">
                               Awaiting Loading in Ramapuram
-                            </span>
-                          )}
-
-                          {order.status === 'confirmed' && hasRemaining && !isAssigning && orderTrips.length > 0 && (
-                            <span className="text-xs text-amber-300 bg-amber-400/10 border border-amber-400/20 px-2.5 py-1.5 rounded-md font-semibold">
-                              Loading in Progress
                             </span>
                           )}
                           
@@ -427,15 +441,12 @@ export function Orders() {
                                   className="w-full rounded-md border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-white focus:border-gold focus:outline-none"
                                 >
                                   <option value="">-- Choose Lorry --</option>
-                                  {lorries.filter((l) => 
-                                    l.status === 'idle' || 
-                                    trips.some((t) => t.lorryId === l.id && t.status === 'loading') || 
-                                    l.id === selectedLorryId
-                                  ).map((l) => {
-                                    const activeTripsCount = trips.filter((t) => t.lorryId === l.id && t.status === 'loading').length;
+                                  {lorries.filter((l) => l.status !== 'sold').map((l) => {
+                                    const activeTripsCount = trips.filter((t) => (t.lorryId === l.id || t.lorryId === l.plate) && (t.status === 'loading' || t.status === 'in-transit')).length;
+                                    const assignedDriver = drivers.find((d) => d.id === l.driverId || d.lorryId === l.id);
                                     return (
                                       <option key={l.id} value={l.id}>
-                                        {l.plate} {activeTripsCount > 0 ? `(Loading ${activeTripsCount} orders)` : `(${l.status})`} - Cap: {l.capacitySqft} sqft
+                                        {l.plate} {activeTripsCount > 0 ? `(${activeTripsCount} active load${activeTripsCount > 1 ? 's' : ''})` : `(${l.status})`} - Cap: {l.capacitySqft.toLocaleString('en-IN')} sqft {assignedDriver ? `(${assignedDriver.name})` : ''}
                                       </option>
                                     );
                                   })}
@@ -453,15 +464,11 @@ export function Orders() {
                                   className="w-full rounded-md border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-white focus:border-gold focus:outline-none"
                                 >
                                   <option value="">-- Choose Driver --</option>
-                                  {drivers.filter((d) => 
-                                    d.status === 'idle' || 
-                                    trips.some((t) => t.driverId === d.id && t.status === 'loading') || 
-                                    d.id === selectedDriverId
-                                  ).map((d) => {
-                                    const activeTripsCount = trips.filter((t) => t.driverId === d.id && t.status === 'loading').length;
+                                  {drivers.filter((d) => d.status !== 'off-duty').map((d) => {
+                                    const assignedLorry = lorries.find((l) => l.driverId === d.id || l.id === d.lorryId);
                                     return (
                                       <option key={d.id} value={d.id}>
-                                        {d.name} {activeTripsCount > 0 ? `(Loading ${activeTripsCount} orders)` : `(${d.status})`}
+                                        {d.name} ({d.status}) {assignedLorry ? `· ${assignedLorry.plate}` : ''}
                                       </option>
                                     );
                                   })}
@@ -549,21 +556,33 @@ export function Orders() {
                             <span className="text-neutral-500">Assigned Lorries:</span>
                             {orderTrips.map((t) => {
                               const l = lorries.find((lorry) => lorry.id === t.lorryId);
-                              const statusColors: Record<typeof t.status, string> = {
+                              const statusColors: Partial<Record<TripStatus, string>> = {
                                 loading: 'bg-amber-400/10 text-amber-300 border-amber-400/25',
+                                loaded: 'bg-amber-500/15 text-amber-200 border-amber-500/30',
                                 'in-transit': 'bg-blue-400/10 text-blue-300 border-blue-400/25',
+                                arrived_kerala: 'bg-purple-400/10 text-purple-300 border-purple-400/25',
+                                return_sand_loading: 'bg-orange-400/10 text-orange-300 border-orange-400/25',
+                                returning: 'bg-indigo-400/10 text-indigo-300 border-indigo-400/25',
+                                returned_to_base: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+                                completed: 'bg-green-500/15 text-green-300 border-green-500/30',
                                 delivered: 'bg-gold/10 text-gold border-gold/25',
                                 paid: 'bg-green-400/10 text-green-300 border-green-400/25'
                               };
                               return (
-                                <span
+                                <Link
                                   key={t.id}
-                                  className={`inline-flex items-center gap-1.5 rounded px-2.5 py-0.5 text-[10px] font-semibold border ${statusColors[t.status]}`}
+                                  to={t.status === 'loading' ? `/loading?tripId=${t.id}&lorryId=${l?.id || t.lorryId}` : `/trips/${t.id}`}
+                                  onClick={(e) => e.stopPropagation()}
+                                  className={`inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-[10px] font-semibold border transition-all hover:scale-[1.03] ${statusColors[t.status] || 'bg-gold/10 text-gold border-gold/25'}`}
+                                  title={t.status === 'loading' ? 'Click to record multi-quarry stones and labour details' : 'View Trip Details'}
                                 >
                                   <span>{l?.plate || 'Lorry'}</span>
                                   <span className="h-1.5 w-1.5 rounded-full bg-current opacity-80" />
                                   <span className="capitalize">{t.status.replace('-', ' ')}</span>
-                                </span>
+                                  {t.status === 'loading' && (
+                                    <span className="ml-1 text-[9px] underline font-bold">Load →</span>
+                                  )}
+                                </Link>
                               );
                             })}
                           </div>

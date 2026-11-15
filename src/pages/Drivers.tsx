@@ -65,7 +65,7 @@ export function Drivers() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <span className="flex h-10 w-10 items-center justify-center rounded-full bg-ink-700 text-sm font-bold text-gold">
-                        {d.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                        {d.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
                       </span>
                       <div>
                         <Link

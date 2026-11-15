@@ -8,7 +8,7 @@ import { useOrders } from '../store/OrdersContext';
 import { AddDistrictRateModal } from '../components/ui/AddDistrictRateModal';
 
 export function DistrictRates() {
-  const { districtRates, updateDistrictRate } = useOrders();
+  const { districtRates, updateDistrictRate, stoneSpecs } = useOrders();
   const [rates, setRates] = useState<DistrictRate[]>([]);
   const [isModified, setIsModified] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -28,6 +28,14 @@ export function DistrictRates() {
   useEffect(() => {
     setRates(districtRates || []);
   }, [districtRates]);
+
+  const getRamapuramPrice = (size: string, thickness: string, finish: string) => {
+    const s = (stoneSpecs || []).find(
+      (spec) => spec.size === size && spec.thickness === thickness && spec.finish === finish
+    );
+    return s?.ratePerSqft ?? 0;
+  };
+
 
   const rateFor = (
     district: string,
@@ -73,8 +81,8 @@ export function DistrictRates() {
   return (
     <div className="min-h-full">
       <PageHeader
-        title="District Rates"
-        subtitle="Selling rate per sqft by Kerala district — drives buyer order pricing"
+        title="District & Ramapuram Stone Rates"
+        subtitle="Manage our procurement rate at Ramapuram Quarry vs selling order rates across Kerala destination districts"
         action={
           <div className="flex items-center gap-3">
             <button
@@ -96,82 +104,113 @@ export function DistrictRates() {
         }
       />
       
-      <div className="p-6 sm:p-8">
+      <div className="p-6 sm:p-8 space-y-6">
+        {/* Comparison Callout */}
+        <div className="rounded-2xl border border-[#F5B82E]/25 bg-[#F5B82E]/5 p-4 flex flex-wrap items-center justify-between gap-4">
+          <div className="space-y-1">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#F5B82E]">
+              Rate Matrix Architecture
+            </h4>
+            <p className="text-xs text-neutral-300">
+              <strong className="text-white">Our Price in Ramapuram:</strong> Base quarry procurement cost per sqft.
+              <br />
+              <strong className="text-white">District Order Price:</strong> Selling rate applied automatically to buyer consignments according to delivery district.
+            </p>
+          </div>
+          <div className="flex items-center gap-3 text-xs">
+            <div className="rounded-lg bg-black/40 border border-white/10 px-3 py-1.5 text-center">
+              <span className="text-[10px] text-neutral-400 block uppercase">Base Quarry</span>
+              <span className="font-mono font-bold text-amber-400">Ramapuram</span>
+            </div>
+            <div className="rounded-lg bg-black/40 border border-white/10 px-3 py-1.5 text-center">
+              <span className="text-[10px] text-neutral-400 block uppercase">Destination</span>
+              <span className="font-mono font-bold text-emerald-400">Kerala Districts</span>
+            </div>
+          </div>
+        </div>
+
         <div className="overflow-hidden rounded-lg border border-ink-700">
           <div className="ti-scroll overflow-x-auto">
-            <table className="w-full min-w-[720px] text-left text-sm">
+            <table className="w-full min-w-[780px] text-left text-sm">
               <thead>
                 <tr className="border-b border-ink-700 bg-ink-950 text-xs uppercase tracking-[0.08em] text-neutral-500">
                   <th className="sticky left-0 z-10 bg-ink-950 px-4 py-3 font-medium">
                     Stone Spec
                   </th>
-                  {districts.map((d) =>
-                  <th key={d} className="px-4 py-3 text-right font-medium">
+                  <th className="px-4 py-3 font-bold text-amber-400 border-r border-ink-800 bg-amber-500/5">
+                    Our Price (Ramapuram)
+                  </th>
+                  {districts.map((d) => (
+                    <th key={d} className="px-4 py-3 text-right font-medium">
                       {d}
                     </th>
-                  )}
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {sellableSpecs.length === 0 && (
                   <tr>
-                    <td colSpan={districts.length + 1} className="px-4 py-10 text-center text-sm text-neutral-500">
+                    <td colSpan={districts.length + 2} className="px-4 py-10 text-center text-sm text-neutral-500">
                       No district rates configured in database. Click "Add District Rate" to create one.
                     </td>
                   </tr>
                 )}
-                {sellableSpecs.map((spec, i) =>
-                <motion.tr
-                  key={`${spec.size}-${spec.thickness}-${spec.finish}`}
-                  initial={{
-                    opacity: 0
-                  }}
-                  animate={{
-                    opacity: 1
-                  }}
-                  transition={{
-                    delay: i * 0.04
-                  }}
-                  className="border-b border-ink-800 bg-ink-900 last:border-0">
-                  
-                    <td className="sticky left-0 z-10 bg-ink-900 px-4 py-3">
-                      <span className="font-semibold text-white">
-                        {spec.size} · {spec.thickness}
-                      </span>
-                      <span className="ml-2 rounded bg-ink-800 px-1.5 py-0.5 text-[11px] capitalize text-neutral-400">
-                        {spec.finish}
-                      </span>
-                    </td>
-                    {districts.map((d) => {
-                    const r = rateFor(
-                      d,
-                      spec.size,
-                      spec.thickness,
-                      spec.finish
-                    );
-                    return (
-                      <td key={d} className="px-4 py-3 text-right">
-                          {r ?
-                        <span className="inline-flex items-center gap-1">
-                              <span className="text-neutral-600">₹</span>
-                              <input
-                            type="number"
-                            value={r.ratePerSqft}
-                            onChange={(e) =>
-                            updateRate(r.id, Number(e.target.value))
-                            }
-                            className="w-16 rounded-md border border-ink-700 bg-ink-950 px-2 py-1 text-right font-semibold text-gold focus:border-gold focus:outline-none"
-                            aria-label={`Rate for ${spec.size} ${spec.thickness} ${spec.finish} in ${d}`} />
-                          
-                            </span> :
+                {sellableSpecs.map((spec, i) => {
+                  const ramapuramCost = getRamapuramPrice(spec.size, spec.thickness, spec.finish);
+                  return (
+                    <motion.tr
+                      key={`${spec.size}-${spec.thickness}-${spec.finish}`}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: i * 0.04 }}
+                      className="border-b border-ink-800 bg-ink-900 last:border-0 hover:bg-white/[0.02]"
+                    >
+                      <td className="sticky left-0 z-10 bg-ink-900 px-4 py-3">
+                        <span className="font-semibold text-white">
+                          {spec.size} · {spec.thickness}
+                        </span>
+                        <span className="ml-2 rounded bg-ink-800 px-1.5 py-0.5 text-[11px] capitalize text-neutral-400">
+                          {spec.finish}
+                        </span>
+                      </td>
 
-                        <span className="text-neutral-700">—</span>
-                        }
-                        </td>);
+                      {/* Ramapuram Our Price */}
+                      <td className="px-4 py-3 font-mono font-bold text-amber-400 border-r border-ink-800 bg-amber-500/5">
+                        ₹{ramapuramCost} <span className="text-[10px] text-neutral-400 font-sans">/sqft</span>
+                      </td>
 
-                  })}
-                  </motion.tr>
-                )}
+                      {districts.map((d) => {
+                        const r = rateFor(d, spec.size, spec.thickness, spec.finish);
+                        const margin = r ? r.ratePerSqft - ramapuramCost : null;
+                        return (
+                          <td key={d} className="px-4 py-3 text-right">
+                            {r ? (
+                              <div className="inline-flex flex-col items-end">
+                                <span className="inline-flex items-center gap-1">
+                                  <span className="text-neutral-600">₹</span>
+                                  <input
+                                    type="number"
+                                    value={r.ratePerSqft}
+                                    onChange={(e) => updateRate(r.id, Number(e.target.value))}
+                                    className="w-16 rounded-md border border-ink-700 bg-ink-950 px-2 py-1 text-right font-semibold text-gold focus:border-gold focus:outline-none"
+                                    aria-label={`Rate for ${spec.size} ${spec.thickness} ${spec.finish} in ${d}`}
+                                  />
+                                </span>
+                                {margin !== null && (
+                                  <span className={`text-[10px] font-mono mt-0.5 ${margin >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                                    {margin >= 0 ? `+₹${margin}` : `-₹${Math.abs(margin)}`}
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-neutral-700">—</span>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </motion.tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

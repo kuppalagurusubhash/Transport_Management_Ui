@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeftIcon, Download, Filter, Calendar, X, ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeftIcon, Download, Filter, Calendar, X, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, FileText } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { formatINR } from '../utils/helpers';
 import {
@@ -15,6 +15,8 @@ import { useOrders } from '../store/OrdersContext';
 import { PageHeader } from '../components/layout/PageHeader';
 import { Card, SectionLabel } from '../components/ui/Card';
 import { OrderStatusBadge } from '../components/ui/Badge';
+import { PartyStatementModal } from '../components/ui/PartyStatementModal';
+import { ledgerApi } from '../api';
 export function UnloadingPartyDetail() {
   const { partyId } = useParams();
   const { orders, trips, lorries, drivers, unloadingParties } = useOrders();
@@ -22,6 +24,7 @@ export function UnloadingPartyDetail() {
 
   // Tab control state
   const [activeTab, setActiveTab] = useState<'orders' | 'trips'>('orders');
+  const [isStatementModalOpen, setIsStatementModalOpen] = useState(false);
 
   // Order history filters and pagination state
   const [orderFilter, setOrderFilter] = useState<'all' | OrderStatus>('all');
@@ -129,13 +132,24 @@ export function UnloadingPartyDetail() {
                 <span className="font-bold text-white text-xs sm:text-sm">{sqft.toLocaleString('en-IN')}</span>
               </div>
             </div>
-            <button
-              onClick={() => alert("Statement exported successfully!")}
-              className="inline-flex items-center gap-1.5 rounded-md border border-ink-700 bg-ink-950 px-3.5 py-1.5 text-xs font-semibold text-neutral-350 transition-colors hover:border-gold hover:text-gold"
-            >
-              <Download className="h-3.5 w-3.5" />
-              Export statement
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsStatementModalOpen(true)}
+                className="inline-flex items-center gap-1.5 rounded-md border border-ink-700 bg-ink-950 px-3.5 py-1.5 text-xs font-semibold text-neutral-350 transition-colors hover:border-gold hover:text-gold"
+              >
+                <FileText className="h-3.5 w-3.5 text-gold" />
+                Ledger Statement
+              </button>
+              <a
+                href={ledgerApi.getStatementPdfUrl(party.id, { role: 'customer' })}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-md bg-gold px-3.5 py-1.5 text-xs font-bold text-ink-950 transition-colors hover:bg-gold-400 shadow-md"
+              >
+                <Download className="h-3.5 w-3.5" />
+                Download PDF
+              </a>
+            </div>
           </div>
         }
       />
@@ -540,6 +554,17 @@ export function UnloadingPartyDetail() {
           </div>
         )}
       </div>
+
+      {/* Authoritative Party Statement Modal */}
+      {isStatementModalOpen && party && (
+        <PartyStatementModal
+          isOpen={isStatementModalOpen}
+          onClose={() => setIsStatementModalOpen(false)}
+          partyId={party.id}
+          partyName={party.name}
+          role="customer"
+        />
+      )}
     </div>
   );
 }

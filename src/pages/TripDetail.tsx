@@ -1,12 +1,36 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeftIcon, CheckIcon, FlagIcon, RefreshCwIcon, EyeIcon, FileTextIcon, XIcon } from 'lucide-react';
+import { 
+  ArrowLeftIcon, 
+  CheckIcon, 
+  FlagIcon, 
+  RefreshCwIcon, 
+  EyeIcon, 
+  FileTextIcon, 
+  XIcon, 
+  ShieldCheckIcon, 
+  AlertTriangleIcon, 
+  CoinsIcon, 
+  MapPinIcon,
+  LayersIcon,
+  ScaleIcon,
+  TruckIcon,
+  ArrowRightIcon,
+  CheckCircle2Icon,
+  PrinterIcon
+} from 'lucide-react';
 import { formatINR } from '../utils/helpers';
 import {
   lineTotalSqft,
   lineAmount,
   tripWorkerTotal,
   tripExpenseTotal,
+  tripReturnRevenue,
+  tripReturnExpenses,
+  tripOutboundExpenses,
+  tripTotalJourneyRevenue,
+  tripTotalJourneyExpenses,
+  tripTotalJourneyProfit,
   type ExpenseReview,
   type Trip,
   type Lorry,
@@ -15,11 +39,29 @@ import {
   type UnloadingParty,
   type DistrictRate,
   type LoadingPartyPayment,
+  type ReturnPlanType,
+  type ReturnSandLoad,
+  type ReturnSandUnload,
+  type DirectReturnDetails,
+  type VehicleReturnDetails,
+  type FinalTripAuditData,
+  type TripStatus
 } from '../data/types';
 import { PageHeader } from '../components/layout/PageHeader';
 import { SectionLabel, Card } from '../components/ui/Card';
 import { TripStatusBadge, ReviewBadge } from '../components/ui/Badge';
 import { tripsApi, lorriesApi, driversApi, loadingPartiesApi, unloadingPartiesApi, districtRatesApi } from '../api/index';
+import { KeralaDeliveryAuditModal } from '../components/ui/KeralaDeliveryAuditModal';
+import { TripJourneyTimeline } from '../components/trip/TripJourneyTimeline';
+import { ReturnPlanSelector } from '../components/trip/ReturnPlanSelector';
+import { ReturnLoadingForm } from '../components/trip/ReturnLoadingForm';
+import { ReturnUnloadingForm } from '../components/trip/ReturnUnloadingForm';
+import { DirectReturnForm } from '../components/trip/DirectReturnForm';
+import { VehicleReturnForm } from '../components/trip/VehicleReturnForm';
+import { FinalTripAudit } from '../components/trip/FinalTripAudit';
+import { TripPdfReportModal } from '../components/trip/TripPdfReportModal';
+import { MultiQuarryLoadingCard } from '../components/trip/MultiQuarryLoadingCard';
+import { MultiPartyUnloadingCard } from '../components/trip/MultiPartyUnloadingCard';
 
 export function TripDetail() {
   const { tripId } = useParams<{ tripId: string }>();
@@ -42,6 +84,9 @@ export function TripDetail() {
   const [quarryPaymentMode, setQuarryPaymentMode] = useState<'cash' | 'phonepe' | 'bank_transfer' | 'unspecified'>('phonepe');
   const [showQuarryPaymentSuccess, setShowQuarryPaymentSuccess] = useState<boolean>(false);
   const [savingQuarryPayment, setSavingQuarryPayment] = useState<boolean>(false);
+  const [isAuditModalOpen, setIsAuditModalOpen] = useState<boolean>(false);
+  const [isPdfModalOpen, setIsPdfModalOpen] = useState<boolean>(false);
+  const [activeWorkflowTab, setActiveWorkflowTab] = useState<string>('all');
 
   const tripLoadingPartyIds = React.useMemo(() => {
     if (!trip) return [];
@@ -104,13 +149,33 @@ export function TripDetail() {
         currentPayments.push(newPayment);
       }
 
+      // If driver is paying, also record this payment in trip expenses
+      const partyName = loadingParties.find(p => p.id === selectedLPId)?.name || 'Quarry';
+      const quarryExpId = `exp-quarry-${selectedLPId}`;
+      let updatedExpenses = (trip.expenses || []).filter(e => e.id !== quarryExpId);
+
+      if (quarryPaidBy === 'driver' && Number(quarryAmountPaid) > 0) {
+        updatedExpenses.push({
+          id: quarryExpId,
+          label: `Quarry Stone Payment - ${partyName} [Driver Paid ${quarryPaymentMode.toUpperCase()}]`,
+          amount: Number(quarryAmountPaid),
+          review: quarryPaymentStatus === 'paid' ? 'approved' : 'pending',
+          category: 'other',
+          notes: `Paid by driver in ${quarryPaymentMode} to quarry loading party.`
+        });
+      }
+
       const updatedTrip = {
         ...trip,
-        loadingPartyPayments: currentPayments
+        loadingPartyPayments: currentPayments,
+        expenses: updatedExpenses
       };
       setTrip(updatedTrip);
 
-      await tripsApi.update(trip.id, { loadingPartyPayments: currentPayments });
+      await tripsApi.update(trip.id, { 
+        loadingPartyPayments: currentPayments,
+        expenses: updatedExpenses
+      });
       setShowQuarryPaymentSuccess(true);
       setTimeout(() => setShowQuarryPaymentSuccess(false), 3000);
     } catch (err) {
@@ -175,6 +240,117 @@ export function TripDetail() {
       fetchTrip();
     } finally {
       setSavingExpense(null);
+    }
+  };
+
+  const getTripStepIndex = (t: Trip) => {
+    const isSand = t.returnPlan === 'sand_return' || !!t.returnSandLoad;
+    if (t.status === 'completed') return isSand ? 10 : 7;
+    if (t.status === 'final_audit_pending' || t.status === 'returned_to_base' || !!t.vehicleReturnDetails) return isSand ? 9 : 6;
+    if (t.status === 'sand_unloaded' || !!t.returnSandUnload) return 8;
+    if (t.status === 'arrived_lt_factory') return 7;
+    if (t.status === 'return_loaded' || t.status === 'returning') return isSand ? 6 : 5;
+    if (t.status === 'return_sand_loading' || !!t.returnSandLoad) return 5;
+    if (t.status === 'direct_return' || !!t.directReturnDetails) return 5;
+    if (t.status === 'return_decision_pending' || t.status === 'stone_unloaded' || t.status === 'delivered' || t.auditStatus === 'audited' || t.auditStatus === 'verified') return 4;
+    if (t.status === 'arrived_kerala' || t.status === 'stone_unloading') return 3;
+    if (t.status === 'in-transit') return 2;
+    return 1;
+  };
+
+  const handleSelectReturnPlan = async (plan: ReturnPlanType) => {
+    if (!trip) return;
+    const nextStatus: TripStatus = plan === 'sand_return' ? 'return_sand_loading' : 'direct_return';
+    const updated = { ...trip, returnPlan: plan, status: nextStatus };
+    setTrip(updated);
+    try {
+      await tripsApi.update(trip.id, { returnPlan: plan, status: nextStatus });
+    } catch (err) {
+      console.error('Failed to update return plan:', err);
+      fetchTrip();
+    }
+  };
+
+  const handleSaveReturnSandLoading = async (data: ReturnSandLoad) => {
+    if (!trip) return;
+    const updated = { ...trip, returnSandLoad: data, returnPlan: 'sand_return' as const, status: 'return_loaded' as const };
+    setTrip(updated);
+    try {
+      await tripsApi.update(trip.id, { returnSandLoad: data, returnPlan: 'sand_return', status: 'return_loaded' });
+    } catch (err) {
+      console.error('Failed to save sand loading:', err);
+      fetchTrip();
+    }
+  };
+
+  const handleSaveReturnSandUnloading = async (data: ReturnSandUnload) => {
+    if (!trip) return;
+    const updated = { ...trip, returnSandUnload: data, status: 'sand_unloaded' as const };
+    setTrip(updated);
+    try {
+      await tripsApi.update(trip.id, { returnSandUnload: data, status: 'sand_unloaded' });
+    } catch (err) {
+      console.error('Failed to save sand unloading:', err);
+      fetchTrip();
+    }
+  };
+
+  const handleSaveDirectReturn = async (data: DirectReturnDetails) => {
+    if (!trip) return;
+    const updated = { ...trip, directReturnDetails: data, returnPlan: 'direct_return' as const, status: 'direct_return' as const };
+    setTrip(updated);
+    try {
+      await tripsApi.update(trip.id, { directReturnDetails: data, returnPlan: 'direct_return', status: 'direct_return' });
+    } catch (err) {
+      console.error('Failed to save direct return:', err);
+      fetchTrip();
+    }
+  };
+
+  const handleSaveVehicleReturn = async (data: VehicleReturnDetails) => {
+    if (!trip) return;
+    const updated = { ...trip, vehicleReturnDetails: data, status: 'returned_to_base' as const };
+    setTrip(updated);
+    try {
+      await tripsApi.update(trip.id, { vehicleReturnDetails: data, status: 'returned_to_base' });
+    } catch (err) {
+      console.error('Failed to save vehicle return:', err);
+      fetchTrip();
+    }
+  };
+
+  const handleCompleteTripAudit = async (auditData: FinalTripAuditData) => {
+    if (!trip) return;
+    const updated = {
+      ...trip,
+      finalAudit: auditData,
+      status: 'completed' as const,
+      completedDate: auditData.completedDate,
+      completedTime: auditData.completedTime,
+      completedBy: auditData.auditedBy || 'Owner',
+      driverOpeningBalance: auditData.driverOpeningBalance,
+      driverCashHandoverToOwner: auditData.driverCashHandedToOwner,
+      driverClosingBalanceForwarded: auditData.driverClosingBalanceForwarded,
+      driverSettlementType: auditData.driverSettlementType
+    };
+    setTrip(updated);
+    try {
+      await tripsApi.update(trip.id, {
+        finalAudit: auditData,
+        status: 'completed',
+        completedDate: auditData.completedDate,
+        completedTime: auditData.completedTime,
+        completedBy: auditData.auditedBy || 'Owner',
+        driverOpeningBalance: auditData.driverOpeningBalance,
+        driverCashHandoverToOwner: auditData.driverCashHandedToOwner,
+        driverClosingBalanceForwarded: auditData.driverClosingBalanceForwarded,
+        driverSettlementType: auditData.driverSettlementType
+      });
+      if (trip.lorryId) lorriesApi.update(trip.lorryId, { status: 'idle', location: 'Depot — Kadapa' }).catch(() => {});
+      if (trip.driverId) driversApi.update(trip.driverId, { status: 'idle' }).catch(() => {});
+    } catch (err) {
+      console.error('Failed to complete final trip audit:', err);
+      fetchTrip();
     }
   };
 
@@ -251,20 +427,39 @@ export function TripDetail() {
       />
 
       <div className="p-6 sm:p-8">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <Link
             to="/trips"
             className="inline-flex items-center gap-2 text-sm text-neutral-400 hover:text-white"
           >
             <ArrowLeftIcon className="h-4 w-4" /> All trips
           </Link>
-          <button
-            onClick={fetchTrip}
-            className="inline-flex items-center gap-1.5 rounded-md border border-ink-700 px-3 py-1.5 text-xs text-neutral-400 transition-colors hover:border-gold hover:text-gold"
-          >
-            <RefreshCwIcon className="h-3.5 w-3.5" />
-            Refresh
-          </button>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsPdfModalOpen(true)}
+              className="flex items-center gap-1.5 rounded-xl border border-gold/40 bg-gold/10 px-4 py-2 text-xs font-bold text-gold hover:bg-gold/20 hover:scale-105 transition-all shadow-md cursor-pointer"
+            >
+              <PrinterIcon className="h-4 w-4" />
+              <span>Full Trip PDF Report</span>
+            </button>
+
+            <button
+              onClick={() => setIsAuditModalOpen(true)}
+              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#F5B82E] to-[#E5A81E] px-4 py-2 text-xs font-black text-black shadow-lg hover:scale-105 transition-all cursor-pointer"
+            >
+              <ShieldCheckIcon className="h-4 w-4" />
+              <span>Audit Kerala Unloading &amp; Payments</span>
+            </button>
+
+            <button
+              onClick={fetchTrip}
+              className="inline-flex items-center gap-1.5 rounded-md border border-ink-700 px-3 py-1.5 text-xs text-neutral-400 transition-colors hover:border-gold hover:text-gold"
+            >
+              <RefreshCwIcon className="h-3.5 w-3.5" />
+              Refresh
+            </button>
+          </div>
         </div>
 
         {/* Assignment Cards */}
@@ -292,9 +487,247 @@ export function TripDetail() {
           </Card>
         </div>
 
-        {/* Load Breakdown grouped by loading party */}
+        {/* 1. Round-Trip Journey Timeline */}
         <div className="mb-6">
-          <SectionLabel>Load Breakdown</SectionLabel>
+          <TripJourneyTimeline
+            trip={trip}
+            currentStepIndex={getTripStepIndex(trip)}
+            onStepClick={(step) => {
+              if (step === 1) setActiveWorkflowTab('stage-1');
+              else if (step === 2 || step === 3) setActiveWorkflowTab('stage-2');
+              else if (step === 4) setActiveWorkflowTab('stage-3');
+              else if (step === 5) setActiveWorkflowTab(trip.returnPlan === 'sand_return' ? 'stage-4' : 'stage-6');
+              else if (step === 6 || step === 7) setActiveWorkflowTab('stage-5');
+              else if (step === 8) setActiveWorkflowTab('stage-7');
+              else if (step === 9 || step === 10) setActiveWorkflowTab('stage-8');
+            }}
+          />
+        </div>
+
+        {/* Workflow Stage Navigator Buttons */}
+        <div className="mb-6 flex items-center gap-2 overflow-x-auto pb-2 ti-scroll">
+          {[
+            { id: 'all', label: 'All Journey Stages' },
+            { id: 'stage-1', label: '01 Outbound Loading' },
+            { id: 'stage-2', label: '02 Kerala Unloading' },
+            { id: 'stage-3', label: '03 Return Plan' },
+            ...(trip.returnPlan === 'sand_return' || trip.returnSandLoad ? [
+              { id: 'stage-4', label: '04 Sand Loading' },
+              { id: 'stage-5', label: '05 L&T Unloading' }
+            ] : []),
+            ...(trip.returnPlan === 'direct_return' || trip.directReturnDetails ? [
+              { id: 'stage-6', label: '06 Direct Return' }
+            ] : []),
+            { id: 'stage-7', label: '07 Base Return' },
+            { id: 'stage-8', label: '08 Final Audit' }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveWorkflowTab(tab.id)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                activeWorkflowTab === tab.id
+                  ? 'bg-gold text-black shadow-md'
+                  : 'bg-ink-900 border border-ink-700 text-neutral-400 hover:text-white hover:border-ink-600'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* ── STAGE 08: FINAL TRIP AUDIT & CLOSURE ──────────────────────────── */}
+        {(activeWorkflowTab === 'all' || activeWorkflowTab === 'stage-8') && (
+          <div className="mb-6">
+            <FinalTripAudit
+              trip={trip}
+              districtRates={districtRates}
+              unloadingParties={unloadingParties}
+              onCompleteTrip={handleCompleteTripAudit}
+            />
+          </div>
+        )}
+
+        {/* ── STAGE 03: RETURN PLAN DECISION ────────────────────────────────── */}
+        {(activeWorkflowTab === 'all' || activeWorkflowTab === 'stage-3') && (
+          <div className="mb-6">
+            <ReturnPlanSelector
+              trip={trip}
+              currentPlan={trip.returnPlan}
+              onSelectPlan={handleSelectReturnPlan}
+            />
+          </div>
+        )}
+
+        {/* ── STAGE 04: RETURN SAND LOADING ─────────────────────────────────── */}
+        {(trip.returnPlan === 'sand_return' || trip.returnSandLoad) && (activeWorkflowTab === 'all' || activeWorkflowTab === 'stage-4') && (
+          <div className="mb-6">
+            <ReturnLoadingForm
+              trip={trip}
+              lorry={lorry}
+              driver={driver}
+              onSave={handleSaveReturnSandLoading}
+            />
+          </div>
+        )}
+
+        {/* ── STAGE 05: L&T FACTORY SAND UNLOADING ──────────────────────────── */}
+        {(trip.returnPlan === 'sand_return' || trip.returnSandLoad) && (activeWorkflowTab === 'all' || activeWorkflowTab === 'stage-5') && (
+          <div className="mb-6">
+            <ReturnUnloadingForm
+              trip={trip}
+              onSave={handleSaveReturnSandUnloading}
+            />
+          </div>
+        )}
+
+        {/* ── STAGE 06: DIRECT RETURN DETAILS ───────────────────────────────── */}
+        {(trip.returnPlan === 'direct_return' || trip.directReturnDetails) && (activeWorkflowTab === 'all' || activeWorkflowTab === 'stage-6') && (
+          <div className="mb-6">
+            <DirectReturnForm
+              trip={trip}
+              onSave={handleSaveDirectReturn}
+            />
+          </div>
+        )}
+
+        {/* ── STAGE 07: VEHICLE RETURN TO BASE ──────────────────────────────── */}
+        {(activeWorkflowTab === 'all' || activeWorkflowTab === 'stage-7') && (
+          <div className="mb-6">
+            <VehicleReturnForm
+              trip={trip}
+              onSave={handleSaveVehicleReturn}
+            />
+          </div>
+        )}
+
+        {/* ── STAGE 02: KERALA UNLOADING & DELIVERY AUDIT ───────────────────── */}
+        {(activeWorkflowTab === 'all' || activeWorkflowTab === 'stage-2') && (
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <SectionLabel>Stage 02 · Kerala Unloading &amp; Delivery Audit</SectionLabel>
+              <button
+                onClick={() => setIsAuditModalOpen(true)}
+                className="text-xs font-bold text-gold hover:underline flex items-center gap-1 cursor-pointer"
+              >
+                <ShieldCheckIcon className="h-3.5 w-3.5" />
+                <span>{trip.auditStatus ? 'Update Unloading Audit' : 'Record Unloading Audit'}</span>
+              </button>
+            </div>
+
+            {/* Multi-Party Kerala Delivery Allocations & Alternative Reassignments */}
+            <div className="mb-5">
+              <MultiPartyUnloadingCard
+                trip={trip}
+                unloadingParties={unloadingParties}
+                onTripUpdated={fetchTrip}
+              />
+            </div>
+
+          <Card className="p-5 bg-gradient-to-r from-ink-900 via-ink-950 to-ink-900 border-gold/30 shadow-xl overflow-hidden relative">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+              {/* Left Column: Location, Pieces, Damages */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-gold/15 border border-gold/40 px-2.5 py-0.5 text-[10px] font-black uppercase text-gold">
+                    <MapPinIcon className="h-3 w-3" />
+                    {trip.unloadingLocation || dest?.district || 'Kerala Site'}
+                  </span>
+                  <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase ${
+                    trip.auditStatus === 'verified'
+                      ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                      : trip.auditStatus === 'disputed'
+                      ? 'bg-red-500/20 text-red-300 border border-red-500/30'
+                      : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                  }`}>
+                    <CheckIcon className="h-3 w-3" />
+                    {trip.auditStatus ? trip.auditStatus.replace('_', ' ') : 'Audited'}
+                  </span>
+                  {trip.auditedAt && (
+                    <span className="text-[10px] text-neutral-400">
+                      Audited: {new Date(trip.auditedAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-3 gap-3 text-xs">
+                  <div className="bg-black/40 rounded-xl p-2.5 border border-white/5">
+                    <span className="text-[10px] uppercase text-neutral-400 font-semibold block">Loaded Quarry</span>
+                    <span className="text-sm font-black text-white font-mono">
+                      {(trip.stoneLines || []).reduce((s, l) => s + (Number(l.pieces) || 0), 0)} pcs
+                    </span>
+                  </div>
+                  <div className="bg-emerald-950/20 rounded-xl p-2.5 border border-emerald-500/20">
+                    <span className="text-[10px] uppercase text-emerald-400 font-semibold block">Unloaded Sound</span>
+                    <span className="text-sm font-black text-emerald-300 font-mono">
+                      {trip.unloadedPieces !== undefined
+                        ? trip.unloadedPieces
+                        : Math.max(0, (trip.stoneLines || []).reduce((s, l) => s + (Number(l.pieces) || 0), 0) - (trip.damagedPieces || 0))} pcs
+                    </span>
+                  </div>
+                  <div className={`rounded-xl p-2.5 border ${
+                    (trip.damagedPieces || 0) > 0
+                      ? 'bg-red-950/30 border-red-500/40 text-red-300'
+                      : 'bg-black/40 border-white/5 text-neutral-400'
+                  }`}>
+                    <span className="text-[10px] uppercase font-semibold block">Damaged / Broken</span>
+                    <span className="text-sm font-black font-mono">
+                      {(trip.damagedPieces || 0) > 0 ? `⚠ ${trip.damagedPieces} pcs` : '0 pcs'}
+                    </span>
+                  </div>
+                </div>
+
+                {trip.auditNote && (
+                  <div className="text-xs text-neutral-300 bg-white/5 rounded-xl p-2.5 border border-white/5">
+                    <strong className="text-gold font-bold">Audit Remarks:</strong> {trip.auditNote}
+                  </div>
+                )}
+              </div>
+
+              {/* Right Column: Payments Collected vs Lessened/Deductions */}
+              <div className="border-t lg:border-t-0 lg:border-l border-white/10 pt-4 lg:pt-0 lg:pl-6 space-y-2 min-w-[260px]">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-neutral-400">Total Agreed Bill:</span>
+                  <span className="font-mono font-bold text-white">{formatINR(revenue)}</span>
+                </div>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-emerald-400">💵 Cash Paid to Driver:</span>
+                  <span className="font-mono font-bold text-emerald-300">{formatINR(trip.partyToDriverCash || 0)}</span>
+                </div>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-blue-400">📱 PhonePe to Owner:</span>
+                  <span className="font-mono font-bold text-blue-300">{formatINR(trip.partyToOwnerPhonePe || 0)}</span>
+                </div>
+                {((trip.damageDeduction || 0) + (trip.shortageDeduction || 0)) > 0 && (
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-red-400">✂ Amount Lessened / Cut:</span>
+                    <span className="font-mono font-bold text-red-300">
+                      − {formatINR((trip.damageDeduction || 0) + (trip.shortageDeduction || 0))}
+                    </span>
+                  </div>
+                )}
+                <div className="pt-2 border-t border-white/10 flex justify-between items-center">
+                  <span className="text-xs font-bold text-neutral-300">Remaining Pending:</span>
+                  <span className="text-sm font-black text-gold font-mono">
+                    {formatINR(Math.max(0, revenue - (trip.amountPaid || 0) - ((trip.damageDeduction || 0) + (trip.shortageDeduction || 0))))}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
+        )}
+
+        {/* ── STAGE 01: LOAD BREAKDOWN & QUARRY COST ───────────────────────── */}
+        {(activeWorkflowTab === 'all' || activeWorkflowTab === 'stage-1') && (
+        <div className="mb-6 space-y-6">
+          <MultiQuarryLoadingCard
+            trip={trip}
+            loadingParties={loadingParties}
+            onTripUpdated={fetchTrip}
+          />
+
+          <SectionLabel>Legacy Outbound Quarry Breakdown</SectionLabel>
           <div className="mt-4 space-y-5">
             {partyIds.length === 0 && (
               <p className="text-sm text-neutral-500">No stone lines loaded for this trip.</p>
@@ -379,6 +812,7 @@ export function TripDetail() {
             })}
           </div>
         </div>
+        )}
 
         {/* Expenses with review actions */}
         <div className="mb-6">
@@ -619,6 +1053,30 @@ export function TripDetail() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Kerala Unloading & Delivery Audit Modal */}
+      {isAuditModalOpen && (
+        <KeralaDeliveryAuditModal
+          trip={trip}
+          isOpen={isAuditModalOpen}
+          onClose={() => setIsAuditModalOpen(false)}
+          onSuccess={fetchTrip}
+        />
+      )}
+
+      {/* Full Trip PDF Report Modal */}
+      {isPdfModalOpen && (
+        <TripPdfReportModal
+          trip={trip}
+          isOpen={isPdfModalOpen}
+          onClose={() => setIsPdfModalOpen(false)}
+          lorries={lorries}
+          drivers={drivers}
+          loadingParties={loadingParties}
+          unloadingParties={unloadingParties}
+          districtRates={districtRates}
+        />
       )}
     </div>
   );

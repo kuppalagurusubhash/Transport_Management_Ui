@@ -5,29 +5,30 @@ import {
   TruckIcon,
   RouteIcon,
   UsersIcon,
+  Building2Icon,
   PackageOpenIcon,
   MapPinnedIcon,
-  Gem,
-  ClipboardListIcon,
-  MapIcon,
+  CreditCardIcon,
+  WalletCardsIcon,
+  FileTextIcon,
   XIcon,
-  UserIcon,
-  LogOut,
-  Settings,
-  SparklesIcon,
-  ExternalLinkIcon
+  LogOutIcon,
+  ShoppingBagIcon
 } from 'lucide-react';
+
+
+import { useOrders } from '../../store/OrdersContext';
 
 interface NavItem {
   to: string;
   label: string;
-  badge?: string;
+  badgeKey?: 'loading' | 'orders';
   icon: ComponentType<{
     className?: string;
   }>;
 }
 
-const mainNavItems: NavItem[] = [
+const navItems: NavItem[] = [
   {
     to: '/',
     label: 'Overview',
@@ -36,7 +37,14 @@ const mainNavItems: NavItem[] = [
   {
     to: '/orders',
     label: 'Orders',
-    icon: ClipboardListIcon
+    badgeKey: 'orders',
+    icon: ShoppingBagIcon
+  },
+  {
+    to: '/loading',
+    label: 'Loading',
+    badgeKey: 'loading',
+    icon: PackageOpenIcon
   },
   {
     to: '/trips',
@@ -45,7 +53,7 @@ const mainNavItems: NavItem[] = [
   },
   {
     to: '/fleet',
-    label: 'Fleet',
+    label: 'Lorries',
     icon: TruckIcon
   },
   {
@@ -56,7 +64,7 @@ const mainNavItems: NavItem[] = [
   {
     to: '/loading-parties',
     label: 'Loading Parties',
-    icon: PackageOpenIcon
+    icon: Building2Icon
   },
   {
     to: '/unloading-parties',
@@ -64,35 +72,19 @@ const mainNavItems: NavItem[] = [
     icon: MapPinnedIcon
   },
   {
-    to: '/district-rates',
-    label: 'District Rates',
-    icon: MapIcon
+    to: '/payments',
+    label: 'Payments',
+    icon: CreditCardIcon
   },
   {
-    to: '/rates',
-    label: 'Stone Rates',
-    icon: Gem
-  }
-];
-
-const portalNavItems: NavItem[] = [
-  {
-    to: '/driver',
-    label: 'Driver Portal',
-    badge: 'Chit Scanner',
-    icon: UserIcon
+    to: '/reports',
+    label: 'Reports',
+    icon: FileTextIcon
   },
   {
-    to: '/loading',
-    label: 'Quarry Loading Portal',
-    badge: 'Supervisor',
-    icon: TruckIcon
-  },
-  {
-    to: '/buyer',
-    label: 'Buyer Order Portal',
-    badge: 'Kerala Depot',
-    icon: PackageOpenIcon
+    to: '/settings?tab=pricing',
+    label: 'Settings & Rates',
+    icon: WalletCardsIcon
   }
 ];
 
@@ -103,6 +95,10 @@ interface SidebarProps {
 
 export function Sidebar({ open, onClose }: SidebarProps) {
   const navigate = useNavigate();
+  const { trips, orders } = useOrders();
+
+  const loadingCount = trips.filter((t) => t.status === 'loading').length;
+  const newOrdersCount = orders.filter((o) => o.status === 'placed').length;
 
   const handleLogout = () => {
     localStorage.removeItem('isAuthenticated');
@@ -111,163 +107,153 @@ export function Sidebar({ open, onClose }: SidebarProps) {
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('username');
     localStorage.removeItem('name');
-    localStorage.removeItem('buyerRef');
-    localStorage.removeItem('driverRef');
     navigate('/login');
   };
 
   return (
     <>
+      {/* Mobile backdrop */}
       {open && (
         <div
-          className="fixed inset-0 z-30 bg-black/60 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/75 backdrop-blur-sm lg:hidden"
           onClick={onClose}
           aria-hidden="true"
         />
       )}
+
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-ink-700 bg-ink-950 transition-transform duration-300 lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-[#F5B82E]/15 bg-[#070B0E] transition-transform duration-300 lg:static lg:translate-x-0 ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
+        style={{
+          backgroundImage: `
+            radial-gradient(ellipse 100% 40% at 50% 90%, rgba(245, 184, 46, 0.08) 0%, transparent 70%),
+            linear-gradient(180deg, #090E14 0%, #06090D 50%, #040608 100%)
+          `
+        }}
       >
-        {/* Logo and branding */}
-        <div className="flex items-center justify-between border-b border-ink-700 px-6 py-5">
+        {/* Brand Header */}
+        <div className="relative flex items-center justify-between px-5 py-4">
+          {/* Smooth Glassmorphic Ambient Underline */}
+          <div className="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none" />
+          <div className="absolute inset-x-6 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-[#F5B82E]/35 to-transparent blur-[0.5px] pointer-events-none" />
+
           <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-md bg-gold font-extrabold text-ink-950 shadow-md">
-              TA
-            </span>
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#F5B82E] via-[#E2A621] to-[#C98A14] font-black text-[#05090D] shadow-[0_4px_15px_rgba(245,184,46,0.3)] text-base tracking-tighter">
+              SB
+            </div>
             <div className="leading-tight">
-              <p className="text-base font-extrabold tracking-tight text-white">
-                TRANS IA
+              <p className="text-sm font-black tracking-wide text-white">
+                SRI SAI BABA
               </p>
-              <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">
-                Transport &amp; Logistics
+              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#F5B82E]/85">
+                TRANSPORT &amp; STONE LOGISTICS
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-neutral-500 hover:text-white lg:hidden"
+            className="rounded-lg p-1 text-neutral-400 hover:bg-white/10 hover:text-white lg:hidden cursor-pointer"
             aria-label="Close menu"
           >
             <XIcon className="h-5 w-5" />
           </button>
         </div>
 
-        {/* Scrollable navigation area */}
-        <div className="flex-1 overflow-y-auto ti-scroll p-3 space-y-5">
-          {/* Main Management Section */}
-          <div>
-            <p className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-neutral-500">
-              Management Ledger
-            </p>
-            <nav className="space-y-0.5" aria-label="Primary">
-              {mainNavItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    end={item.to === '/'}
-                    onClick={onClose}
-                    className={({ isActive }) =>
-                      `flex items-center gap-3 rounded-md px-3 py-2 text-xs font-medium transition-colors ${
-                        isActive
-                          ? 'bg-gold/10 text-gold font-semibold'
-                          : 'text-neutral-400 hover:bg-ink-850 hover:text-white'
-                      }`
-                    }
-                  >
-                    <Icon className="h-4 w-4 shrink-0" />
-                    {item.label}
-                  </NavLink>
-                );
-              })}
-            </nav>
-          </div>
+        {/* Navigation Items List */}
+        <div className="ti-scroll flex-1 overflow-y-auto px-3.5 py-4 space-y-1">
+          <nav className="space-y-1" aria-label="Main Navigation">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const badgeNum =
+                item.badgeKey === 'loading'
+                  ? loadingCount
+                  : item.badgeKey === 'orders'
+                  ? newOrdersCount
+                  : 0;
 
-          {/* Operational Portals (Owner Full Access) */}
-          <div className="rounded-xl border border-gold/25 bg-gold/5 p-2 space-y-1">
-            <div className="flex items-center justify-between px-2 pt-1 pb-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-gold flex items-center gap-1.5">
-                <SparklesIcon className="h-3 w-3 text-gold" />
-                Operational Portals
-              </span>
-              <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-gold/20 text-gold uppercase">
-                Owner Access
-              </span>
-            </div>
-            <nav className="space-y-0.5">
-              {portalNavItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    onClick={onClose}
-                    className={({ isActive }) =>
-                      `flex items-center justify-between rounded-lg px-2.5 py-2 text-xs font-medium transition-all ${
-                        isActive
-                          ? 'bg-gold text-ink-950 font-bold shadow-sm'
-                          : 'text-neutral-300 hover:bg-gold/15 hover:text-white'
-                      }`
-                    }
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <Icon className="h-4 w-4 shrink-0" />
-                      <span className="truncate">{item.label}</span>
-                    </div>
-                    {item.badge && (
-                      <span className="text-[9px] font-semibold opacity-75 shrink-0 ml-1">
-                        {item.badge}
-                      </span>
-                    )}
-                  </NavLink>
-                );
-              })}
-            </nav>
-          </div>
-
-          {/* System Settings */}
-          <div>
-            <p className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-neutral-500">
-              System
-            </p>
-            <NavLink
-              to="/settings"
-              onClick={onClose}
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-md px-3 py-2 text-xs font-medium transition-colors ${
-                  isActive
-                    ? 'bg-gold/10 text-gold font-semibold'
-                    : 'text-neutral-400 hover:bg-ink-850 hover:text-white'
-                }`
-              }
-            >
-              <Settings className="h-4 w-4 shrink-0" />
-              Settings
-            </NavLink>
-          </div>
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.to === '/'}
+                  onClick={onClose}
+                  className={({ isActive }) =>
+                    `group flex items-center justify-between rounded-xl px-3.5 py-2.5 text-xs font-semibold transition-all duration-200 ${
+                      isActive
+                        ? 'bg-gradient-to-r from-[#F5B82E]/25 via-[#F5B82E]/12 to-transparent text-white border border-[#F5B82E]/40 shadow-[0_0_18px_rgba(245,184,46,0.18)] ring-1 ring-[#F5B82E]/25'
+                        : 'text-neutral-400 hover:bg-white/5 hover:text-neutral-100 hover:border-white/10'
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`flex h-6 w-6 items-center justify-center rounded-lg transition-colors ${
+                            isActive
+                              ? 'text-[#F5B82E]'
+                              : 'text-neutral-400 group-hover:text-[#F5B82E]'
+                          }`}
+                        >
+                          <Icon className="h-4 w-4 shrink-0" />
+                        </div>
+                        <span className="tracking-wide">{item.label}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        {badgeNum > 0 && (
+                          <span className={`inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-extrabold rounded-full ${
+                            item.badgeKey === 'loading'
+                              ? 'bg-amber-400/20 text-amber-300 border border-amber-400/40'
+                              : 'bg-gold/20 text-gold border border-gold/40'
+                          }`}>
+                            {badgeNum}
+                          </span>
+                        )}
+                        {isActive && (
+                          <div className="h-1.5 w-1.5 rounded-full bg-[#F5B82E] shadow-[0_0_8px_#F5B82E]" />
+                        )}
+                      </div>
+                    </>
+                  )}
+                </NavLink>
+              );
+            })}
+          </nav>
         </div>
 
-        {/* Footer profile & logout */}
-        <div className="border-t border-ink-700 p-4">
+        {/* Mountain Scenic Quote Backdrop */}
+        <div className="relative px-4 py-3.5 text-center border-t border-white/5 overflow-hidden">
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#F5B82E]/10 via-transparent to-transparent" />
+          <p className="relative font-serif italic text-xs text-[#FCE8A6]/60 leading-relaxed tracking-wide">
+            &ldquo;Reliable Transport <br />
+            for a Stronger Tomorrow&rdquo;
+          </p>
+        </div>
+
+        {/* User Account Footer Profile */}
+        <div className="border-t border-white/10 p-3.5 bg-[#040608]/80 backdrop-blur-md">
           <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gold/20 border border-gold/40 text-xs font-bold text-gold">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#F5B82E]/20 to-[#C98A14]/30 border border-[#F5B82E]/40 text-[#F5B82E] text-sm font-bold shadow-inner">
                 👑
-              </span>
-              <div className="leading-tight">
-                <p className="text-sm font-semibold text-white">Owner Account</p>
-                <p className="text-[11px] text-green-400">All Portals Unlocked</p>
+              </div>
+              <div className="min-w-0 leading-tight">
+                <p className="truncate text-xs font-bold text-white">
+                  Owner Account
+                </p>
+                <p className="text-[10px] text-neutral-400 font-medium">
+                  Admin
+                </p>
               </div>
             </div>
+
             <button
               onClick={handleLogout}
-              className="rounded p-1.5 text-neutral-400 hover:bg-ink-800 hover:text-red-400 transition-colors"
-              title="Log out"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 text-neutral-400 hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-400 transition-colors cursor-pointer"
+              title="Logout"
             >
-              <LogOut className="h-4 w-4" />
+              <LogOutIcon className="h-4 w-4" />
             </button>
           </div>
         </div>
