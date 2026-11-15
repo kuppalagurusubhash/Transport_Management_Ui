@@ -859,216 +859,169 @@ export function Overview() {
         </div>
       </div>
 
-      {/* 2. Top 4 KPI Stat Cards */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {/* 2. Top 4 KPI Stat Cards (2x2 Bento Grid on iPhone, 4-Column on Desktop) */}
-        <div className="grid grid-cols-2 gap-2.5 sm:gap-3 xl:grid-cols-4">
-          {/* Total Revenue */}
-          <motion.div
-            whileHover={{ y: -2 }}
-            className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-[#0F1D17] via-[#0C1612] to-[#080E0C] p-3 sm:p-3.5 shadow-md"
-            className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-[#0F1D17] via-[#0C1612] to-[#080E0C] p-2.5 sm:p-3.5 shadow-md"
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/25 shadow-inner">
-                <CoinsIcon className="h-5 w-5" />
-                <div className="flex items-start sm:items-center gap-2 sm:gap-3">
-                  <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/25 shadow-inner">
-                    <CoinsIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[11px] font-semibold text-neutral-400">Total Revenue</p>
-                    <div className="mt-0.5 flex items-baseline gap-2">
-                      <span className="font-mono text-lg sm:text-xl font-black text-white">
-                        <p className="text-[10px] sm:text-[11px] font-semibold text-neutral-400 truncate">Total Revenue</p>
-                        <div className="mt-0.5 flex flex-wrap items-baseline gap-1 sm:gap-2">
-                          <span className="font-mono text-sm sm:text-xl font-black text-white truncate">
-                            {formatINR(stats.revenue)}
-                          </span>
-                          <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-400">
-                            <ArrowUpRightIcon className="h-3 w-3" /> +12%
-                            <span className="inline-flex items-center gap-0.5 text-[9px] sm:text-[10px] font-bold text-emerald-400">
-                              <ArrowUpRightIcon className="h-2.5 w-2.5 sm:h-3 sm:w-3" /> +12%
-                            </span>
-                        </div>
-                        <p className="text-[9.5px] text-neutral-500">vs last month</p>
-                        <p className="text-[9px] sm:text-[9.5px] text-neutral-500">vs last month</p>
-                    </div>
-                  </div>
-                </motion.div>
+      {/* 2. Top 4 KPI Stat Cards (2x2 Bento Grid on iPhone, 4-Column on Desktop) */}
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3 xl:grid-cols-4">
+        {/* Total Revenue */}
+        <motion.div
+          whileHover={{ y: -2 }}
+          className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-[#0F1D17] via-[#0C1612] to-[#080E0C] p-2.5 sm:p-3.5 shadow-md"
+        >
+          <div className="flex items-start sm:items-center gap-2 sm:gap-3">
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/25 shadow-inner">
+              <CoinsIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] sm:text-[11px] font-semibold text-neutral-400 truncate">Total Revenue</p>
+              <div className="mt-0.5 flex flex-wrap items-baseline gap-1 sm:gap-2">
+                <span className="font-mono text-sm sm:text-xl font-black text-white truncate">
+                  {formatINR(stats.revenue)}
+                </span>
+                <span className="inline-flex items-center gap-0.5 text-[9px] sm:text-[10px] font-bold text-emerald-400">
+                  <ArrowUpRightIcon className="h-2.5 w-2.5 sm:h-3 sm:w-3" /> +12%
+                </span>
+              </div>
+              <p className="text-[9px] sm:text-[9.5px] text-neutral-500">vs last month</p>
+            </div>
+          </div>
+        </motion.div>
 
-                {/* Total Expenses */}
-                <motion.div
-                  whileHover={{ y: -2 }}
-                  className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-[#241315] via-[#1B0F10] to-[#12090A] p-3 sm:p-3.5 shadow-md"
-                  className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-[#241315] via-[#1B0F10] to-[#12090A] p-2.5 sm:p-3.5 shadow-md"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-500/20 text-red-400 border border-red-500/25 shadow-inner">
-                      <WalletIcon className="h-5 w-5" />
-                      <div className="flex items-start sm:items-center gap-2 sm:gap-3">
-                        <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-red-500/20 text-red-400 border border-red-500/25 shadow-inner">
-                          <WalletIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-[11px] font-semibold text-neutral-400">Total Expenses</p>
-                          <div className="mt-0.5 flex items-baseline gap-2">
-                            <span className="font-mono text-lg sm:text-xl font-black text-red-400">
-                              <p className="text-[10px] sm:text-[11px] font-semibold text-neutral-400 truncate">Total Expenses</p>
-                              <div className="mt-0.5 flex flex-wrap items-baseline gap-1 sm:gap-2">
-                                <span className="font-mono text-sm sm:text-xl font-black text-red-400 truncate">
-                                  {formatINR(stats.expenses)}
-                                </span>
-                                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-red-400">
-                                  <ArrowUpRightIcon className="h-3 w-3" /> +8%
-                                  <span className="inline-flex items-center gap-0.5 text-[9px] sm:text-[10px] font-bold text-red-400">
-                                    <ArrowUpRightIcon className="h-2.5 w-2.5 sm:h-3 sm:w-3" /> +8%
-                                  </span>
-                              </div>
-                              <p className="text-[9.5px] text-neutral-500">vs last month</p>
-                              <p className="text-[9px] sm:text-[9.5px] text-neutral-500">vs last month</p>
-                          </div>
-                        </div>
-                      </motion.div>
+        {/* Total Expenses */}
+        <motion.div
+          whileHover={{ y: -2 }}
+          className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-[#241315] via-[#1B0F10] to-[#12090A] p-2.5 sm:p-3.5 shadow-md"
+        >
+          <div className="flex items-start sm:items-center gap-2 sm:gap-3">
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-red-500/20 text-red-400 border border-red-500/25 shadow-inner">
+              <WalletIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] sm:text-[11px] font-semibold text-neutral-400 truncate">Total Expenses</p>
+              <div className="mt-0.5 flex flex-wrap items-baseline gap-1 sm:gap-2">
+                <span className="font-mono text-sm sm:text-xl font-black text-red-400 truncate">
+                  {formatINR(stats.expenses)}
+                </span>
+                <span className="inline-flex items-center gap-0.5 text-[9px] sm:text-[10px] font-bold text-red-400">
+                  <ArrowUpRightIcon className="h-2.5 w-2.5 sm:h-3 sm:w-3" /> +8%
+                </span>
+              </div>
+              <p className="text-[9px] sm:text-[9.5px] text-neutral-500">vs last month</p>
+            </div>
+          </div>
+        </motion.div>
 
-                      {/* Total Profit */}
-                      <motion.div
-                        whileHover={{ y: -2 }}
-                        className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-[#241B0D] via-[#1A1308] to-[#120D05] p-3 sm:p-3.5 shadow-md"
-                        className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-[#241B0D] via-[#1A1308] to-[#120D05] p-2.5 sm:p-3.5 shadow-md"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F5B82E]/20 text-[#F5B82E] border border-[#F5B82E]/25 shadow-inner">
-                            <BarChart3Icon className="h-5 w-5" />
-                            <div className="flex items-start sm:items-center gap-2 sm:gap-3">
-                              <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-[#F5B82E]/20 text-[#F5B82E] border border-[#F5B82E]/25 shadow-inner">
-                                <BarChart3Icon className="h-4 w-4 sm:h-5 sm:w-5" />
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <p className="text-[11px] font-semibold text-neutral-400">Total Profit</p>
-                                <div className="mt-0.5 flex items-baseline gap-2">
-                                  <span className="font-mono text-lg sm:text-xl font-black text-[#F5B82E]">
-                                    <p className="text-[10px] sm:text-[11px] font-semibold text-neutral-400 truncate">Total Profit</p>
-                                    <div className="mt-0.5 flex flex-wrap items-baseline gap-1 sm:gap-2">
-                                      <span className="font-mono text-sm sm:text-xl font-black text-[#F5B82E] truncate">
-                                        {formatINR(stats.profit)}
-                                      </span>
-                                      <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-400">
-                                        <ArrowUpRightIcon className="h-3 w-3" /> +24%
-                                        <span className="inline-flex items-center gap-0.5 text-[9px] sm:text-[10px] font-bold text-emerald-400">
-                                          <ArrowUpRightIcon className="h-2.5 w-2.5 sm:h-3 sm:w-3" /> +24%
-                                        </span>
-                                    </div>
-                                    <p className="text-[9.5px] text-neutral-500">vs last month</p>
-                                    <p className="text-[9px] sm:text-[9.5px] text-neutral-500">vs last month</p>
-                                </div>
-                              </div>
-                            </motion.div>
+        {/* Total Profit */}
+        <motion.div
+          whileHover={{ y: -2 }}
+          className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-[#241B0D] via-[#1A1308] to-[#120D05] p-2.5 sm:p-3.5 shadow-md"
+        >
+          <div className="flex items-start sm:items-center gap-2 sm:gap-3">
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-[#F5B82E]/20 text-[#F5B82E] border border-[#F5B82E]/25 shadow-inner">
+              <BarChart3Icon className="h-4 w-4 sm:h-5 sm:w-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] sm:text-[11px] font-semibold text-neutral-400 truncate">Total Profit</p>
+              <div className="mt-0.5 flex flex-wrap items-baseline gap-1 sm:gap-2">
+                <span className="font-mono text-sm sm:text-xl font-black text-[#F5B82E] truncate">
+                  {formatINR(stats.profit)}
+                </span>
+                <span className="inline-flex items-center gap-0.5 text-[9px] sm:text-[10px] font-bold text-emerald-400">
+                  <ArrowUpRightIcon className="h-2.5 w-2.5 sm:h-3 sm:w-3" /> +24%
+                </span>
+              </div>
+              <p className="text-[9px] sm:text-[9.5px] text-neutral-500">vs last month</p>
+            </div>
+          </div>
+        </motion.div>
 
-                            {/* Total Trips */}
-                            <motion.div
-                              whileHover={{ y: -2 }}
-                              className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-[#101A29] via-[#0C1320] to-[#070C14] p-3 sm:p-3.5 shadow-md"
-                              className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-[#101A29] via-[#0C1320] to-[#070C14] p-2.5 sm:p-3.5 shadow-md"
-                            >
-                              <div className="flex items-center gap-3">
-                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/20 text-blue-400 border border-blue-500/25 shadow-inner">
-                                  <FileTextIcon className="h-5 w-5" />
-                                  <div className="flex items-start sm:items-center gap-2 sm:gap-3">
-                                    <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/20 text-blue-400 border border-blue-500/25 shadow-inner">
-                                      <FileTextIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-                                    </div>
-                                    <div className="min-w-0 flex-1">
-                                      <p className="text-[11px] font-semibold text-neutral-400">Total Trips</p>
-                                      <div className="mt-0.5 flex items-baseline gap-2">
-                                        <span className="font-mono text-lg sm:text-xl font-black text-white">
-                                          <p className="text-[10px] sm:text-[11px] font-semibold text-neutral-400 truncate">Total Trips</p>
-                                          <div className="mt-0.5 flex flex-wrap items-baseline gap-1 sm:gap-2">
-                                            <span className="font-mono text-sm sm:text-xl font-black text-white">
-                                              {stats.totalTrips}
-                                            </span>
-                                            <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-400">
-                                              <ArrowUpRightIcon className="h-3 w-3" /> +20%
-                                              <span className="inline-flex items-center gap-0.5 text-[9px] sm:text-[10px] font-bold text-emerald-400">
-                                                <ArrowUpRightIcon className="h-2.5 w-2.5 sm:h-3 sm:w-3" /> +20%
-                                              </span>
-                                          </div>
-                                          <p className="text-[9.5px] text-neutral-500">All time trips</p>
-                                          <p className="text-[9px] sm:text-[9.5px] text-neutral-500">All time trips</p>
-                                      </div>
-                                    </div>
-                                  </motion.div>
-                                </div>
+        {/* Total Trips */}
+        <motion.div
+          whileHover={{ y: -2 }}
+          className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-[#101A29] via-[#0C1320] to-[#070C14] p-2.5 sm:p-3.5 shadow-md"
+        >
+          <div className="flex items-start sm:items-center gap-2 sm:gap-3">
+            <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/20 text-blue-400 border border-blue-500/25 shadow-inner">
+              <FileTextIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] sm:text-[11px] font-semibold text-neutral-400 truncate">Total Trips</p>
+              <div className="mt-0.5 flex flex-wrap items-baseline gap-1 sm:gap-2">
+                <span className="font-mono text-sm sm:text-xl font-black text-white">
+                  {stats.totalTrips}
+                </span>
+                <span className="inline-flex items-center gap-0.5 text-[9px] sm:text-[10px] font-bold text-emerald-400">
+                  <ArrowUpRightIcon className="h-2.5 w-2.5 sm:h-3 sm:w-3" /> +20%
+                </span>
+              </div>
+              <p className="text-[9px] sm:text-[9.5px] text-neutral-500">All time trips</p>
+            </div>
+          </div>
+        </motion.div>
+      </div>
 
-                                {/* 3. Hero Fleet Showcase: Compact 3D Interactive Moving Fleet Showroom */}
-                                <FleetShowcaseCarousel onSelectLorry={setSelectedLorry} />
+      {/* 3. Hero Fleet Showcase: Compact 3D Interactive Moving Fleet Showroom */}
+      <FleetShowcaseCarousel onSelectLorry={setSelectedLorry} />
 
-                                {/* 4. Fleet Statistics Section */}
-                                <div className="space-y-3">
-                                  <div className="flex flex-wrap items-center justify-between gap-2.5">
-                                    <div className="flex items-center gap-2.5">
-                                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#F5B82E]/15 text-[#F5B82E] border border-[#F5B82E]/25">
-                                        <TruckIcon className="h-4 w-4" />
-                                      </div>
-                                      <div>
-                                        <div className="flex items-center gap-2">
-                                          <h2 className="text-base sm:text-lg font-bold tracking-tight text-white">
-                                            Fleet Statistics
-                                          </h2>
-                                          {isFetchingStats && (
-                                            <span className="flex h-2 w-2 rounded-full bg-[#F5B82E] animate-ping" title="Syncing vehicle data..." />
-                                          )}
-                                        </div>
-                                        <p className="text-[11px] text-neutral-400">
-                                          {fleetScope === 'vehicle' && selectedLorry
-                                            ? `Live telemetry & operational statistics for ${selectedLorry.plate}`
-                                            : 'Live status of all vehicles in your fleet'}
-                                        </p>
-                                      </div>
-                                    </div>
+      {/* 4. Fleet Statistics Section */}
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#F5B82E]/15 text-[#F5B82E] border border-[#F5B82E]/25">
+              <TruckIcon className="h-4 w-4" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-base sm:text-lg font-bold tracking-tight text-white">
+                  Fleet Statistics
+                </h2>
+                {isFetchingStats && (
+                  <span className="flex h-2 w-2 rounded-full bg-[#F5B82E] animate-ping" title="Syncing vehicle data..." />
+                )}
+              </div>
+              <p className="text-[11px] text-neutral-400">
+                {fleetScope === 'vehicle' && selectedLorry
+                  ? `Live telemetry & operational statistics for ${selectedLorry.plate}`
+                  : 'Live status of all vehicles in your fleet'}
+              </p>
+            </div>
+          </div>
 
-                                    {/* Scope Selector: Selected Vehicle vs All Fleet */}
-                                    <div className="flex items-center gap-2">
-                                      <div className="flex items-center rounded-lg border border-white/10 bg-[#0A0E14] p-0.5 shadow-inner">
-                                        <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
-                                          <div className="flex items-center rounded-lg border border-white/10 bg-[#0A0E14] p-0.5 shadow-inner flex-1 sm:flex-initial">
-                                            <button
-                                              type="button"
-                                              onClick={() => setFleetScope('vehicle')}
-                                              className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-bold transition-all cursor-pointer ${className = {`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 rounded-md px-2.5 py-1 text-[11px] sm:text-xs font-bold transition-all cursor-pointer ${fleetScope === 'vehicle'
-                                                    ? 'bg-gradient-to-r from-[#F5B82E] to-amber-500 text-black shadow-sm'
-                                                    : 'text-neutral-400 hover:text-white'
-                                                  }`}
+          {/* Scope Selector: Selected Vehicle vs All Fleet */}
+          <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
+            <div className="flex items-center rounded-lg border border-white/10 bg-[#0A0E14] p-0.5 shadow-inner flex-1 sm:flex-initial">
+              <button
+                type="button"
+                onClick={() => setFleetScope('vehicle')}
+                className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 rounded-md px-2.5 py-1 text-[11px] sm:text-xs font-bold transition-all cursor-pointer ${
+                  fleetScope === 'vehicle'
+                    ? 'bg-gradient-to-r from-[#F5B82E] to-amber-500 text-black shadow-sm'
+                    : 'text-neutral-400 hover:text-white'
+                }`}
               >
-                <TruckIcon className="h-3 w-3" />
-                <span>{selectedLorry?.plate || 'Current Vehicle'}</span>
                 <TruckIcon className="h-3 w-3 shrink-0" />
                 <span className="truncate">{selectedLorry?.plate || 'Current Vehicle'}</span>
               </button>
               <button
                 type="button"
                 onClick={() => setFleetScope('all')}
-                className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-bold transition-all cursor-pointer ${
-                                              className = {`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 rounded-md px-2.5 py-1 text-[11px] sm:text-xs font-bold transition-all cursor-pointer ${fleetScope === 'all'
-                                                  ? 'bg-gradient-to-r from-[#F5B82E] to-amber-500 text-black shadow-sm'
-                                                  : 'text-neutral-400 hover:text-white'
-                                                }`}
+                className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 rounded-md px-2.5 py-1 text-[11px] sm:text-xs font-bold transition-all cursor-pointer ${
+                  fleetScope === 'all'
+                    ? 'bg-gradient-to-r from-[#F5B82E] to-amber-500 text-black shadow-sm'
+                    : 'text-neutral-400 hover:text-white'
+                }`}
               >
-                                            <span>All Fleet ({totalLorriesCount})</span>
-                                          </button>
-                                        </div>
+                <span>All Fleet ({totalLorriesCount})</span>
+              </button>
+            </div>
 
-                                        <Link
-                                          to="/fleet"
-                                          className="flex items-center gap-1 rounded-lg border border-white/10 bg-[#0F141A] px-2.5 py-1.5 text-xs font-semibold text-neutral-300 hover:border-[#F5B82E] hover:text-[#F5B82E] transition-all cursor-pointer shadow-sm"
-                                          className="flex items-center gap-1 rounded-lg border border-white/10 bg-[#0F141A] px-2.5 py-1.5 text-[11px] sm:text-xs font-semibold text-neutral-300 hover:border-[#F5B82E] hover:text-[#F5B82E] transition-all cursor-pointer shadow-sm shrink-0"
-                                        >
-                                          <span>View All Lorries</span>
-                                          <span>All Lorries</span>
-                                          <ArrowRightIcon className="h-3 w-3" />
-                                        </Link>
-                                      </div>
-                                    </div>
+            <Link
+              to="/fleet"
+              className="flex items-center gap-1 rounded-lg border border-white/10 bg-[#0F141A] px-2.5 py-1.5 text-[11px] sm:text-xs font-semibold text-neutral-300 hover:border-[#F5B82E] hover:text-[#F5B82E] transition-all cursor-pointer shadow-sm shrink-0"
+            >
+              <span>All Lorries</span>
+              <ArrowRightIcon className="h-3 w-3" />
+            </Link>
+          </div>
+        </div>
 
                                     {/* 5 Quick Fleet Status Cards (Dynamically reacting to selected vehicle or whole fleet) */}
                                     {fleetScope === 'vehicle' && selectedLorry ? (
@@ -1516,135 +1469,102 @@ export function Overview() {
                                     </div>
                                   </div>
 
-                                  {/* 6. Dedicated Kerala Fleet Delivery & Unloading Audit Module */}
-                                  <div className="space-y-3.5">
-                                    <div className="flex flex-wrap items-center justify-between gap-2.5">
-                                      <div className="flex items-center gap-2.5">
-                                        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gold/20 text-gold border border-gold/40 shadow-md">
-                                          <div className="flex items-start sm:items-center gap-2.5 min-w-0">
-                                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gold/20 text-gold border border-gold/40 shadow-md">
-                                              <ShieldCheckIcon className="h-5 w-5" />
-                                            </div>
-                                            <div>
-                                              <div className="flex items-center gap-2">
-                                                <h2 className="text-base sm:text-lg font-black tracking-tight text-white flex items-center gap-2">
-                                                  <span>Kerala Delivery &amp; Unloading Audit</span>
-                                                  <span className="text-[11px] font-mono text-gold border border-gold/30 bg-gold/10 px-2 py-0.5 rounded-full font-bold">
-                                                    OWNER AUDIT HUB
-                                                  </span>
-                                                  <div className="min-w-0">
-                                                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                                                      <h2 className="text-base sm:text-lg font-black tracking-tight text-white">
-                                                        Kerala Delivery &amp; Unloading Audit
-                                                      </h2>
-                                                      <span className="text-[10px] sm:text-[11px] font-mono text-gold border border-gold/30 bg-gold/10 px-2 py-0.5 rounded-full font-bold">
-                                                        OWNER AUDIT HUB
-                                                      </span>
-                                                      <span className="rounded-full bg-emerald-500/15 text-emerald-300 text-[10px] font-bold px-2 py-0.5 border border-emerald-500/30">
-                                                        {fleetScope === 'vehicle' && selectedLorry ? `${selectedLorry.plate}` : 'All Fleets'}
-                                                      </span>
-                                                    </div>
-                                                    <p className="text-[11px] text-neutral-400">
-                                                      <p className="text-[11px] text-neutral-400 mt-0.5">
-                                                        Audit where the fleet unloaded in Kerala, stone pieces, damages, cash to driver, PhonePe to owner, and amount lessened.
-                                                      </p>
-                                                  </div>
-                                              </div>
+      {/* 6. Dedicated Kerala Fleet Delivery & Unloading Audit Module */}
+      <div className="space-y-3.5">
+        <div className="flex flex-wrap items-center justify-between gap-2.5">
+          <div className="flex items-start sm:items-center gap-2.5 min-w-0">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gold/20 text-gold border border-gold/40 shadow-md">
+              <ShieldCheckIcon className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                <h2 className="text-base sm:text-lg font-black tracking-tight text-white">
+                  Kerala Delivery &amp; Unloading Audit
+                </h2>
+                <span className="text-[10px] sm:text-[11px] font-mono text-gold border border-gold/30 bg-gold/10 px-2 py-0.5 rounded-full font-bold">
+                  OWNER AUDIT HUB
+                </span>
+                <span className="rounded-full bg-emerald-500/15 text-emerald-300 text-[10px] font-bold px-2 py-0.5 border border-emerald-500/30">
+                  {fleetScope === 'vehicle' && selectedLorry ? `${selectedLorry.plate}` : 'All Fleets'}
+                </span>
+              </div>
+              <p className="text-[11px] text-neutral-400 mt-0.5">
+                Audit where the fleet unloaded in Kerala, stone pieces, damages, cash to driver, PhonePe to owner, and amount lessened.
+              </p>
+            </div>
+          </div>
 
-                                              <div className="flex items-center gap-2">
-                                                <Link
-                                                  to="/unloading-parties"
-                                                  className="flex items-center gap-1 rounded-xl border border-white/10 bg-[#0F141A] px-3 py-1.5 text-xs font-bold text-neutral-300 hover:border-gold hover:text-gold transition-all cursor-pointer shadow-sm"
-                                                >
-                                                  <span>Buyer Parties</span>
-                                                  <ArrowRightIcon className="h-3 w-3" />
-                                                </Link>
-                                              </div>
-                                            </div>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/unloading-parties"
+              className="flex items-center gap-1 rounded-xl border border-white/10 bg-[#0F141A] px-3 py-1.5 text-xs font-bold text-neutral-300 hover:border-gold hover:text-gold transition-all cursor-pointer shadow-sm"
+            >
+              <span>Buyer Parties</span>
+              <ArrowRightIcon className="h-3 w-3" />
+            </Link>
+          </div>
+        </div>
 
-                                            {/* Audit Quick KPI Summary Cards */}
-                                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                                              <div className="rounded-xl border border-emerald-500/20 bg-emerald-950/20 p-3 space-y-0.5">
-                                                <span className="text-[10px] uppercase font-bold text-emerald-400 block">Sound Unloaded</span>
-                                                <span className="font-mono text-base font-black text-white">
-                                                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3">
-                                                    <div className="rounded-xl border border-emerald-500/20 bg-emerald-950/20 p-2.5 sm:p-3 space-y-0.5">
-                                                      <span className="text-[9.5px] sm:text-[10px] uppercase font-bold text-emerald-400 block truncate">Sound Unloaded</span>
-                                                      <span className="font-mono text-sm sm:text-base font-black text-white block truncate">
-                                                        {unloadingAuditKPIs.totalUnloaded.toLocaleString('en-IN')} pcs
-                                                      </span>
-                                                      <span className="text-[9.5px] text-neutral-400 block">of {unloadingAuditKPIs.totalLoaded.toLocaleString('en-IN')} loaded</span>
-                                                      <span className="text-[9px] sm:text-[9.5px] text-neutral-400 block truncate">of {unloadingAuditKPIs.totalLoaded.toLocaleString('en-IN')} loaded</span>
-                                                    </div>
+        {/* Audit Quick KPI Summary Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3">
+          <div className="rounded-xl border border-emerald-500/20 bg-emerald-950/20 p-2.5 sm:p-3 space-y-0.5">
+            <span className="text-[9.5px] sm:text-[10px] uppercase font-bold text-emerald-400 block truncate">Sound Unloaded</span>
+            <span className="font-mono text-sm sm:text-base font-black text-white block truncate">
+              {unloadingAuditKPIs.totalUnloaded.toLocaleString('en-IN')} pcs
+            </span>
+            <span className="text-[9px] sm:text-[9.5px] text-neutral-400 block truncate">of {unloadingAuditKPIs.totalLoaded.toLocaleString('en-IN')} loaded</span>
+          </div>
 
-                                                    <div className={`rounded-xl p-3 space-y-0.5 border ${<div className={`rounded-xl p-2.5 sm:p-3 space-y-0.5 border ${unloadingAuditKPIs.totalDamaged > 0
-                                                          ? 'border-red-500/40 bg-red-950/30 text-red-300'
-                                                          : 'border-white/10 bg-black/40 text-neutral-400'
-                                                        }`}>
-                                                        <span className="text-[10px] uppercase font-bold block">Damaged Stones</span>
-                                                        <span className="font-mono text-base font-black text-red-300">
-                                                          <span className="text-[9.5px] sm:text-[10px] uppercase font-bold block truncate">Damaged Stones</span>
-                                                          <span className="font-mono text-sm sm:text-base font-black text-red-300 block truncate">
-                                                            {unloadingAuditKPIs.totalDamaged > 0 ? `⚠ ${unloadingAuditKPIs.totalDamaged} pcs` : '0 pcs'}
-                                                          </span>
-                                                          <span className="text-[9.5px] text-neutral-400 block">
-                                                            <span className="text-[9px] sm:text-[9.5px] text-neutral-400 block truncate">
-                                                              {unloadingAuditKPIs.totalDamaged > 0 ? 'Transit / site breakages' : '✓ Zero damages'}
-                                                            </span>
-                                                          </div>
+          <div
+            className={`rounded-xl p-2.5 sm:p-3 space-y-0.5 border ${
+              unloadingAuditKPIs.totalDamaged > 0
+                ? 'border-red-500/40 bg-red-950/30 text-red-300'
+                : 'border-white/10 bg-black/40 text-neutral-400'
+            }`}
+          >
+            <span className="text-[9.5px] sm:text-[10px] uppercase font-bold block truncate">Damaged Stones</span>
+            <span className="font-mono text-sm sm:text-base font-black text-red-300 block truncate">
+              {unloadingAuditKPIs.totalDamaged > 0 ? `⚠ ${unloadingAuditKPIs.totalDamaged} pcs` : '0 pcs'}
+            </span>
+            <span className="text-[9px] sm:text-[9.5px] text-neutral-400 block truncate">
+              {unloadingAuditKPIs.totalDamaged > 0 ? 'Transit / site breakages' : '✓ Zero damages'}
+            </span>
+          </div>
 
-                                                          <div className="rounded-xl border border-emerald-500/20 bg-emerald-950/20 p-3 space-y-0.5">
-                                                            <span className="text-[10px] uppercase font-bold text-emerald-400 block">💵 Cash to Driver</span>
-                                                            <span className="font-mono text-base font-black text-emerald-300">
-                                                              <div className="rounded-xl border border-emerald-500/20 bg-emerald-950/20 p-2.5 sm:p-3 space-y-0.5">
-                                                                <span className="text-[9.5px] sm:text-[10px] uppercase font-bold text-emerald-400 block truncate">💵 Cash to Driver</span>
-                                                                <span className="font-mono text-sm sm:text-base font-black text-emerald-300 block truncate">
-                                                                  {formatINR(unloadingAuditKPIs.totalCash)}
-                                                                </span>
-                                                                <span className="text-[9.5px] text-neutral-400 block">Collected at site</span>
-                                                                <span className="text-[9px] sm:text-[9.5px] text-neutral-400 block truncate">Collected at site</span>
-                                                              </div>
+          <div className="rounded-xl border border-emerald-500/20 bg-emerald-950/20 p-2.5 sm:p-3 space-y-0.5">
+            <span className="text-[9.5px] sm:text-[10px] uppercase font-bold text-emerald-400 block truncate">💵 Cash to Driver</span>
+            <span className="font-mono text-sm sm:text-base font-black text-emerald-300 block truncate">
+              {formatINR(unloadingAuditKPIs.totalCash)}
+            </span>
+            <span className="text-[9px] sm:text-[9.5px] text-neutral-400 block truncate">Collected at site</span>
+          </div>
 
-                                                              <div className="rounded-xl border border-blue-500/20 bg-blue-950/20 p-3 space-y-0.5">
-                                                                <span className="text-[10px] uppercase font-bold text-blue-400 block">📱 PhonePe to Owner</span>
-                                                                <span className="font-mono text-base font-black text-blue-300">
-                                                                  <div className="rounded-xl border border-blue-500/20 bg-blue-950/20 p-2.5 sm:p-3 space-y-0.5">
-                                                                    <span className="text-[9.5px] sm:text-[10px] uppercase font-bold text-blue-400 block truncate">📱 PhonePe to Owner</span>
-                                                                    <span className="font-mono text-sm sm:text-base font-black text-blue-300 block truncate">
-                                                                      {formatINR(unloadingAuditKPIs.totalPhonePe)}
-                                                                    </span>
-                                                                    <span className="text-[9.5px] text-neutral-400 block">Direct owner account</span>
-                                                                    <span className="text-[9px] sm:text-[9.5px] text-neutral-400 block truncate">Direct owner account</span>
-                                                                  </div>
+          <div className="rounded-xl border border-blue-500/20 bg-blue-950/20 p-2.5 sm:p-3 space-y-0.5">
+            <span className="text-[9.5px] sm:text-[10px] uppercase font-bold text-blue-400 block truncate">📱 PhonePe to Owner</span>
+            <span className="font-mono text-sm sm:text-base font-black text-blue-300 block truncate">
+              {formatINR(unloadingAuditKPIs.totalPhonePe)}
+            </span>
+            <span className="text-[9px] sm:text-[9.5px] text-neutral-400 block truncate">Direct owner account</span>
+          </div>
 
-                                                                  <div className="rounded-xl border border-red-500/20 bg-red-950/20 p-3 space-y-0.5">
-                                                                    <span className="text-[10px] uppercase font-bold text-red-400 block">✂ Amount Lessened</span>
-                                                                    <span className="font-mono text-base font-black text-red-300">
-                                                                      <div className="rounded-xl border border-red-500/20 bg-red-950/20 p-2.5 sm:p-3 space-y-0.5">
-                                                                        <span className="text-[9.5px] sm:text-[10px] uppercase font-bold text-red-400 block truncate">✂ Amount Lessened</span>
-                                                                        <span className="font-mono text-sm sm:text-base font-black text-red-300 block truncate">
-                                                                          − {formatINR(unloadingAuditKPIs.totalLessened)}
-                                                                        </span>
-                                                                        <span className="text-[9.5px] text-neutral-400 block">Damage &amp; shortage cuts</span>
-                                                                        <span className="text-[9px] sm:text-[9.5px] text-neutral-400 block truncate">Damage &amp; shortage cuts</span>
-                                                                      </div>
+          <div className="rounded-xl border border-red-500/20 bg-red-950/20 p-2.5 sm:p-3 space-y-0.5">
+            <span className="text-[9.5px] sm:text-[10px] uppercase font-bold text-red-400 block truncate">✂ Amount Lessened</span>
+            <span className="font-mono text-sm sm:text-base font-black text-red-300 block truncate">
+              − {formatINR(unloadingAuditKPIs.totalLessened)}
+            </span>
+            <span className="text-[9px] sm:text-[9.5px] text-neutral-400 block truncate">Damage &amp; shortage cuts</span>
+          </div>
 
-                                                                      <div className="rounded-xl border border-gold/30 bg-gold/5 p-3 space-y-0.5">
-                                                                        <span className="text-[10px] uppercase font-bold text-gold block">Active Kerala Deliveries</span>
-                                                                        <span className="font-mono text-base font-black text-gold">
-                                                                          <div className="rounded-xl border border-gold/30 bg-gold/5 p-2.5 sm:p-3 space-y-0.5">
-                                                                            <span className="text-[9.5px] sm:text-[10px] uppercase font-bold text-gold block truncate">Active Deliveries</span>
-                                                                            <span className="font-mono text-sm sm:text-base font-black text-gold block truncate">
-                                                                              {unloadingAuditKPIs.count} Consignments
-                                                                            </span>
-                                                                            <span className="text-[9.5px] text-neutral-400 block">Kerala buyers</span>
-                                                                            <span className="text-[9px] sm:text-[9.5px] text-neutral-400 block truncate">Kerala buyers</span>
-                                                                          </div>
-                                                                      </div>
+          <div className="rounded-xl border border-gold/30 bg-gold/5 p-2.5 sm:p-3 space-y-0.5">
+            <span className="text-[9.5px] sm:text-[10px] uppercase font-bold text-gold block truncate">Active Deliveries</span>
+            <span className="font-mono text-sm sm:text-base font-black text-gold block truncate">
+              {unloadingAuditKPIs.count} Consignments
+            </span>
+            <span className="text-[9px] sm:text-[9.5px] text-neutral-400 block truncate">Kerala buyers</span>
+          </div>
+        </div>
 
-                                                                      {/* Detailed Kerala Unloading & Delivery Audit Table */}
-                                                                      <div className="rounded-2xl border border-white/10 bg-[#0D1218]/95 p-3.5 sm:p-4 shadow-xl backdrop-blur-2xl">
-                                                                        {/* Mobile Luxury Audit Cards (iPhone / <768px) */}
+        {/* Mobile Luxury Audit Cards (iPhone / <768px) */}
                                                                         <div className="space-y-3 md:hidden">
                                                                           {unloadingDetailsList.length === 0 ? (
                                                                             <div className="rounded-2xl border border-white/10 bg-[#0D1218]/95 p-6 text-center text-xs text-neutral-500">

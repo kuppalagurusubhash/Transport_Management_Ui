@@ -122,12 +122,14 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       )}
 
       <aside
-            }`}
+        className={`fixed inset-y-0 left-0 z-50 flex w-72 sm:w-64 flex-col bg-[#06090D] border-r border-white/[0.06] text-neutral-100 transition-transform duration-300 lg:static lg:translate-x-0 shadow-[4px_0_30px_rgba(0,0,0,0.6)] pt-safe pb-safe ${
+          open ? 'translate-x-0' : '-translate-x-full'
+        }`}
         style={{
           backgroundImage: `
             radial-gradient(ellipse 100% 40% at 50% 90%, rgba(245, 184, 46, 0.08) 0%, transparent 70%),
-      linear-gradient(180deg, #090E14 0%, #06090D 50%, #040608 100%)
-      `
+            linear-gradient(180deg, #090E14 0%, #06090D 50%, #040608 100%)
+          `
         }}
       >
       {/* Brand Header */}

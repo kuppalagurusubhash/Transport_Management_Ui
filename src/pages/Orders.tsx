@@ -155,30 +155,34 @@ export function Orders() {
         }
       />
 
-                          <div className="p-3.5 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
-                            <div className="space-y-3 sm:space-y-4">
-                              {/* Status Tabs with counts */}
-                              <div className="border-b border-ink-800">
-                                  <div className="flex overflow-x-auto no-scrollbar -mb-px gap-1 sm:gap-2">
-                                    {filters.map((f) => {
-                                      const count = f.key === 'all'
-                                        ? orders.length
-                                        : orders.filter((o) => o.status === f.key).length;
+      <div className="p-3.5 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
+        <div className="space-y-3 sm:space-y-4">
+          {/* Status Tabs with counts */}
+          <div className="border-b border-ink-800">
+            <div className="flex overflow-x-auto no-scrollbar -mb-px gap-1 sm:gap-2">
+              {filters.map((f) => {
+                const count = f.key === 'all'
+                  ? orders.length
+                  : orders.filter((o) => o.status === f.key).length;
 
-                                      const isActive = filter === f.key;
+                const isActive = filter === f.key;
 
-                                      return (
-                                        <button
-                                          key={f.key}
-                                          onClick={() => setFilter(f.key)}
-                                                ? 'border-gold text-gold bg-gold/5'
-                                                : 'border-transparent text-neutral-400 hover:border-ink-700 hover:text-white'
-                                              }`}
+                return (
+                  <button
+                    key={f.key}
+                    onClick={() => setFilter(f.key)}
+                    className={`flex items-center gap-2 whitespace-nowrap px-3 sm:px-4 py-2 sm:py-2.5 text-[11px] sm:text-xs font-semibold border-b-2 transition-all shrink-0 ${
+                      isActive
+                        ? 'border-gold text-gold bg-gold/5'
+                        : 'border-transparent text-neutral-400 hover:border-ink-700 hover:text-white'
+                    }`}
                   >
                     <span>{f.label}</span>
-                    <span className={`rounded-full px-1.5 py - 0.5 text - [10px] font - bold ${
-                                        isActive ? 'bg-gold text-ink-950' : 'bg-ink-800 text-neutral-400'
-                                      } `}>
+                    <span
+                      className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                        isActive ? 'bg-gold text-ink-950' : 'bg-ink-800 text-neutral-400'
+                      }`}
+                    >
                       {count}
                     </span>
                   </button>
