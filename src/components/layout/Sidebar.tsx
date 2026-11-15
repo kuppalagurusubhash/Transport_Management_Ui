@@ -18,7 +18,6 @@ import {
 
 
 import { useOrders } from '../../store/OrdersContext';
-import { InstallAppButton } from './InstallAppButton';
 
 interface NavItem {
   to: string;
@@ -233,7 +232,6 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
       {/* User Account Footer Profile */}
       <div className="border-t border-white/10 p-3.5 bg-[#040608]/80 backdrop-blur-md pb-safe">
-        <InstallAppButton variant="sidebar" />
         <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#F5B82E]/20 to-[#C98A14]/30 border border-[#F5B82E]/40 text-[#F5B82E] text-sm font-bold shadow-inner">

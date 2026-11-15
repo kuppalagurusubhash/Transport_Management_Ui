@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 import { authApi, driversApi, unloadingPartiesApi } from '../api/index';
 import { useOrders } from '../store/OrdersContext';
-import { InstallAppButton } from '../components/layout/InstallAppButton';
 import type { Driver, UnloadingParty } from '../data/types';
 
 
@@ -183,11 +182,6 @@ export function Register() {
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="z-10 w-full max-w-md space-y-5 sm:space-y-6 rounded-2xl border border-ink-800 bg-ink-900/75 p-5 sm:p-8 shadow-[0_0_50px_rgba(0,0,0,0.8)] backdrop-blur-xl relative"
         >
-          {/* Install App Button on Register Card */}
-          <div className="absolute top-4 left-4">
-            <InstallAppButton variant="auth" />
-          </div>
-
           {/* Connection Status Badge */}
           <div className="absolute top-4 right-4 flex items-center gap-1.5 rounded-full px-2.5 py-1 bg-ink-950 border border-ink-800 text-[10px] font-semibold text-neutral-400">
             {isBackendOnline === null ? (

@@ -17,7 +17,6 @@ import {
 } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { NotificationBell } from './NotificationBell';
-import { InstallAppButton } from './InstallAppButton';
 import { useOrders } from '../../store/OrdersContext';
 import { showcaseFleetData } from '../../data/fleetShowcase';
 
@@ -180,9 +179,6 @@ export function DashboardLayout() {
 
           {/* Right Header Controls */}
           <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
-            {/* Install Web Application Button */}
-            <InstallAppButton variant="header" />
-
             {/* Mobile Quick Search Button */}
             <button
               onClick={() => {
