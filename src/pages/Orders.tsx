@@ -10,8 +10,9 @@ import {
   orderLineAmount,
   orderLineTotalSqft,
   type OrderStatus,
-  type TripStatus } from
-'../data/types';
+  type TripStatus
+} from
+  '../data/types';
 import { useOrders } from '../store/OrdersContext';
 import { PageHeader } from '../components/layout/PageHeader';
 import { OrderStatusBadge } from '../components/ui/Badge';
@@ -29,20 +30,20 @@ const filters: Array<{
   key: 'all' | OrderStatus;
   label: string;
 }> = [
-  { key: 'all', label: 'All' },
-  { key: 'placed', label: 'New' },
-  { key: 'confirmed', label: 'Confirmed' },
-  { key: 'dispatched', label: 'Dispatched' },
-  { key: 'delivered', label: 'Delivered' },
-  { key: 'paid', label: 'Paid' }
-];
+    { key: 'all', label: 'All' },
+    { key: 'placed', label: 'New' },
+    { key: 'confirmed', label: 'Confirmed' },
+    { key: 'dispatched', label: 'Dispatched' },
+    { key: 'delivered', label: 'Delivered' },
+    { key: 'paid', label: 'Paid' }
+  ];
 
 export function Orders() {
   const navigate = useNavigate();
   const { orders, setOrderStatus, assignOrderToLorry, lorries, drivers, unloadingParties, trips } = useOrders();
   const [filter, setFilter] = useState<'all' | OrderStatus>('all');
   const [isCreateOrderOpen, setIsCreateOrderOpen] = useState(false);
-  
+
   // Local state for tracking which order is currently being assigned a lorry
   const [assigningOrderId, setAssigningOrderId] = useState<string | null>(null);
   const [selectedLorryId, setSelectedLorryId] = useState<string>('');
@@ -125,61 +126,59 @@ export function Orders() {
         title="Orders"
         subtitle=""
         action={
-          <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-            <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-neutral-400">
-              <div className="border-r border-ink-700 pr-4 sm:pr-6">
-                <span className="block text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-0.5">Total Orders</span>
-                <span className="font-bold text-white text-xs sm:text-sm">{orders.length}</span>
-              </div>
-              <div className="border-r border-ink-700 pr-4 sm:pr-6">
-                <span className="block text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-0.5">Total Value</span>
-                <span className="font-bold text-gold text-xs sm:text-sm">{formatINR(totalValue)}</span>
-              </div>
-              <div className="border-r border-ink-700 pr-4 sm:pr-6">
-                <span className="block text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-0.5">Active Orders</span>
-                <span className="font-bold text-amber-400 text-xs sm:text-sm">{activeOrders.length}</span>
-              </div>
-              <div className="border-r border-ink-700 pr-4 sm:pr-6">
-                <span className="block text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-0.5">Active Value</span>
-                <span className="font-bold text-white text-xs sm:text-sm">{formatINR(activeValue)}</span>
-              </div>
-            </div>
-            <button
-              onClick={() => setIsCreateOrderOpen(true)}
-              className="rounded-md bg-gold px-4 py-2 text-xs font-bold text-ink-950 hover:bg-gold-400 transition-colors shadow-md hover:scale-[1.02] active:scale-[0.98] flex items-center gap-1.5"
-            >
-              <PlusIcon className="h-4 w-4" /> Create Order
-            </button>
-          </div>
+                <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-6 w-full sm:w-auto">
+                  <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-6 text-neutral-400">
+                    <div className="rounded-lg border border-ink-800 bg-ink-900/60 p-2 sm:p-0 sm:rounded-none sm:border-0 sm:bg-transparent sm:border-r sm:border-ink-700 sm:pr-6">
+                      <span className="block text-[9.5px] sm:text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-0.5">Total Orders</span>
+                      <span className="font-bold text-white text-xs sm:text-sm font-mono">{orders.length}</span>
+                    </div>
+                      <div className="rounded-lg border border-ink-800 bg-ink-900/60 p-2 sm:p-0 sm:rounded-none sm:border-0 sm:bg-transparent sm:border-r sm:border-ink-700 sm:pr-6">
+                        <span className="block text-[9.5px] sm:text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-0.5">Total Value</span>
+                        <span className="font-bold text-gold text-xs sm:text-sm font-mono">{formatINR(totalValue)}</span>
+                      </div>
+                        <div className="rounded-lg border border-ink-800 bg-ink-900/60 p-2 sm:p-0 sm:rounded-none sm:border-0 sm:bg-transparent sm:border-r sm:border-ink-700 sm:pr-6">
+                          <span className="block text-[9.5px] sm:text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-0.5">Active Orders</span>
+                          <span className="font-bold text-amber-400 text-xs sm:text-sm font-mono">{activeOrders.length}</span>
+                        </div>
+                          <div className="rounded-lg border border-ink-800 bg-ink-900/60 p-2 sm:p-0 sm:rounded-none sm:border-0 sm:bg-transparent sm:border-r sm:border-ink-700 sm:pr-6">
+                            <span className="block text-[9.5px] sm:text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-0.5">Active Value</span>
+                            <span className="font-bold text-white text-xs sm:text-sm font-mono">{formatINR(activeValue)}</span>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setIsCreateOrderOpen(true)}
+                          className="w-full sm:w-auto justify-center rounded-xl sm:rounded-md bg-gold px-4 py-2.5 sm:py-2 text-xs font-bold text-ink-950 hover:bg-gold-400 transition-colors shadow-md hover:scale-[1.02] active:scale-[0.98] flex items-center gap-1.5"
+                        >
+                          <PlusIcon className="h-4 w-4" /> Create Order
+                        </button>
+                      </div>
         }
       />
-      
-      <div className="p-6 sm:p-8 space-y-6">
-        <div className="space-y-4">
-          {/* Status Tabs with counts */}
-          <div className="border-b border-ink-800">
-            <div className="flex flex-wrap -mb-px gap-2">
-              {filters.map((f) => {
-                const count = f.key === 'all'
-                  ? orders.length
-                  : orders.filter((o) => o.status === f.key).length;
 
-                const isActive = filter === f.key;
+                          <div className="p-3.5 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
+                            <div className="space-y-3 sm:space-y-4">
+                              {/* Status Tabs with counts */}
+                              <div className="border-b border-ink-800">
+                                  <div className="flex overflow-x-auto no-scrollbar -mb-px gap-1 sm:gap-2">
+                                    {filters.map((f) => {
+                                      const count = f.key === 'all'
+                                        ? orders.length
+                                        : orders.filter((o) => o.status === f.key).length;
 
-                return (
-                  <button
-                    key={f.key}
-                    onClick={() => setFilter(f.key)}
-                    className={`inline-flex items-center gap-2 border-b-2 px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-all ${
-                      isActive
-                        ? 'border-gold text-gold bg-gold/5'
-                        : 'border-transparent text-neutral-400 hover:border-ink-700 hover:text-white'
-                    }`}
+                                      const isActive = filter === f.key;
+
+                                      return (
+                                        <button
+                                          key={f.key}
+                                          onClick={() => setFilter(f.key)}
+                                                ? 'border-gold text-gold bg-gold/5'
+                                                : 'border-transparent text-neutral-400 hover:border-ink-700 hover:text-white'
+                                              }`}
                   >
                     <span>{f.label}</span>
-                    <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
-                      isActive ? 'bg-gold text-ink-950' : 'bg-ink-800 text-neutral-400'
-                    }`}>
+                    <span className={`rounded-full px-1.5 py - 0.5 text - [10px] font - bold ${
+                                        isActive ? 'bg-gold text-ink-950' : 'bg-ink-800 text-neutral-400'
+                                      } `}>
                       {count}
                     </span>
                   </button>
@@ -189,18 +188,18 @@ export function Orders() {
           </div>
 
           {/* Filter fields bar */}
-          <div className="flex flex-wrap items-center gap-3 bg-ink-950 p-3 rounded-lg border border-ink-800">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 bg-ink-950 p-2.5 sm:p-3 rounded-xl border border-ink-800">
             <div className="flex items-center gap-1.5 text-neutral-400 text-xs">
               <Filter className="h-3.5 w-3.5 text-gold" />
               <span className="font-bold uppercase tracking-wider">Filter:</span>
             </div>
 
             {/* Buyer Filter */}
-            <div className="flex items-center gap-1.5">
+            <div className="flex-1 sm:flex-initial min-w-[130px]">
               <select
                 value={filterBuyerId}
                 onChange={(e) => setFilterBuyerId(e.target.value)}
-                className="rounded-md border border-ink-700 bg-ink-900 px-2 py-1 text-xs text-white focus:border-gold focus:outline-none min-w-[140px]"
+                className="w-full rounded-lg border border-ink-700 bg-ink-900 px-2.5 py-1.5 sm:py-1 text-xs text-white focus:border-gold focus:outline-none"
               >
                 <option value="">All Buyers</option>
                 {unloadingParties.map((up) => (
@@ -212,11 +211,11 @@ export function Orders() {
             </div>
 
             {/* District Filter */}
-            <div className="flex items-center gap-1.5">
+            <div className="flex-1 sm:flex-initial min-w-[115px]">
               <select
                 value={filterDistrict}
                 onChange={(e) => setFilterDistrict(e.target.value)}
-                className="rounded-md border border-ink-700 bg-ink-900 px-2 py-1 text-xs text-white focus:border-gold focus:outline-none min-w-[120px]"
+                className="w-full rounded-lg border border-ink-700 bg-ink-900 px-2.5 py-1.5 sm:py-1 text-xs text-white focus:border-gold focus:outline-none"
               >
                 <option value="">All Districts</option>
                 {uniqueDistricts.map((d) => (
@@ -336,7 +335,7 @@ export function Orders() {
                       <p className="text-[10px] uppercase tracking-wide text-neutral-500">
                         Fulfillment
                       </p>
-                      <p className={`text-xs font-bold ${loadedPercentage === 100 ? 'text-green-400' : 'text-amber-400'}`}>
+                      <p className={`text - xs font - bold ${ loadedPercentage === 100 ? 'text-green-400' : 'text-amber-400' } `}>
                         {loadedPercentage}% Loaded
                       </p>
                     </div>
@@ -391,7 +390,7 @@ export function Orders() {
 
                           {orderTrips.length > 0 && orderTrips.some(t => t.status === 'loading') && (
                             <Link
-                              to={`/loading?tripId=${orderTrips.find(t => t.status === 'loading')?.id}&lorryId=${orderTrips.find(t => t.status === 'loading')?.lorryId}`}
+                              to={`/ loading ? tripId = ${ orderTrips.find(t => t.status === 'loading')?.id }& lorryId=${ orderTrips.find(t => t.status === 'loading')?.lorryId }`}
                               onClick={(e) => e.stopPropagation()}
                               className="rounded-md bg-amber-500/20 border border-amber-400/40 px-3 py-1.5 text-xs font-bold text-amber-300 transition-colors hover:bg-amber-500/30 flex items-center gap-1.5"
                             >
@@ -446,9 +445,9 @@ export function Orders() {
                                     const assignedDriver = drivers.find((d) => d.id === l.driverId || d.lorryId === l.id);
                                     return (
                                       <option key={l.id} value={l.id}>
-                                        {l.plate} {activeTripsCount > 0 ? `(${activeTripsCount} active load${activeTripsCount > 1 ? 's' : ''})` : `(${l.status})`} - Cap: {l.capacitySqft.toLocaleString('en-IN')} sqft {assignedDriver ? `(${assignedDriver.name})` : ''}
-                                      </option>
-                                    );
+                                        {l.plate} {activeTripsCount > 0 ? `(${ activeTripsCount } active load${ activeTripsCount > 1 ? 's' : ''})` : `(${l.status})`} - Cap: {l.capacitySqft.toLocaleString('en-IN')} sqft {assignedDriver ? `(${assignedDriver.name})` : ''}
+                                  </option>
+                                  );
                                   })}
                                 </select>
                               </div>
@@ -499,149 +498,149 @@ export function Orders() {
                             </div>
                           </motion.div>
                         )}
-                      </AnimatePresence>
+                        </AnimatePresence>
 
-                      <div className="ti-scroll overflow-x-auto">
-                        <table className="w-full min-w-[560px] text-left text-xs sm:text-sm">
-                          <thead>
-                            <tr className="text-xs uppercase tracking-wide text-neutral-600 bg-ink-900/10">
-                              <th className="px-4 py-2 font-medium">Stone</th>
-                              <th className="px-4 py-2 font-medium">Calculation</th>
-                              <th className="px-4 py-2 text-right font-medium">
-                                Amount
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {order.lines.map((line) => (
-                              <tr key={line.id} className="border-t border-ink-800">
-                                <td className="px-4 py-2.5">
-                                  <span className="text-white font-medium">
-                                    {line.size} · {line.thickness}
-                                  </span>
-                                  <span className="ml-2 rounded bg-ink-800 px-1.5 py-0.5 text-[10px] capitalize text-neutral-400 font-mono">
-                                    {line.finish}
-                                  </span>
-                                </td>
-                                <td className="px-4 py-2.5 font-mono text-xs text-neutral-400">
-                                  {line.sqftPerPiece} sqft × {line.pieces} pcs ={' '}
-                                  {orderLineTotalSqft(line)} sqft × ₹
-                                  {line.ratePerSqft}
-                                </td>
-                                <td className="px-4 py-2.5 text-right font-bold text-gold">
-                                  {formatINR(orderLineAmount(line))}
-                                </td>
+                        <div className="ti-scroll overflow-x-auto">
+                          <table className="w-full min-w-[560px] text-left text-xs sm:text-sm">
+                            <thead>
+                              <tr className="text-xs uppercase tracking-wide text-neutral-600 bg-ink-900/10">
+                                <th className="px-4 py-2 font-medium">Stone</th>
+                                <th className="px-4 py-2 font-medium">Calculation</th>
+                                <th className="px-4 py-2 text-right font-medium">
+                                  Amount
+                                </th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-
-                      <div className="border-t border-ink-700 px-4 py-3 bg-ink-950/40 space-y-3">
-                        <div className="flex items-center justify-between text-xs text-neutral-400">
-                          <span className="font-semibold">Fulfillment Progress:</span>
-                          <span className={loadedPercentage === 100 ? "text-green-400 font-bold" : "text-gold font-bold"}>
-                            {totalLoadedSqft.toLocaleString('en-IN')} / {totalOrderedSqft.toLocaleString('en-IN')} SQFT ({loadedPercentage}%)
-                          </span>
+                            </thead>
+                            <tbody>
+                              {order.lines.map((line) => (
+                                <tr key={line.id} className="border-t border-ink-800">
+                                  <td className="px-4 py-2.5">
+                                    <span className="text-white font-medium">
+                                      {line.size} · {line.thickness}
+                                    </span>
+                                    <span className="ml-2 rounded bg-ink-800 px-1.5 py-0.5 text-[10px] capitalize text-neutral-400 font-mono">
+                                      {line.finish}
+                                    </span>
+                                  </td>
+                                  <td className="px-4 py-2.5 font-mono text-xs text-neutral-400">
+                                    {line.sqftPerPiece} sqft × {line.pieces} pcs ={' '}
+                                    {orderLineTotalSqft(line)} sqft × ₹
+                                    {line.ratePerSqft}
+                                  </td>
+                                  <td className="px-4 py-2.5 text-right font-bold text-gold">
+                                    {formatINR(orderLineAmount(line))}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
                         </div>
-                        <div className="h-1.5 w-full bg-ink-850 rounded-full overflow-hidden">
-                          <div
-                            style={{ width: `${loadedPercentage}%` }}
-                            className={`h-full transition-all duration-300 ${loadedPercentage === 100 ? "bg-green-500" : "bg-gold"}`}
-                          />
-                        </div>
 
-                        {orderTrips.length > 0 && (
-                          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-ink-800/40 text-xs">
-                            <span className="text-neutral-500">Assigned Lorries:</span>
-                            {orderTrips.map((t) => {
-                              const l = lorries.find((lorry) => lorry.id === t.lorryId);
-                              const statusColors: Partial<Record<TripStatus, string>> = {
-                                loading: 'bg-amber-400/10 text-amber-300 border-amber-400/25',
-                                loaded: 'bg-amber-500/15 text-amber-200 border-amber-500/30',
-                                'in-transit': 'bg-blue-400/10 text-blue-300 border-blue-400/25',
-                                arrived_kerala: 'bg-purple-400/10 text-purple-300 border-purple-400/25',
-                                return_sand_loading: 'bg-orange-400/10 text-orange-300 border-orange-400/25',
-                                returning: 'bg-indigo-400/10 text-indigo-300 border-indigo-400/25',
-                                returned_to_base: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
-                                completed: 'bg-green-500/15 text-green-300 border-green-500/30',
-                                delivered: 'bg-gold/10 text-gold border-gold/25',
-                                paid: 'bg-green-400/10 text-green-300 border-green-400/25'
-                              };
-                              return (
-                                <Link
-                                  key={t.id}
-                                  to={t.status === 'loading' ? `/loading?tripId=${t.id}&lorryId=${l?.id || t.lorryId}` : `/trips/${t.id}`}
-                                  onClick={(e) => e.stopPropagation()}
-                                  className={`inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-[10px] font-semibold border transition-all hover:scale-[1.03] ${statusColors[t.status] || 'bg-gold/10 text-gold border-gold/25'}`}
-                                  title={t.status === 'loading' ? 'Click to record multi-quarry stones and labour details' : 'View Trip Details'}
-                                >
-                                  <span>{l?.plate || 'Lorry'}</span>
-                                  <span className="h-1.5 w-1.5 rounded-full bg-current opacity-80" />
-                                  <span className="capitalize">{t.status.replace('-', ' ')}</span>
-                                  {t.status === 'loading' && (
-                                    <span className="ml-1 text-[9px] underline font-bold">Load →</span>
-                                  )}
-                                </Link>
-                              );
-                            })}
+                        <div className="border-t border-ink-700 px-4 py-3 bg-ink-950/40 space-y-3">
+                          <div className="flex items-center justify-between text-xs text-neutral-400">
+                            <span className="font-semibold">Fulfillment Progress:</span>
+                            <span className={loadedPercentage === 100 ? "text-green-400 font-bold" : "text-gold font-bold"}>
+                              {totalLoadedSqft.toLocaleString('en-IN')} / {totalOrderedSqft.toLocaleString('en-IN')} SQFT ({loadedPercentage}%)
+                            </span>
                           </div>
-                        )}
-                      </div>
+                          <div className="h-1.5 w-full bg-ink-850 rounded-full overflow-hidden">
+                            <div
+                              style={{ width: `${loadedPercentage}%` }}
+                              className={`h-full transition-all duration-300 ${loadedPercentage === 100 ? "bg-green-500" : "bg-gold"}`}
+                            />
+                          </div>
 
-                      <div className="flex items-center justify-between border-t border-ink-700 px-4 py-2.5 text-xs text-neutral-500 bg-ink-950/20">
-                        <span className="font-semibold text-neutral-400">
-                          {orderSqft(order).toLocaleString('en-IN')} sqft total
-                        </span>
-                        <Link
-                          to={`/unloading-parties/${order.unloadingPartyId}`}
-                          className="text-gold hover:underline font-bold"
-                        >
-                          View buyer
-                        </Link>
-                      </div>
-                    </motion.div>
+                          {orderTrips.length > 0 && (
+                            <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-ink-800/40 text-xs">
+                              <span className="text-neutral-500">Assigned Lorries:</span>
+                              {orderTrips.map((t) => {
+                                const l = lorries.find((lorry) => lorry.id === t.lorryId);
+                                const statusColors: Partial<Record<TripStatus, string>> = {
+                                  loading: 'bg-amber-400/10 text-amber-300 border-amber-400/25',
+                                  loaded: 'bg-amber-500/15 text-amber-200 border-amber-500/30',
+                                  'in-transit': 'bg-blue-400/10 text-blue-300 border-blue-400/25',
+                                  arrived_kerala: 'bg-purple-400/10 text-purple-300 border-purple-400/25',
+                                  return_sand_loading: 'bg-orange-400/10 text-orange-300 border-orange-400/25',
+                                  returning: 'bg-indigo-400/10 text-indigo-300 border-indigo-400/25',
+                                  returned_to_base: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+                                  completed: 'bg-green-500/15 text-green-300 border-green-500/30',
+                                  delivered: 'bg-gold/10 text-gold border-gold/25',
+                                  paid: 'bg-green-400/10 text-green-300 border-green-400/25'
+                                };
+                                return (
+                                  <Link
+                                    key={t.id}
+                                    to={t.status === 'loading' ? `/loading?tripId=${t.id}&lorryId=${l?.id || t.lorryId}` : `/trips/${t.id}`}
+                                    onClick={(e) => e.stopPropagation()}
+                                    className={`inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-[10px] font-semibold border transition-all hover:scale-[1.03] ${statusColors[t.status] || 'bg-gold/10 text-gold border-gold/25'}`}
+                                    title={t.status === 'loading' ? 'Click to record multi-quarry stones and labour details' : 'View Trip Details'}
+                                  >
+                                    <span>{l?.plate || 'Lorry'}</span>
+                                    <span className="h-1.5 w-1.5 rounded-full bg-current opacity-80" />
+                                    <span className="capitalize">{t.status.replace('-', ' ')}</span>
+                                    {t.status === 'loading' && (
+                                      <span className="ml-1 text-[9px] underline font-bold">Load →</span>
+                                    )}
+                                  </Link>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex items-center justify-between border-t border-ink-700 px-4 py-2.5 text-xs text-neutral-500 bg-ink-950/20">
+                          <span className="font-semibold text-neutral-400">
+                            {orderSqft(order).toLocaleString('en-IN')} sqft total
+                          </span>
+                          <Link
+                            to={`/unloading-parties/${order.unloadingPartyId}`}
+                            className="text-gold hover:underline font-bold"
+                          >
+                            View buyer
+                          </Link>
+                        </div>
+                      </motion.div>
                   )}
-                </AnimatePresence>
-              </motion.div>
-            );
+                    </AnimatePresence>
+                  </motion.div>
+                  );
           })}
-        </div>
+                </div>
 
-        {/* Pagination Controls */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-ink-800 pt-4 text-xs text-neutral-400">
-            <span>
-              Showing <strong className="text-white font-medium">{startIndex + 1}</strong> to <strong className="text-white font-medium">{endIndex}</strong> of{' '}
-              <strong className="text-gold font-semibold">{totalFiltered}</strong> order{totalFiltered !== 1 ? 's' : ''}
-            </span>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={activePage === 1}
-                className="inline-flex h-7 w-7 items-center justify-center rounded border border-ink-700 bg-ink-900 text-neutral-400 transition-colors hover:border-gold hover:text-gold disabled:opacity-30"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              <span className="text-[11px] text-neutral-500 font-medium px-2">
-                Page {activePage} of {totalPages}
-              </span>
-              <button
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                disabled={activePage === totalPages}
-                className="inline-flex h-7 w-7 items-center justify-center rounded border border-ink-700 bg-ink-900 text-neutral-400 transition-colors hover:border-gold hover:text-gold disabled:opacity-30"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </button>
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between border-t border-ink-800 pt-4 text-xs text-neutral-400">
+                    <span>
+                      Showing <strong className="text-white font-medium">{startIndex + 1}</strong> to <strong className="text-white font-medium">{endIndex}</strong> of{' '}
+                      <strong className="text-gold font-semibold">{totalFiltered}</strong> order{totalFiltered !== 1 ? 's' : ''}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        disabled={activePage === 1}
+                        className="inline-flex h-7 w-7 items-center justify-center rounded border border-ink-700 bg-ink-900 text-neutral-400 transition-colors hover:border-gold hover:text-gold disabled:opacity-30"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </button>
+                      <span className="text-[11px] text-neutral-500 font-medium px-2">
+                        Page {activePage} of {totalPages}
+                      </span>
+                      <button
+                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        disabled={activePage === totalPages}
+                        className="inline-flex h-7 w-7 items-center justify-center rounded border border-ink-700 bg-ink-900 text-neutral-400 transition-colors hover:border-gold hover:text-gold disabled:opacity-30"
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <CreateOrderModal
+                isOpen={isCreateOrderOpen}
+                onClose={() => setIsCreateOrderOpen(false)}
+              />
             </div>
-          </div>
-        )}
-      </div>
-      
-      <CreateOrderModal
-        isOpen={isCreateOrderOpen}
-        onClose={() => setIsCreateOrderOpen(false)}
-      />
-    </div>
-  );
+            );
 }

@@ -5,7 +5,7 @@ import { BellIcon, PackageIcon } from 'lucide-react';
 import { useOrders } from '../../store/OrdersContext';
 export function NotificationBell() {
   const { notifications, unreadCount, markNotificationRead, markAllRead } =
-  useOrders();
+    useOrders();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -20,12 +20,12 @@ export function NotificationBell() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="relative flex h-10 w-10 items-center justify-center rounded-md border border-ink-700 bg-ink-950 text-neutral-300 transition-colors hover:text-white"
+        className="relative flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-neutral-300 transition-all hover:border-[#F5B82E]/50 hover:text-white active:scale-95 cursor-pointer"
         aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ''}`}>
-        
-        <BellIcon className="h-5 w-5" />
+
+        <BellIcon className="h-4 w-4 sm:h-5 sm:w-5" />
         {unreadCount > 0 &&
-        <span className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-gold px-1 text-[11px] font-bold text-ink-950">
+        <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] sm:h-5 sm:min-w-[20px] items-center justify-center rounded-full bg-gold px-1 text-[10px] sm:text-[11px] font-bold text-ink-950 shadow">
             {unreadCount}
           </span>
         }
@@ -49,7 +49,7 @@ export function NotificationBell() {
           transition={{
             duration: 0.15
           }}
-          className="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-lg border border-ink-700 bg-ink-950 shadow-2xl">
+          className="fixed inset-x-3 top-16 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto z-50 sm:mt-2 sm:w-80 overflow-hidden rounded-2xl border border-white/15 bg-[#0D1218]/95 backdrop-blur-2xl shadow-2xl">
           
             <div className="flex items-center justify-between border-b border-ink-700 px-4 py-3">
               <span className="text-sm font-semibold text-white">

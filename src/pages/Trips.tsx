@@ -85,7 +85,7 @@ export function Trips() {
     const dest = unloadingParties.find((p) => p.id === trip.unloadingPartyId);
     const buyerDistrict = dest?.district;
     return (trip.stoneLines || []).reduce((sum, line) => {
-      const matchRate = districtRates.find(r => 
+      const matchRate = districtRates.find(r =>
         r.district === buyerDistrict &&
         r.size === line.size &&
         r.thickness === line.thickness &&
@@ -112,318 +112,429 @@ export function Trips() {
         subtitle="Every load from Ramapuram to Kerala buyers"
       />
 
-      <div className="p-6 sm:p-8">
-        {/* Compact Filters Row */}
-        <div className="mb-4 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-ink-950 p-3 rounded-lg border border-ink-800">
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-1.5 text-neutral-400 text-xs">
-              <Filter className="h-3.5 w-3.5 text-gold" />
-              <span className="font-bold uppercase tracking-wider">Filter:</span>
-            </div>
+        <div className="p-3.5 sm:p-6 lg:p-8">
+          {/* Compact Filters Row */}
+              <div className="mb-4 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-ink-950 p-3 rounded-xl border border-ink-800">
+                <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+                  <div className="flex items-center gap-1.5 text-neutral-400 text-xs">
+                    <Filter className="h-3.5 w-3.5 text-gold" />
+                    <span className="font-bold uppercase tracking-wider">Filter:</span>
+                  </div>
 
-            {/* Lorry Selector */}
-            <div className="flex items-center gap-1.5">
-              <Truck className="h-3.5 w-3.5 text-neutral-500" />
-              <select
-                value={selectedLorryId}
-                onChange={(e) => setSelectedLorryId(e.target.value)}
-                className="rounded-md border border-ink-700 bg-ink-900 px-2 py-1 text-xs text-white placeholder-neutral-600 transition-colors hover:border-ink-600 focus:border-gold focus:outline-none min-w-[120px]"
-              >
-                <option value="">All Vehicles</option>
-                {lorries.map((lorry) => (
-                  <option key={lorry.id} value={lorry.id}>
-                    {lorry.plate}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* From Date */}
-            <div className="flex items-center gap-1.5">
-              <Calendar className="h-3.5 w-3.5 text-neutral-500" />
-              <span className="text-[10px] text-neutral-500 uppercase font-semibold">From</span>
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="rounded-md border border-ink-700 bg-ink-900 px-2 py-1 text-xs text-white transition-colors hover:border-ink-600 focus:border-gold focus:outline-none"
-              />
-            </div>
-
-            {/* To Date */}
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] text-neutral-500 uppercase font-semibold">To</span>
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="rounded-md border border-ink-700 bg-ink-900 px-2 py-1 text-xs text-white transition-colors hover:border-ink-600 focus:border-gold focus:outline-none"
-              />
-            </div>
-
-            {/* Clear Button */}
-            {(selectedLorryId || startDate || endDate) && (
-              <button
-                onClick={() => {
-                  setSelectedLorryId('');
-                  setStartDate('');
-                  setEndDate('');
-                }}
-                className="inline-flex items-center gap-1 rounded bg-red-500/10 border border-red-500/20 px-2 py-1 text-[10px] text-red-400 font-semibold transition-colors hover:bg-red-500/20"
-              >
-                <X className="h-3.5 w-3.5" />
-                Clear
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Header row with refresh */}
-        <div className="mb-4 flex items-center justify-between">
-          <p className="text-xs text-neutral-500">
-            {loading
-              ? 'Fetching trips…'
-              : selectedLorryId || startDate || endDate
-              ? `${filteredTrips.length} of ${trips.length} trip${trips.length !== 1 ? 's' : ''} filtered`
-              : `${trips.length} trip${trips.length !== 1 ? 's' : ''} found`}
-          </p>
-          <button
-            onClick={fetchData}
-            disabled={loading}
-            className="inline-flex items-center gap-1.5 rounded-md border border-ink-700 px-3 py-1.5 text-xs text-neutral-400 transition-colors hover:border-gold hover:text-gold disabled:opacity-40"
-          >
-            <RefreshCwIcon className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
-          </button>
-        </div>
-
-        {/* Error state */}
-        {error && (
-          <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-            {error}
-          </div>
-        )}
-
-        {/* Loading skeleton */}
-        {loading && (
-          <div className="overflow-hidden rounded-lg border border-ink-700">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="flex items-center gap-4 border-b border-ink-800 px-4 py-4 last:border-0">
-                <div className="h-4 w-20 animate-pulse rounded bg-ink-700" />
-                <div className="h-4 w-28 animate-pulse rounded bg-ink-700" />
-                <div className="h-4 w-40 animate-pulse rounded bg-ink-700 flex-1" />
-                <div className="h-4 w-12 animate-pulse rounded bg-ink-700" />
-                <div className="h-4 w-16 animate-pulse rounded bg-ink-700" />
-                <div className="h-4 w-16 animate-pulse rounded bg-ink-700" />
-                <div className="h-6 w-20 animate-pulse rounded bg-ink-700" />
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Data table */}
-        {!loading && (
-          <div className="overflow-hidden rounded-lg border border-ink-700 bg-ink-900">
-            <div className="ti-scroll overflow-x-auto">
-              <table className="w-full min-w-[950px] text-left text-sm">
-                <thead>
-                  <tr className="border-b border-ink-700 bg-ink-950 text-xs uppercase tracking-[0.08em] text-neutral-500">
-                    <th className="px-4 py-3 font-medium">Trip ID</th>
-                    <th className="px-4 py-3 font-medium">Lorry / Driver</th>
-                    <th className="px-4 py-3 font-medium">Outbound Leg</th>
-                    <th className="px-4 py-3 font-medium">Return Leg &amp; Cargo</th>
-                    <th className="px-4 py-3 text-right font-medium">Total Rev</th>
-                    <th className="px-4 py-3 text-right font-medium">Pending</th>
-                    <th className="px-4 py-3 font-medium">Journey Stage</th>
-                    <th className="px-4 py-3 text-center font-medium">Audit &amp; Details</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredTrips.length === 0 && (
-                    <tr>
-                      <td colSpan={8} className="px-4 py-10 text-center text-sm text-neutral-500">
-                        No trips match the active filters or found in the database.
-                      </td>
-                    </tr>
-                  )}
-                  {paginatedTrips.map((trip, i) => {
-                    const lorry = lorries.find((l) => l.id === trip.lorryId);
-                    const driver = drivers.find((d) => d.id === trip.driverId);
-                    const dest = unloadingParties.find((p) => p.id === trip.unloadingPartyId);
-                    const isSand = trip.returnPlan === 'sand_return' || !!trip.returnSandLoad;
-                    const isDirect = trip.returnPlan === 'direct_return' || !!trip.directReturnDetails;
-
-                    return (
-                      <motion.tr
-                        key={trip.id}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: i * 0.04 }}
-                        className="border-b border-ink-800 bg-ink-900 transition-colors last:border-0 hover:bg-ink-850"
+                  {/* Lorry Selector */}
+                    <div className="flex items-center gap-1.5 flex-1 sm:flex-initial min-w-[140px]">
+                      <Truck className="h-3.5 w-3.5 shrink-0 text-neutral-500" />
+                      <select
+                        value={selectedLorryId}
+                        onChange={(e) => setSelectedLorryId(e.target.value)}
+                        className="w-full rounded-lg border border-ink-700 bg-ink-900 px-2.5 py-1.5 sm:py-1 text-xs text-white placeholder-neutral-600 transition-colors hover:border-ink-600 focus:border-gold focus:outline-none"
                       >
-                        <td className="px-4 py-4">
-                          <Link
-                            to={`/trips/${trip.id}`}
-                            className="font-bold text-white hover:text-gold flex items-center gap-1.5 font-mono"
+                        <option value="">All Vehicles</option>
+                        {lorries.map((lorry) => (
+                          <option key={lorry.id} value={lorry.id}>
+                            {lorry.plate}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* From Date */}
+                      <div className="flex items-center gap-1.5 flex-1 sm:flex-initial min-w-[140px]">
+                        <Calendar className="h-3.5 w-3.5 shrink-0 text-neutral-500 hidden sm:inline" />
+                        <span className="text-[10px] text-neutral-500 uppercase font-semibold">From</span>
+                        <input
+                          type="date"
+                          value={startDate}
+                          onChange={(e) => setStartDate(e.target.value)}
+                          className="w-full rounded-lg border border-ink-700 bg-ink-900 px-2 py-1 text-xs text-white transition-colors hover:border-ink-600 focus:border-gold focus:outline-none"
+                        />
+                      </div>
+
+                      {/* To Date */}
+                        <div className="flex items-center gap-1.5 flex-1 sm:flex-initial min-w-[140px]">
+                          <span className="text-[10px] text-neutral-500 uppercase font-semibold">To</span>
+                          <input
+                            type="date"
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            className="w-full rounded-lg border border-ink-700 bg-ink-900 px-2 py-1 text-xs text-white transition-colors hover:border-ink-600 focus:border-gold focus:outline-none"
+                          />
+                        </div>
+
+                        {/* Clear Button */}
+                        {(selectedLorryId || startDate || endDate) && (
+                          <button
+                            onClick={() => {
+                              setSelectedLorryId('');
+                              setStartDate('');
+                              setEndDate('');
+                            }}
+                            className="inline-flex items-center gap-1 rounded bg-red-500/10 border border-red-500/20 px-2 py-1 text-[10px] text-red-400 font-semibold transition-colors hover:bg-red-500/20"
                           >
-                            {trip.code}
-                          </Link>
-                          <p className="text-xs text-neutral-600">{trip.date}</p>
-                        </td>
-                        <td className="px-4 py-4">
-                          <p className="text-white font-medium font-mono">{lorry?.plate ?? trip.lorryId}</p>
-                          <p className="text-xs text-neutral-500">{driver?.name ?? trip.driverId}</p>
-                        </td>
-                        <td className="px-4 py-4 text-neutral-400">
-                          <span className="text-white font-medium">{trip.origin} → {dest?.district || 'Kerala'}</span>
-                          <p className="text-xs text-neutral-600">{tripSqft(trip).toLocaleString('en-IN')} sqft stone</p>
-                        </td>
-                        <td className="px-4 py-4">
-                          {isSand ? (
-                            <div>
-                              <span className="text-xs font-bold text-orange-300">
-                                {trip.returnSandLoad?.loadingLocation || 'Mangalore'} → L&amp;T Factory
-                              </span>
-                              <p className="text-[11px] text-neutral-400 font-mono">
-                                Sand: {trip.returnSandLoad?.weightTons || 24.5} Ton
-                              </p>
-                            </div>
-                          ) : isDirect ? (
-                            <div>
-                              <span className="text-xs font-semibold text-blue-300">
-                                Kerala → Kadapa Base
-                              </span>
-                              <p className="text-[11px] text-neutral-500 font-mono">
-                                Direct Return (Empty)
-                              </p>
-                            </div>
-                          ) : (
-                            <span className="text-xs text-neutral-500 italic">
-                              Return Pending
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-4 py-4 text-right font-semibold text-gold font-mono">
-                          {formatINR(getTripRevenue(trip) + (trip.returnSandLoad ? (trip.returnSandLoad.weightTons * (trip.returnSandLoad.ratePerTon || 0)) : 0))}
-                        </td>
-                        <td className="px-4 py-4 text-right text-neutral-350 font-mono">
-                          {getTripPending(trip) > 0 ? formatINR(getTripPending(trip)) : '—'}
-                        </td>
-                        <td className="px-4 py-4">
-                          <TripStatusBadge status={trip.status} />
-                        </td>
-                        <td className="px-4 py-4 text-center">
-                          <div className="inline-flex items-center gap-1.5">
-                            <button
-                              type="button"
-                              onClick={() => setPdfTrip(trip)}
-                              title="Print / Save Full Trip PDF Report"
-                              className="inline-flex items-center gap-1 rounded-lg bg-ink-800 border border-ink-700 px-2 py-1 text-xs font-bold text-neutral-300 hover:text-gold hover:border-gold/40 transition-all cursor-pointer"
-                            >
-                              <Printer className="h-3.5 w-3.5" />
-                              <span className="hidden sm:inline">PDF</span>
-                            </button>
-                            <Link
-                              to={`/trips/${trip.id}`}
-                              className="inline-flex items-center gap-1 rounded-lg bg-gold/10 border border-gold/30 px-2.5 py-1 text-xs font-bold text-gold hover:bg-gold/20 hover:scale-105 transition-all"
-                            >
-                              <ShieldCheck className="h-3.5 w-3.5" />
-                              <span>View &amp; Audit</span>
-                            </Link>
+                            <X className="h-3.5 w-3.5" />
+                            Clear
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Header row with refresh */}
+                    <div className="mb-4 flex items-center justify-between">
+                      <p className="text-xs text-neutral-500">
+                        {loading
+                          ? 'Fetching trips…'
+                          : selectedLorryId || startDate || endDate
+                            ? `${filteredTrips.length} of ${trips.length} trip${trips.length !== 1 ? 's' : ''} filtered`
+                            : `${trips.length} trip${trips.length !== 1 ? 's' : ''} found`}
+                      </p>
+                      <button
+                        onClick={fetchData}
+                        disabled={loading}
+                        className="inline-flex items-center gap-1.5 rounded-md border border-ink-700 px-3 py-1.5 text-xs text-neutral-400 transition-colors hover:border-gold hover:text-gold disabled:opacity-40"
+                      >
+                        <RefreshCwIcon className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
+                        Refresh
+                      </button>
+                    </div>
+
+                    {/* Error state */}
+                    {error && (
+                      <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+                        {error}
+                      </div>
+                    )}
+
+                    {/* Loading skeleton */}
+                    {loading && (
+                      <div className="overflow-hidden rounded-lg border border-ink-700">
+                        {[...Array(5)].map((_, i) => (
+                          <div key={i} className="flex items-center gap-4 border-b border-ink-800 px-4 py-4 last:border-0">
+                            <div className="h-4 w-20 animate-pulse rounded bg-ink-700" />
+                            <div className="h-4 w-28 animate-pulse rounded bg-ink-700" />
+                            <div className="h-4 w-40 animate-pulse rounded bg-ink-700 flex-1" />
+                            <div className="h-4 w-12 animate-pulse rounded bg-ink-700" />
+                            <div className="h-4 w-16 animate-pulse rounded bg-ink-700" />
+                            <div className="h-4 w-16 animate-pulse rounded bg-ink-700" />
+                            <div className="h-6 w-20 animate-pulse rounded bg-ink-700" />
                           </div>
-                        </td>
-                      </motion.tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                        ))}
+                      </div>
+                    )}
 
-            {/* Pagination Controls */}
-            <div className="border-t border-ink-700 bg-ink-950 px-4 py-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex flex-wrap items-center gap-4 text-xs text-neutral-400">
-                <span>
-                  Showing <strong className="text-white font-medium">{totalItems === 0 ? 0 : startIndex + 1}</strong> to{' '}
-                  <strong className="text-white font-medium">{endIndex}</strong> of{' '}
-                  <strong className="text-gold font-semibold">{totalItems}</strong> trip{totalItems !== 1 ? 's' : ''}
-                </span>
+                    {/* Data table & Mobile Cards */}
+                    {!loading && (
+                          <div className="space-y-4">
+                            {/* Mobile Luxury Trip Cards (iPhone / <768px) */}
+                            <div className="space-y-3 md:hidden">
+                              {filteredTrips.length === 0 ? (
+                                <div className="rounded-2xl border border-ink-700 bg-ink-900 p-8 text-center text-sm text-neutral-500">
+                                  No trips match the active filters or found in the database.
+                                </div>
+                              ) : (
+                                paginatedTrips.map((trip) => {
+                                  const lorry = lorries.find((l) => l.id === trip.lorryId);
+                                  const driver = drivers.find((d) => d.id === trip.driverId);
+                                  const dest = unloadingParties.find((p) => p.id === trip.unloadingPartyId);
+                                  const isSand = trip.returnPlan === 'sand_return' || !!trip.returnSandLoad;
+                                  const isDirect = trip.returnPlan === 'direct_return' || !!trip.directReturnDetails;
+                                  const totalRev =
+                                    getTripRevenue(trip) +
+                                    (trip.returnSandLoad ? trip.returnSandLoad.weightTons * (trip.returnSandLoad.ratePerTon || 0) : 0);
+                                  const pendingAmt = getTripPending(trip);
 
-                <div className="flex items-center gap-2 border-l border-ink-800 pl-4">
-                  <span className="text-neutral-500">Show</span>
-                  <select
-                    value={pageSize}
-                    onChange={(e) => setPageSize(Number(e.target.value))}
-                    className="rounded border border-ink-700 bg-ink-900 px-2 py-1 text-xs text-white focus:border-gold focus:outline-none font-medium"
-                  >
-                    <option value={5}>5</option>
-                    <option value={10}>10</option>
-                    <option value={20}>20</option>
-                    <option value={50}>50</option>
-                  </select>
-                  <span className="text-neutral-500">per page</span>
-                </div>
-              </div>
+                                  return (
+                                    <div
+                                      key={trip.id}
+                                      className="rounded-2xl border border-ink-700 bg-ink-900/95 p-4 shadow-lg space-y-3"
+                                    >
+                                      <div className="flex items-start justify-between gap-2 border-b border-ink-800 pb-2.5">
+                                        <div>
+                                          <Link
+                                            to={`/trips/${trip.id}`}
+                                            className="font-mono text-sm font-black text-gold hover:underline"
+                                          >
+                                            {trip.code}
+                                          </Link>
+                                          <p className="text-[11px] text-neutral-400 mt-0.5">
+                                            {lorry?.plate ?? trip.lorryId} &bull; {driver?.name ?? trip.driverId}
+                                          </p>
+                                        </div>
+                                        <div className="text-right">
+                                          <TripStatusBadge status={trip.status} />
+                                          <p className="text-[10px] text-neutral-500 mt-1">{trip.date}</p>
+                                        </div>
+                                      </div>
 
-              {totalPages > 1 && (
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    disabled={activePage === 1}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded border border-ink-700 bg-ink-900 text-neutral-400 transition-colors hover:border-gold hover:text-gold disabled:opacity-30 disabled:hover:border-ink-700 disabled:hover:text-neutral-400"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </button>
+                                      <div className="grid grid-cols-2 gap-2.5 text-xs">
+                                        <div className="rounded-xl bg-ink-950/70 border border-ink-800 p-2.5">
+                                          <span className="text-[9.5px] uppercase font-bold text-neutral-500 block">Outbound Leg</span>
+                                          <p className="font-semibold text-white truncate mt-0.5">
+                                            {trip.origin} → {dest?.district || 'Kerala'}
+                                          </p>
+                                          <p className="text-[10.5px] text-neutral-400 font-mono">
+                                            {tripSqft(trip).toLocaleString('en-IN')} sqft stone
+                                          </p>
+                                        </div>
+                                        <div className="rounded-xl bg-ink-950/70 border border-ink-800 p-2.5">
+                                          <span className="text-[9.5px] uppercase font-bold text-neutral-500 block">Return Leg</span>
+                                          {isSand ? (
+                                            <>
+                                              <p className="font-bold text-orange-300 truncate mt-0.5">
+                                                {trip.returnSandLoad?.loadingLocation || 'Mangalore'} → L&amp;T
+                                              </p>
+                                              <p className="text-[10.5px] text-neutral-400 font-mono">
+                                                Sand: {trip.returnSandLoad?.weightTons || 24.5} Ton
+                                              </p>
+                                            </>
+                                          ) : isDirect ? (
+                                            <>
+                                              <p className="font-semibold text-blue-300 truncate mt-0.5">Kerala → Kadapa</p>
+                                              <p className="text-[10.5px] text-neutral-500 font-mono">Direct Return</p>
+                                            </>
+                                          ) : (
+                                            <p className="text-neutral-500 italic mt-1">Return Pending</p>
+                                          )}
+                                        </div>
+                                      </div>
 
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`inline-flex h-8 w-8 items-center justify-center rounded text-xs font-semibold transition-colors ${
-                        page === activePage
-                          ? 'bg-gold text-ink-950 shadow-md'
-                          : 'border border-ink-700 bg-ink-900 text-neutral-400 hover:border-gold hover:text-gold'
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ))}
+                                      <div className="flex items-center justify-between rounded-xl bg-ink-950/90 border border-ink-800 px-3 py-2 text-xs">
+                                        <div>
+                                          <span className="text-[9.5px] uppercase font-bold text-neutral-500 block">Total Revenue</span>
+                                          <span className="font-mono font-black text-gold text-sm">{formatINR(totalRev)}</span>
+                                        </div>
+                                        <div className="text-right">
+                                          <span className="text-[9.5px] uppercase font-bold text-neutral-500 block">Pending</span>
+                                          <span className="font-mono font-bold text-neutral-200 text-sm">
+                                            {pendingAmt > 0 ? formatINR(pendingAmt) : '—'}
+                                          </span>
+                                        </div>
+                                      </div>
 
-                  <button
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                    disabled={activePage === totalPages}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded border border-ink-700 bg-ink-900 text-neutral-400 transition-colors hover:border-gold hover:text-gold disabled:opacity-30 disabled:hover:border-ink-700 disabled:hover:text-neutral-400"
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
+                                      <div className="flex items-center gap-2 pt-0.5">
+                                        <button
+                                          type="button"
+                                          onClick={() => setPdfTrip(trip)}
+                                          className="flex items-center justify-center gap-1.5 rounded-xl bg-ink-800 border border-ink-700 px-3.5 py-2 text-xs font-bold text-neutral-300 hover:text-gold hover:border-gold/40 transition-all cursor-pointer"
+                                        >
+                                          <Printer className="h-3.5 w-3.5" />
+                                          <span>PDF Report</span>
+                                        </button>
+                                        <Link
+                                          to={`/trips/${trip.id}`}
+                                          className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-gold/15 border border-gold/40 py-2 text-xs font-bold text-gold hover:bg-gold/25 transition-all"
+                                        >
+                                          <ShieldCheck className="h-3.5 w-3.5" />
+                                          <span>View &amp; Audit Trip</span>
+                                        </Link>
+                                      </div>
+                                    </div>
+                                  );
+                                })
+                              )}
+                            </div>
+
+                            {/* Desktop Table (>=768px) */}
+                            <div className="hidden md:block overflow-hidden rounded-lg border border-ink-700 bg-ink-900">
+                              <div className="ti-scroll overflow-x-auto">
+                                <table className="w-full min-w-[950px] text-left text-sm">
+                                  <thead>
+                                    <tr className="border-b border-ink-700 bg-ink-950 text-xs uppercase tracking-[0.08em] text-neutral-500">
+                                      <th className="px-4 py-3 font-medium">Trip ID</th>
+                                      <th className="px-4 py-3 font-medium">Lorry / Driver</th>
+                                      <th className="px-4 py-3 font-medium">Outbound Leg</th>
+                                      <th className="px-4 py-3 font-medium">Return Leg &amp; Cargo</th>
+                                      <th className="px-4 py-3 text-right font-medium">Total Rev</th>
+                                      <th className="px-4 py-3 text-right font-medium">Pending</th>
+                                      <th className="px-4 py-3 font-medium">Journey Stage</th>
+                                      <th className="px-4 py-3 text-center font-medium">Audit &amp; Details</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {filteredTrips.length === 0 && (
+                                      <tr>
+                                        <td colSpan={8} className="px-4 py-10 text-center text-sm text-neutral-500">
+                                          No trips match the active filters or found in the database.
+                                        </td>
+                                      </tr>
+                                    )}
+                                    {paginatedTrips.map((trip, i) => {
+                                      const lorry = lorries.find((l) => l.id === trip.lorryId);
+                                      const driver = drivers.find((d) => d.id === trip.driverId);
+                                      const dest = unloadingParties.find((p) => p.id === trip.unloadingPartyId);
+                                      const isSand = trip.returnPlan === 'sand_return' || !!trip.returnSandLoad;
+                                      const isDirect = trip.returnPlan === 'direct_return' || !!trip.directReturnDetails;
+
+                                      return (
+                                        <motion.tr
+                                          key={trip.id}
+                                          initial={{ opacity: 0 }}
+                                          animate={{ opacity: 1 }}
+                                          transition={{ delay: i * 0.04 }}
+                                          className="border-b border-ink-800 bg-ink-900 transition-colors last:border-0 hover:bg-ink-850"
+                                        >
+                                          <td className="px-4 py-4">
+                                            <Link
+                                              to={`/trips/${trip.id}`}
+                                              className="font-bold text-white hover:text-gold flex items-center gap-1.5 font-mono"
+                                            >
+                                              {trip.code}
+                                            </Link>
+                                            <p className="text-xs text-neutral-600">{trip.date}</p>
+                                          </td>
+                                          <td className="px-4 py-4">
+                                            <p className="text-white font-medium font-mono">{lorry?.plate ?? trip.lorryId}</p>
+                                            <p className="text-xs text-neutral-500">{driver?.name ?? trip.driverId}</p>
+                                          </td>
+                                          <td className="px-4 py-4 text-neutral-400">
+                                            <span className="text-white font-medium">{trip.origin} → {dest?.district || 'Kerala'}</span>
+                                            <p className="text-xs text-neutral-600">{tripSqft(trip).toLocaleString('en-IN')} sqft stone</p>
+                                          </td>
+                                          <td className="px-4 py-4">
+                                            {isSand ? (
+                                              <div>
+                                                <span className="text-xs font-bold text-orange-300">
+                                                  {trip.returnSandLoad?.loadingLocation || 'Mangalore'} → L&amp;T Factory
+                                                </span>
+                                                <p className="text-[11px] text-neutral-400 font-mono">
+                                                  Sand: {trip.returnSandLoad?.weightTons || 24.5} Ton
+                                                </p>
+                                              </div>
+                                            ) : isDirect ? (
+                                              <div>
+                                                <span className="text-xs font-semibold text-blue-300">
+                                                  Kerala → Kadapa Base
+                                                </span>
+                                                <p className="text-[11px] text-neutral-500 font-mono">
+                                                  Direct Return (Empty)
+                                                </p>
+                                              </div>
+                                            ) : (
+                                              <span className="text-xs text-neutral-500 italic">
+                                                Return Pending
+                                              </span>
+                                            )}
+                                          </td>
+                                          <td className="px-4 py-4 text-right font-semibold text-gold font-mono">
+                                            {formatINR(getTripRevenue(trip) + (trip.returnSandLoad ? (trip.returnSandLoad.weightTons * (trip.returnSandLoad.ratePerTon || 0)) : 0))}
+                                          </td>
+                                          <td className="px-4 py-4 text-right text-neutral-350 font-mono">
+                                            {getTripPending(trip) > 0 ? formatINR(getTripPending(trip)) : '—'}
+                                          </td>
+                                          <td className="px-4 py-4">
+                                            <TripStatusBadge status={trip.status} />
+                                          </td>
+                                          <td className="px-4 py-4 text-center">
+                                            <div className="inline-flex items-center gap-1.5">
+                                              <button
+                                                type="button"
+                                                onClick={() => setPdfTrip(trip)}
+                                                title="Print / Save Full Trip PDF Report"
+                                                className="inline-flex items-center gap-1 rounded-lg bg-ink-800 border border-ink-700 px-2 py-1 text-xs font-bold text-neutral-300 hover:text-gold hover:border-gold/40 transition-all cursor-pointer"
+                                              >
+                                                <Printer className="h-3.5 w-3.5" />
+                                                <span className="hidden sm:inline">PDF</span>
+                                              </button>
+                                              <Link
+                                                to={`/trips/${trip.id}`}
+                                                className="inline-flex items-center gap-1 rounded-lg bg-gold/10 border border-gold/30 px-2.5 py-1 text-xs font-bold text-gold hover:bg-gold/20 hover:scale-105 transition-all"
+                                              >
+                                                <ShieldCheck className="h-3.5 w-3.5" />
+                                                <span>View &amp; Audit</span>
+                                              </Link>
+                                            </div>
+                                          </td>
+                                        </motion.tr>
+                                      );
+                                    })}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+
+                            {/* Pagination Controls */}
+                              <div className="rounded-xl border border-ink-700 bg-ink-950 px-4 py-3.5 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+                                <div className="flex flex-wrap items-center gap-4 text-xs text-neutral-400">
+                                  <span>
+                                    Showing <strong className="text-white font-medium">{totalItems === 0 ? 0 : startIndex + 1}</strong> to{' '}
+                                    <strong className="text-white font-medium">{endIndex}</strong> of{' '}
+                                    <strong className="text-gold font-semibold">{totalItems}</strong> trip{totalItems !== 1 ? 's' : ''}
+                                  </span>
+
+                                  <div className="flex items-center gap-2 border-l border-ink-800 pl-4">
+                                    <span className="text-neutral-500">Show</span>
+                                    <select
+                                      value={pageSize}
+                                      onChange={(e) => setPageSize(Number(e.target.value))}
+                                      className="rounded border border-ink-700 bg-ink-900 px-2 py-1 text-xs text-white focus:border-gold focus:outline-none font-medium"
+                                    >
+                                      <option value={5}>5</option>
+                                      <option value={10}>10</option>
+                                      <option value={20}>20</option>
+                                      <option value={50}>50</option>
+                                    </select>
+                                    <span className="text-neutral-500">per page</span>
+                                  </div>
+                                </div>
+
+                                {totalPages > 1 && (
+                                  <div className="flex items-center gap-1">
+                                    <button
+                                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                      disabled={activePage === 1}
+                                      className="inline-flex h-8 w-8 items-center justify-center rounded border border-ink-700 bg-ink-900 text-neutral-400 transition-colors hover:border-gold hover:text-gold disabled:opacity-30 disabled:hover:border-ink-700 disabled:hover:text-neutral-400"
+                                    >
+                                      <ChevronLeft className="h-4 w-4" />
+                                    </button>
+
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                      <button
+                                        key={page}
+                                        onClick={() => setCurrentPage(page)}
+                                        className={`inline-flex h-8 w-8 items-center justify-center rounded text-xs font-semibold transition-colors ${page === activePage
+                                            ? 'bg-gold text-ink-950 shadow-md'
+                                            : 'border border-ink-700 bg-ink-900 text-neutral-400 hover:border-gold hover:text-gold'
+                                          }`}
+                                      >
+                                        {page}
+                                      </button>
+                                    ))}
+
+                                    <button
+                                      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                                      disabled={activePage === totalPages}
+                                      className="inline-flex h-8 w-8 items-center justify-center rounded border border-ink-700 bg-ink-900 text-neutral-400 transition-colors hover:border-gold hover:text-gold disabled:opacity-30 disabled:hover:border-ink-700 disabled:hover:text-neutral-400"
+                                    >
+                                      <ChevronRight className="h-4 w-4" />
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
         )}
-      </div>
+                          </div>
 
-      {/* Kerala Unloading & Delivery Audit Modal */}
-      {auditingTrip && (
-        <KeralaDeliveryAuditModal
-          trip={auditingTrip}
-          isOpen={Boolean(auditingTrip)}
-          onClose={() => setAuditingTrip(null)}
-          onSuccess={fetchData}
-        />
-      )}
+                          {/* Kerala Unloading & Delivery Audit Modal */}
+                          {auditingTrip && (
+                            <KeralaDeliveryAuditModal
+                              trip={auditingTrip}
+                              isOpen={Boolean(auditingTrip)}
+                              onClose={() => setAuditingTrip(null)}
+                              onSuccess={fetchData}
+                            />
+                          )}
 
-      {/* Full Trip PDF Report Modal */}
-      {pdfTrip && (
-        <TripPdfReportModal
-          trip={pdfTrip}
-          isOpen={Boolean(pdfTrip)}
-          onClose={() => setPdfTrip(null)}
-          lorries={lorries}
-          drivers={drivers}
-          unloadingParties={unloadingParties}
-          districtRates={districtRates}
-        />
-      )}
-    </div>
-  );
+                          {/* Full Trip PDF Report Modal */}
+                          {pdfTrip && (
+                            <TripPdfReportModal
+                              trip={pdfTrip}
+                              isOpen={Boolean(pdfTrip)}
+                              onClose={() => setPdfTrip(null)}
+                              lorries={lorries}
+                              drivers={drivers}
+                              unloadingParties={unloadingParties}
+                              districtRates={districtRates}
+                            />
+                          )}
+                        </div>
+                        );
 }

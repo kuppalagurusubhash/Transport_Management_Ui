@@ -123,9 +123,9 @@ export function CreateOrderModal({ isOpen, onClose }: CreateOrderModalProps) {
       prev.map((l) =>
         l.key === key
           ? {
-              ...l,
-              ...patch,
-            }
+            ...l,
+            ...patch,
+          }
           : l
       )
     );
@@ -160,213 +160,211 @@ export function CreateOrderModal({ isOpen, onClose }: CreateOrderModalProps) {
 
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
-      <div className="w-full max-w-2xl overflow-hidden rounded-lg border border-ink-700 bg-ink-950 shadow-2xl my-8">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-ink-800 px-6 py-4 bg-ink-950">
-          <h3 className="text-base font-extrabold text-white flex items-center gap-2">
-            <ShoppingBagIcon className="h-5 w-5 text-gold animate-pulse" />
-            Create Buyer Order (Owner Console)
-          </h3>
-          <button
-            onClick={onClose}
-            className="text-neutral-500 hover:text-white transition-colors"
-            aria-label="Close"
-          >
-            <XIcon className="h-5 w-5" />
-          </button>
-        </div>
+        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2.5 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto ti-scroll">
+          <div className="w-full max-w-2xl overflow-hidden rounded-xl sm:rounded-lg border border-ink-700 bg-ink-950 shadow-2xl my-2 sm:my-8">
+            {/* Header */}
+              <div className="flex items-center justify-between border-b border-ink-800 px-4 sm:px-6 py-3.5 sm:py-4 bg-ink-950">
+                <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+                  <ShoppingBagIcon className="h-5 w-5 text-gold animate-pulse" />
+                  Create Buyer Order (Owner Console)
+                </h3>
+                <button
+                  onClick={onClose}
+                  className="text-neutral-500 hover:text-white transition-colors"
+                  aria-label="Close"
+                >
+                  <XIcon className="h-5 w-5" />
+                </button>
+              </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
-          {/* Order Channel / Source Toggle */}
-          <div>
-            <label className="block text-xs uppercase tracking-wider text-neutral-400 font-bold mb-1.5">
-              Order Source / Channel
-            </label>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setOrderSource('manual')}
-                className={`flex items-center justify-center gap-2 p-2.5 rounded-lg border text-xs font-bold transition-all cursor-pointer ${
-                  orderSource === 'manual'
-                    ? 'border-[#F5B82E] bg-[#F5B82E]/15 text-[#F5B82E] shadow-[0_0_12px_rgba(245,184,46,0.25)]'
-                    : 'border-white/10 bg-white/5 text-neutral-400 hover:border-white/20'
-                }`}
-              >
-                <PencilIcon className="h-4 w-4" />
-                <span>Direct / Office Booking (Created by Us)</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setOrderSource('online')}
-                className={`flex items-center justify-center gap-2 p-2.5 rounded-lg border text-xs font-bold transition-all cursor-pointer ${
-                  orderSource === 'online'
-                    ? 'border-cyan-400 bg-cyan-500/15 text-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.25)]'
-                    : 'border-white/10 bg-white/5 text-neutral-400 hover:border-white/20'
-                }`}
-              >
-                <GlobeIcon className="h-4 w-4" />
-                <span>Online Order (Received via Web / Portal)</span>
-              </button>
-            </div>
-          </div>
+              {/* Form */}
+                <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-5 sm:space-y-6 max-h-[80dvh] overflow-y-auto ti-scroll">
+                  {/* Order Channel / Source Toggle */}
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-neutral-400 font-bold mb-1.5">
+                      Order Source / Channel
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setOrderSource('manual')}
+                        className={`flex items-center justify-center gap-2 p-2.5 rounded-lg border text-xs font-bold transition-all cursor-pointer ${orderSource === 'manual'
+                            ? 'border-[#F5B82E] bg-[#F5B82E]/15 text-[#F5B82E] shadow-[0_0_12px_rgba(245,184,46,0.25)]'
+                            : 'border-white/10 bg-white/5 text-neutral-400 hover:border-white/20'
+                          }`}
+                      >
+                        <PencilIcon className="h-4 w-4" />
+                        <span>Direct / Office Booking (Created by Us)</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setOrderSource('online')}
+                        className={`flex items-center justify-center gap-2 p-2.5 rounded-lg border text-xs font-bold transition-all cursor-pointer ${orderSource === 'online'
+                            ? 'border-cyan-400 bg-cyan-500/15 text-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.25)]'
+                            : 'border-white/10 bg-white/5 text-neutral-400 hover:border-white/20'
+                          }`}
+                      >
+                        <GlobeIcon className="h-4 w-4" />
+                        <span>Online Order (Received via Web / Portal)</span>
+                      </button>
+                    </div>
+                  </div>
 
-          {/* Select Buyer */}
-          <div>
-            <label className="block text-xs uppercase tracking-wider text-neutral-500 font-bold mb-1.5">
-              Select Unloading Party (Buyer)
-            </label>
-            <select
-              value={selectedBuyerId}
-              onChange={(e) => setSelectedBuyerId(e.target.value)}
-              className="w-full rounded-md border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-white focus:border-gold focus:outline-none"
-              aria-label="Select buyer"
-            >
-              {unloadingParties.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name} ({b.district})
-                </option>
-              ))}
-            </select>
-            <p className="mt-1.5 text-xs text-neutral-500">
-              Rates shown are configured for unloading party at{' '}
-              <span className="text-neutral-300 font-semibold">{selectedBuyer.district}</span>.
-            </p>
-          </div>
-
-          {/* Stone Specifications */}
-          <div className="space-y-3">
-            <label className="block text-xs uppercase tracking-wider text-neutral-500 font-bold">
-              Stone Specifications
-            </label>
-
-            {computedLines.map((l) => (
-              <div
-                key={l.key}
-                className="rounded-lg border border-ink-800 bg-ink-900/40 p-4 transition-colors hover:border-ink-700"
-              >
-                <div className="flex flex-wrap items-end gap-3">
-                  <div className="flex-1 min-w-[200px]">
-                    <span className="mb-1 block text-[10px] uppercase tracking-wide text-neutral-500 font-bold">
-                      Stone Specification
-                    </span>
+                  {/* Select Buyer */}
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-neutral-500 font-bold mb-1.5">
+                      Select Unloading Party (Buyer)
+                    </label>
                     <select
-                      value={l.specIndex}
-                      onChange={(e) =>
-                        updateLine(l.key, {
-                          specIndex: Number(e.target.value),
-                        })
-                      }
-                      className="w-full rounded-md border border-ink-700 bg-ink-900 px-3 py-2 text-xs text-white focus:border-gold focus:outline-none"
-                      aria-label="Select stone spec"
+                      value={selectedBuyerId}
+                      onChange={(e) => setSelectedBuyerId(e.target.value)}
+                      className="w-full rounded-md border border-ink-700 bg-ink-900 px-3 py-2 text-sm text-white focus:border-gold focus:outline-none"
+                      aria-label="Select buyer"
                     >
-                      {sellableSpecs.map((s, idx) => (
-                        <option key={idx} value={idx}>
-                          {s.size} · {s.thickness} · {s.finish}
+                      {unloadingParties.map((b) => (
+                        <option key={b.id} value={b.id}>
+                          {b.name} ({b.district})
                         </option>
                       ))}
                     </select>
+                    <p className="mt-1.5 text-xs text-neutral-500">
+                      Rates shown are configured for unloading party at{' '}
+                      <span className="text-neutral-300 font-semibold">{selectedBuyer.district}</span>.
+                    </p>
                   </div>
-                  <div className="w-24">
-                    <span className="mb-1 block text-[10px] uppercase tracking-wide text-neutral-500 font-bold">
-                      Pieces
-                    </span>
-                    <input
-                      type="number"
-                      min={0}
-                      value={l.pieces}
-                      onChange={(e) =>
-                        updateLine(l.key, {
-                          pieces: Number(e.target.value),
-                        })
-                      }
-                      className="w-full rounded-md border border-ink-700 bg-ink-900 px-3 py-2 text-xs text-white focus:border-gold focus:outline-none"
+
+                  {/* Stone Specifications */}
+                  <div className="space-y-3">
+                    <label className="block text-xs uppercase tracking-wider text-neutral-500 font-bold">
+                      Stone Specifications
+                    </label>
+
+                    {computedLines.map((l) => (
+                      <div
+                        key={l.key}
+                        className="rounded-lg border border-ink-800 bg-ink-900/40 p-4 transition-colors hover:border-ink-700"
+                      >
+                        <div className="flex flex-wrap items-end gap-3">
+                          <div className="flex-1 min-w-[200px]">
+                            <span className="mb-1 block text-[10px] uppercase tracking-wide text-neutral-500 font-bold">
+                              Stone Specification
+                            </span>
+                            <select
+                              value={l.specIndex}
+                              onChange={(e) =>
+                                updateLine(l.key, {
+                                  specIndex: Number(e.target.value),
+                                })
+                              }
+                              className="w-full rounded-md border border-ink-700 bg-ink-900 px-3 py-2 text-xs text-white focus:border-gold focus:outline-none"
+                              aria-label="Select stone spec"
+                            >
+                              {sellableSpecs.map((s, idx) => (
+                                <option key={idx} value={idx}>
+                                  {s.size} · {s.thickness} · {s.finish}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="w-24">
+                            <span className="mb-1 block text-[10px] uppercase tracking-wide text-neutral-500 font-bold">
+                              Pieces
+                            </span>
+                            <input
+                              type="number"
+                              min={0}
+                              value={l.pieces}
+                              onChange={(e) =>
+                                updateLine(l.key, {
+                                  pieces: Number(e.target.value),
+                                })
+                              }
+                              className="w-full rounded-md border border-ink-700 bg-ink-900 px-3 py-2 text-xs text-white focus:border-gold focus:outline-none"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeLine(l.key)}
+                            className="flex h-9 w-9 items-center justify-center rounded-md border border-ink-800 text-neutral-500 transition-colors hover:text-red-300 cursor-pointer"
+                            aria-label="Remove line"
+                          >
+                            <Trash2Icon className="h-4 w-4" />
+                          </button>
+                        </div>
+
+                        {/* Calculation row with Ramapuram base price & district price */}
+                        <div className="mt-3 flex flex-wrap items-center justify-between border-t border-ink-800/60 pt-3 text-xs gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="font-mono text-neutral-400">
+                              {l.sqftPerPiece} sqft × {l.pieces} pcs = {l.totalSqft} sqft × ₹{l.rate}
+                              <span className="text-[10px] text-emerald-400 font-sans ml-1">({selectedBuyer.district} selling rate)</span>
+                            </span>
+                            {l.ramapuramRate > 0 && (
+                              <span className="rounded bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 text-[10px] font-mono text-amber-400">
+                                Ramapuram Base: ₹{l.ramapuramRate}/sqft
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-sm font-bold text-gold">
+                            {formatINR(l.amount)}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+
+                    <button
+                      type="button"
+                      onClick={addLine}
+                      className="inline-flex items-center gap-2 rounded-md border border-dashed border-ink-700 px-3 py-2 text-xs font-medium text-neutral-400 transition-colors hover:text-white hover:border-ink-500 cursor-pointer"
+                    >
+                      <PlusIcon className="h-4 w-4" /> Add another stone specification
+                    </button>
+                  </div>
+
+                  {/* Notes */}
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-neutral-400 font-bold mb-1.5">
+                      Order Remarks / Reference (Optional)
+                    </label>
+                    <textarea
+                      rows={2}
+                      placeholder="e.g. Received over phone call, urgently needed for Palakkad project..."
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      className="w-full rounded-md border border-ink-700 bg-ink-900 px-3 py-2 text-xs text-white placeholder-neutral-500 focus:border-gold focus:outline-none"
                     />
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => removeLine(l.key)}
-                    className="flex h-9 w-9 items-center justify-center rounded-md border border-ink-800 text-neutral-500 transition-colors hover:text-red-300 cursor-pointer"
-                    aria-label="Remove line"
-                  >
-                    <Trash2Icon className="h-4 w-4" />
-                  </button>
-                </div>
 
-                {/* Calculation row with Ramapuram base price & district price */}
-                <div className="mt-3 flex flex-wrap items-center justify-between border-t border-ink-800/60 pt-3 text-xs gap-2">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-neutral-400">
-                      {l.sqftPerPiece} sqft × {l.pieces} pcs = {l.totalSqft} sqft × ₹{l.rate}
-                      <span className="text-[10px] text-emerald-400 font-sans ml-1">({selectedBuyer.district} selling rate)</span>
-                    </span>
-                    {l.ramapuramRate > 0 && (
-                      <span className="rounded bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 text-[10px] font-mono text-amber-400">
-                        Ramapuram Base: ₹{l.ramapuramRate}/sqft
-                      </span>
-                    )}
+
+                  {/* Footer Actions */}
+                  <div className="mt-6 flex items-center justify-between border-t border-ink-800 pt-5">
+                    <div>
+                      <p className="text-[11px] uppercase tracking-wide text-neutral-500 font-bold">
+                        Order Total
+                      </p>
+                      <p className="text-2xl font-black text-gold">
+                        {formatINR(total)}
+                      </p>
+                    </div>
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={onClose}
+                        className="rounded-md border border-ink-700 px-4 py-2.5 text-xs font-semibold text-neutral-400 hover:text-white transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={total <= 0}
+                        className="rounded-md bg-gold px-5 py-2.5 text-xs font-bold text-ink-950 hover:bg-gold-400 disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+                      >
+                        Place Order
+                      </button>
+                    </div>
                   </div>
-                  <span className="text-sm font-bold text-gold">
-                    {formatINR(l.amount)}
-                  </span>
-                </div>
-              </div>
-            ))}
-
-            <button
-              type="button"
-              onClick={addLine}
-              className="inline-flex items-center gap-2 rounded-md border border-dashed border-ink-700 px-3 py-2 text-xs font-medium text-neutral-400 transition-colors hover:text-white hover:border-ink-500 cursor-pointer"
-            >
-              <PlusIcon className="h-4 w-4" /> Add another stone specification
-            </button>
-          </div>
-
-          {/* Notes */}
-          <div>
-            <label className="block text-xs uppercase tracking-wider text-neutral-400 font-bold mb-1.5">
-              Order Remarks / Reference (Optional)
-            </label>
-            <textarea
-              rows={2}
-              placeholder="e.g. Received over phone call, urgently needed for Palakkad project..."
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className="w-full rounded-md border border-ink-700 bg-ink-900 px-3 py-2 text-xs text-white placeholder-neutral-500 focus:border-gold focus:outline-none"
-            />
-          </div>
-
-
-          {/* Footer Actions */}
-          <div className="mt-6 flex items-center justify-between border-t border-ink-800 pt-5">
-            <div>
-              <p className="text-[11px] uppercase tracking-wide text-neutral-500 font-bold">
-                Order Total
-              </p>
-              <p className="text-2xl font-black text-gold">
-                {formatINR(total)}
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={onClose}
-                className="rounded-md border border-ink-700 px-4 py-2.5 text-xs font-semibold text-neutral-400 hover:text-white transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={total <= 0}
-                className="rounded-md bg-gold px-5 py-2.5 text-xs font-bold text-ink-950 hover:bg-gold-400 disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
-              >
-                Place Order
-              </button>
+                </form>
             </div>
           </div>
-        </form>
-      </div>
-    </div>
-  );
+          );
 }

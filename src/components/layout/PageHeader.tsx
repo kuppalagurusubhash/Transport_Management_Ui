@@ -6,16 +6,16 @@ interface PageHeaderProps {
 }
 export function PageHeader({ title, subtitle, action }: PageHeaderProps) {
   return (
-    <header className="flex flex-wrap items-end justify-between gap-4 border-b border-ink-700 bg-ink-950 px-6 py-6 sm:px-8">
-      <div>
-        <h1 className="text-2xl font-extrabold tracking-tight text-white sm:text-[28px]">
-          {title}
-        </h1>
-        {subtitle &&
-        <p className="mt-1 text-sm text-neutral-500">{subtitle}</p>
-        }
-      </div>
-      {action}
-    </header>);
+          <header className="flex flex-col sm:flex-row sm:flex-wrap sm:items-end justify-between gap-3 sm:gap-4 border-b border-ink-700 bg-ink-950/90 px-4 py-4 sm:px-8 sm:py-6">
+            <div className="min-w-0">
+              <h1 className="text-xl font-extrabold tracking-tight text-white sm:text-[28px] truncate">
+                {title}
+              </h1>
+              {subtitle &&
+        <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-neutral-400">{subtitle}</p>
+              }
+            </div>
+            {action && <div className="w-full sm:w-auto">{action}</div>}
+          </header>);
 
 }
