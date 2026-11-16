@@ -800,42 +800,35 @@ export function Overview() {
   }, [unloadingDetailsList]);
 
   return (
-    <div className="min-h-full max-w-[1600px] mx-auto space-y-6 sm:space-y-7 lg:space-y-8 px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
-      {/* 1. Header: DASHBOARD / Overall Business Status */}
-      <div className="flex flex-wrap items-start sm:items-center justify-between gap-3.5">
-        <div className="space-y-1">
-          <div className="flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#F5B82E]" />
-            <span className="text-[10px] font-extrabold tracking-[0.25em] text-[#F5B82E] uppercase">
-              DASHBOARD
-            </span>
-          </div>
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#F5B82E]/15 text-[#F5B82E] border border-[#F5B82E]/25">
-              <BarChart3Icon className="h-4 w-4" />
-            </div>
-            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white">
-              Overall Business Status
-            </h1>
-          </div>
-          <p className="text-xs text-neutral-400">
-            Your transport business at a glance
-          </p>
+    <div className="min-h-full max-w-[1600px] mx-auto space-y-4 sm:space-y-5 px-4 py-3.5 sm:px-6 sm:py-5 lg:px-8">
+      {/* 1. Sleek & Compact Command Center Header */}
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_8px_#10B981]" />
+          </span>
+          <h1 className="text-xs sm:text-sm font-black uppercase tracking-[0.24em] bg-gradient-to-r from-white via-neutral-100 to-[#F5B82E] bg-clip-text text-transparent">
+            COMMAND CENTER
+          </h1>
+          <span className="hidden sm:inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[9px] font-bold tracking-wider text-emerald-400 backdrop-blur-md">
+            LIVE OPS
+          </span>
         </div>
 
-        {/* Right Period Filter Dropdown */}
+        {/* Compact iPhone Frosted Glass Period Filter Pill */}
         <div className="relative z-30">
           <button
             onClick={() => setIsPeriodOpen(!isPeriodOpen)}
-            className="flex items-center gap-2 rounded-xl border border-white/10 bg-[#0F141A] px-3.5 py-2 text-xs font-semibold text-neutral-200 shadow-md transition-all hover:border-[#F5B82E]/50 hover:bg-[#141B24] cursor-pointer"
+            className="flex items-center gap-2 rounded-full border border-white/[0.14] bg-white/[0.06] px-3.5 py-1.5 text-[11px] font-semibold text-neutral-200 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_4px_16px_rgba(0,0,0,0.3)] backdrop-blur-2xl backdrop-saturate-150 transition-all hover:border-[#F5B82E]/50 hover:bg-white/[0.09] hover:text-white cursor-pointer active:scale-95"
           >
-            <span className="text-neutral-400 text-xs">📅</span>
+            <span className="text-[11px]">📅</span>
             <span>{timePeriod}</span>
-            <ChevronDownIcon className="h-3.5 w-3.5 text-neutral-400" />
+            <ChevronDownIcon className="h-3 w-3 text-neutral-400" />
           </button>
 
           {isPeriodOpen && (
-            <div className="absolute right-0 z-30 mt-2 w-44 overflow-hidden rounded-xl border border-white/15 bg-[#0F141A] p-1.5 shadow-2xl backdrop-blur-xl">
+            <div className="absolute right-0 z-30 mt-2 w-44 overflow-hidden rounded-2xl border border-white/[0.15] bg-[#0A0F15]/90 p-1.5 shadow-[0_16px_40px_rgba(0,0,0,0.6),inset_0_1px_0_0_rgba(255,255,255,0.15)] backdrop-blur-2xl backdrop-saturate-150">
               {(['This Month', 'Today', 'This Week', 'This Quarter', 'This Year', 'All Time'] as const).map(
                 (period) => (
                   <button
@@ -844,14 +837,14 @@ export function Overview() {
                       setTimePeriod(period);
                       setIsPeriodOpen(false);
                     }}
-                    className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-xs font-medium transition-colors cursor-pointer ${
+                    className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-medium transition-colors cursor-pointer ${
                       timePeriod === period
-                        ? 'bg-[#F5B82E]/20 text-[#F5B82E] font-bold'
-                        : 'text-neutral-300 hover:bg-white/5 hover:text-white'
+                        ? 'bg-[#F5B82E]/20 text-[#F5B82E] font-bold border border-[#F5B82E]/30'
+                        : 'text-neutral-300 hover:bg-white/10 hover:text-white'
                     }`}
                   >
                     <span>{period}</span>
-                    {timePeriod === period && <div className="h-1.5 w-1.5 rounded-full bg-[#F5B82E]" />}
+                    {timePeriod === period && <div className="h-1.5 w-1.5 rounded-full bg-[#F5B82E] shadow-[0_0_8px_#F5B82E]" />}
                   </button>
                 )
               )}
@@ -860,163 +853,152 @@ export function Overview() {
         </div>
       </div>
 
-      {/* 2. Top 4 KPI Stat Cards (2x2 Bento Grid on Mobile, 4-Column on Desktop) */}
-      <div className="grid grid-cols-2 gap-3.5 sm:gap-4 lg:gap-5 xl:grid-cols-4">
+      {/* 2. iPhone Frosted Glass 4 KPI Stat Cards */}
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4">
         {/* Total Revenue */}
         <motion.div
-          whileHover={{ y: -2 }}
-          className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#0F1D17] via-[#0C1612] to-[#080E0C] p-3.5 sm:p-4 lg:p-5 shadow-md"
+          whileHover={{ y: -2, scale: 1.01 }}
+          transition={{ duration: 0.2 }}
+          className="group relative overflow-hidden rounded-2xl border border-white/[0.12] bg-white/[0.04] p-3 sm:p-3.5 backdrop-blur-2xl backdrop-saturate-180 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.22),0_8px_24px_rgba(0,0,0,0.35)] hover:border-emerald-500/40 hover:bg-white/[0.07] transition-all"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3.5">
-            <div className="flex items-center gap-2 sm:block">
-              <div className="flex h-9 w-9 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/25 shadow-inner">
-                <CoinsIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-              </div>
-              <p className="text-[11px] font-semibold text-neutral-400 sm:hidden">Total Revenue</p>
+          {/* Ambient Backlight Glow */}
+          <div className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-emerald-500/15 blur-2xl transition-all group-hover:bg-emerald-500/25" />
+
+          <div className="relative flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl border border-emerald-400/25 bg-emerald-500/10 text-emerald-400 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25)] backdrop-blur-xl">
+              <CoinsIcon className="h-5 w-5 drop-shadow-[0_2px_8px_rgba(16,185,129,0.5)]" />
             </div>
-            <div className="min-w-0 flex-1 space-y-1">
-              <p className="hidden sm:block text-xs font-semibold text-neutral-400 truncate">Total Revenue</p>
-              <div className="flex flex-wrap items-baseline gap-1.5 sm:gap-2">
-                <span className="font-mono text-base sm:text-xl font-black text-white truncate">
-                  {formatINR(stats.revenue)}
-                </span>
-                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-400 shrink-0">
-                  <ArrowUpRightIcon className="h-3 w-3" /> +12%
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between gap-1">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 truncate">Revenue</p>
+                <span className="inline-flex items-center gap-0.5 rounded-full border border-emerald-500/30 bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-extrabold text-emerald-400 backdrop-blur-md shrink-0 shadow-sm">
+                  <ArrowUpRightIcon className="h-2.5 w-2.5" />+12%
                 </span>
               </div>
-              <p className="text-[10px] text-neutral-500">vs last month</p>
+              <p className="font-mono text-sm sm:text-base font-black text-white truncate mt-0.5 tracking-tight">
+                {formatINR(stats.revenue)}
+              </p>
             </div>
           </div>
         </motion.div>
 
         {/* Total Expenses */}
         <motion.div
-          whileHover={{ y: -2 }}
-          className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#241315] via-[#1B0F10] to-[#12090A] p-3.5 sm:p-4 lg:p-5 shadow-md"
+          whileHover={{ y: -2, scale: 1.01 }}
+          transition={{ duration: 0.2 }}
+          className="group relative overflow-hidden rounded-2xl border border-white/[0.12] bg-white/[0.04] p-3 sm:p-3.5 backdrop-blur-2xl backdrop-saturate-180 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.22),0_8px_24px_rgba(0,0,0,0.35)] hover:border-rose-500/40 hover:bg-white/[0.07] transition-all"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3.5">
-            <div className="flex items-center gap-2 sm:block">
-              <div className="flex h-9 w-9 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl bg-red-500/20 text-red-400 border border-red-500/25 shadow-inner">
-                <WalletIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-              </div>
-              <p className="text-[11px] font-semibold text-neutral-400 sm:hidden">Total Expenses</p>
+          {/* Ambient Backlight Glow */}
+          <div className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-rose-500/15 blur-2xl transition-all group-hover:bg-rose-500/25" />
+
+          <div className="relative flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl border border-rose-400/25 bg-rose-500/10 text-rose-400 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25)] backdrop-blur-xl">
+              <WalletIcon className="h-5 w-5 drop-shadow-[0_2px_8px_rgba(244,63,94,0.5)]" />
             </div>
-            <div className="min-w-0 flex-1 space-y-1">
-              <p className="hidden sm:block text-xs font-semibold text-neutral-400 truncate">Total Expenses</p>
-              <div className="flex flex-wrap items-baseline gap-1.5 sm:gap-2">
-                <span className="font-mono text-base sm:text-xl font-black text-red-400 truncate">
-                  {formatINR(stats.expenses)}
-                </span>
-                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-red-400 shrink-0">
-                  <ArrowUpRightIcon className="h-3 w-3" /> +8%
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between gap-1">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 truncate">Expenses</p>
+                <span className="inline-flex items-center gap-0.5 rounded-full border border-rose-500/30 bg-rose-500/15 px-1.5 py-0.5 text-[9px] font-extrabold text-rose-400 backdrop-blur-md shrink-0 shadow-sm">
+                  <ArrowUpRightIcon className="h-2.5 w-2.5" />+8%
                 </span>
               </div>
-              <p className="text-[10px] text-neutral-500">vs last month</p>
+              <p className="font-mono text-sm sm:text-base font-black text-rose-300 truncate mt-0.5 tracking-tight">
+                {formatINR(stats.expenses)}
+              </p>
             </div>
           </div>
         </motion.div>
 
         {/* Total Profit */}
         <motion.div
-          whileHover={{ y: -2 }}
-          className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#241B0D] via-[#1A1308] to-[#120D05] p-3.5 sm:p-4 lg:p-5 shadow-md"
+          whileHover={{ y: -2, scale: 1.01 }}
+          transition={{ duration: 0.2 }}
+          className="group relative overflow-hidden rounded-2xl border border-white/[0.12] bg-white/[0.04] p-3 sm:p-3.5 backdrop-blur-2xl backdrop-saturate-180 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.22),0_8px_24px_rgba(0,0,0,0.35)] hover:border-[#F5B82E]/50 hover:bg-white/[0.07] transition-all"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3.5">
-            <div className="flex items-center gap-2 sm:block">
-              <div className="flex h-9 w-9 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl bg-[#F5B82E]/20 text-[#F5B82E] border border-[#F5B82E]/25 shadow-inner">
-                <BarChart3Icon className="h-4 w-4 sm:h-5 sm:w-5" />
-              </div>
-              <p className="text-[11px] font-semibold text-neutral-400 sm:hidden">Total Profit</p>
+          {/* Ambient Backlight Glow */}
+          <div className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-[#F5B82E]/15 blur-2xl transition-all group-hover:bg-[#F5B82E]/25" />
+
+          <div className="relative flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl border border-[#F5B82E]/35 bg-[#F5B82E]/10 text-[#F5B82E] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25)] backdrop-blur-xl">
+              <BarChart3Icon className="h-5 w-5 drop-shadow-[0_2px_8px_rgba(245,184,46,0.5)]" />
             </div>
-            <div className="min-w-0 flex-1 space-y-1">
-              <p className="hidden sm:block text-xs font-semibold text-neutral-400 truncate">Total Profit</p>
-              <div className="flex flex-wrap items-baseline gap-1.5 sm:gap-2">
-                <span className="font-mono text-base sm:text-xl font-black text-[#F5B82E] truncate">
-                  {formatINR(stats.profit)}
-                </span>
-                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-400 shrink-0">
-                  <ArrowUpRightIcon className="h-3 w-3" /> +24%
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between gap-1">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 truncate">Net Profit</p>
+                <span className="inline-flex items-center gap-0.5 rounded-full border border-emerald-500/30 bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-extrabold text-emerald-400 backdrop-blur-md shrink-0 shadow-sm">
+                  <ArrowUpRightIcon className="h-2.5 w-2.5" />+24%
                 </span>
               </div>
-              <p className="text-[10px] text-neutral-500">vs last month</p>
+              <p className="font-mono text-sm sm:text-base font-black text-[#F5B82E] truncate mt-0.5 tracking-tight drop-shadow-[0_0_12px_rgba(245,184,46,0.25)]">
+                {formatINR(stats.profit)}
+              </p>
             </div>
           </div>
         </motion.div>
 
         {/* Total Trips */}
         <motion.div
-          whileHover={{ y: -2 }}
-          className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#101A29] via-[#0C1320] to-[#070C14] p-3.5 sm:p-4 lg:p-5 shadow-md"
+          whileHover={{ y: -2, scale: 1.01 }}
+          transition={{ duration: 0.2 }}
+          className="group relative overflow-hidden rounded-2xl border border-white/[0.12] bg-white/[0.04] p-3 sm:p-3.5 backdrop-blur-2xl backdrop-saturate-180 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.22),0_8px_24px_rgba(0,0,0,0.35)] hover:border-sky-500/40 hover:bg-white/[0.07] transition-all"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3.5">
-            <div className="flex items-center gap-2 sm:block">
-              <div className="flex h-9 w-9 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl bg-blue-500/20 text-blue-400 border border-blue-500/25 shadow-inner">
-                <FileTextIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-              </div>
-              <p className="text-[11px] font-semibold text-neutral-400 sm:hidden">Total Trips</p>
+          {/* Ambient Backlight Glow */}
+          <div className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-sky-500/15 blur-2xl transition-all group-hover:bg-sky-500/25" />
+
+          <div className="relative flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl border border-sky-400/25 bg-sky-500/10 text-sky-400 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25)] backdrop-blur-xl">
+              <FileTextIcon className="h-5 w-5 drop-shadow-[0_2px_8px_rgba(56,189,248,0.5)]" />
             </div>
-            <div className="min-w-0 flex-1 space-y-1">
-              <p className="hidden sm:block text-xs font-semibold text-neutral-400 truncate">Total Trips</p>
-              <div className="flex flex-wrap items-baseline gap-1.5 sm:gap-2">
-                <span className="font-mono text-base sm:text-xl font-black text-white">
-                  {stats.totalTrips}
-                </span>
-                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-400 shrink-0">
-                  <ArrowUpRightIcon className="h-3 w-3" /> +20%
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between gap-1">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 truncate">Total Trips</p>
+                <span className="inline-flex items-center gap-0.5 rounded-full border border-sky-500/30 bg-sky-500/15 px-1.5 py-0.5 text-[9px] font-extrabold text-sky-400 backdrop-blur-md shrink-0 shadow-sm">
+                  <ArrowUpRightIcon className="h-2.5 w-2.5" />+20%
                 </span>
               </div>
-              <p className="text-[10px] text-neutral-500">All time trips</p>
+              <p className="font-mono text-sm sm:text-base font-black text-white truncate mt-0.5 tracking-tight">
+                {stats.totalTrips}
+              </p>
             </div>
           </div>
         </motion.div>
       </div>
 
-      {/* 3. Hero Fleet Showcase: Compact 3D Interactive Moving Fleet Showroom */}
+      {/* 3. Hero Fleet Showcase: Compact Glassy Fleet Showroom */}
       <FleetShowcaseCarousel onSelectLorry={setSelectedLorry} />
 
-      {/* 4. Fleet Statistics Section */}
-      <div className="space-y-4 sm:space-y-5 scroll-mt-20">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
-          <div className="flex items-start sm:items-center gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#F5B82E]/15 text-[#F5B82E] border border-[#F5B82E]/25">
-              <TruckIcon className="h-4 w-4" />
-            </div>
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-bold tracking-tight text-white">
-                  Fleet Statistics
-                </h2>
-                {isFetchingStats && (
-                  <span className="flex h-2 w-2 rounded-full bg-[#F5B82E] animate-ping" title="Syncing vehicle data..." />
-                )}
-              </div>
-              <p className="text-xs text-neutral-400">
-                {fleetScope === 'vehicle' && selectedLorry
-                  ? `Live telemetry & operational statistics for ${selectedLorry.plate}`
-                  : 'Live status of all vehicles in your fleet'}
-              </p>
-            </div>
+      {/* 4. Fleet Statistics Section (Includes Trip Breakdown) */}
+      <div className="space-y-3 scroll-mt-20">
+        <div className="flex flex-wrap items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#F5B82E]" />
+            <h2 className="text-xs sm:text-sm font-black uppercase tracking-[0.18em] text-white">
+              Fleet Statistics
+            </h2>
+            {isFetchingStats && (
+              <span className="flex h-2 w-2 rounded-full bg-[#F5B82E] animate-ping" title="Syncing vehicle data..." />
+            )}
           </div>
 
           {/* Scope Selector: Selected Vehicle vs All Fleet */}
-          <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2.5 w-full sm:w-auto">
-            <div className="flex items-center rounded-xl border border-white/10 bg-[#0A0E14] p-1 shadow-inner flex-1 sm:flex-initial">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center rounded-lg border border-white/10 bg-[#0A0E14] p-0.5 shadow-inner">
               <button
                 type="button"
                 onClick={() => setFleetScope('vehicle')}
-                className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+                className={`flex items-center justify-center gap-1.5 rounded-md px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer ${
                   fleetScope === 'vehicle'
                     ? 'bg-gradient-to-r from-[#F5B82E] to-amber-500 text-black shadow-sm'
                     : 'text-neutral-400 hover:text-white'
                 }`}
               >
-                <TruckIcon className="h-3.5 w-3.5 shrink-0" />
-                <span className="truncate">{selectedLorry?.plate || 'Current Vehicle'}</span>
+                <TruckIcon className="h-3 w-3 shrink-0" />
+                <span className="truncate">{selectedLorry?.plate || 'Vehicle'}</span>
               </button>
               <button
                 type="button"
                 onClick={() => setFleetScope('all')}
-                className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+                className={`flex items-center justify-center gap-1.5 rounded-md px-2.5 py-1 text-[11px] font-bold transition-all cursor-pointer ${
                   fleetScope === 'all'
                     ? 'bg-gradient-to-r from-[#F5B82E] to-amber-500 text-black shadow-sm'
                     : 'text-neutral-400 hover:text-white'
@@ -1028,34 +1010,35 @@ export function Overview() {
 
             <Link
               to="/fleet"
-              className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-[#0F141A] px-3.5 py-2 text-xs font-semibold text-neutral-300 hover:border-[#F5B82E] hover:text-[#F5B82E] transition-all cursor-pointer shadow-sm shrink-0"
+              title="All Lorries"
+              className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-[11px] font-semibold text-neutral-300 hover:border-[#F5B82E] hover:text-[#F5B82E] transition-all cursor-pointer"
             >
-              <span>All Lorries</span>
-              <ArrowRightIcon className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Fleet</span>
+              <ArrowRightIcon className="h-3 w-3" />
             </Link>
           </div>
         </div>
 
-        {/* 5 Quick Fleet Status Cards (Dynamically reacting to selected vehicle or whole fleet) */}
+        {/* 6 iPhone Frosted Glass Fleet Status Cards (5 Telemetry + 6th Trip Breakdown Card) */}
         {fleetScope === 'vehicle' && selectedLorry ? (
-          <div className="grid grid-cols-2 gap-3.5 sm:gap-4 sm:grid-cols-3 lg:grid-cols-5">
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-3 sm:grid-cols-3 xl:grid-cols-6">
             {/* 1. Vehicle Status */}
-            <div className="rounded-2xl border border-white/10 bg-[#0D1218]/90 p-3.5 sm:p-4 shadow-md backdrop-blur-xl">
-              <div className="flex items-start sm:items-center gap-3">
+            <div className="group relative overflow-hidden rounded-2xl border border-white/[0.12] bg-white/[0.04] p-3 backdrop-blur-2xl backdrop-saturate-180 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_8px_24px_rgba(0,0,0,0.3)] hover:border-white/20 transition-all">
+              <div className="flex items-center gap-2.5">
                 <div
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl border shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-xl"
                   style={{
-                    backgroundColor: `${selectedLorry.statusColor || '#F5B82E'}20`,
+                    backgroundColor: `${selectedLorry.statusColor || '#F5B82E'}25`,
                     color: selectedLorry.statusColor || '#F5B82E',
                     borderColor: `${selectedLorry.statusColor || '#F5B82E'}40`
                   }}
                 >
-                  <TruckIcon className="h-4 w-4" />
+                  <TruckIcon className="h-4 w-4 drop-shadow-[0_2px_6px_rgba(0,0,0,0.4)]" />
                 </div>
-                <div className="min-w-0 space-y-0.5">
-                  <p className="text-[11px] text-neutral-400 font-medium">Vehicle Status</p>
-                  <div className="flex items-baseline gap-1.5">
-                    <p className="text-sm sm:text-base font-black text-white truncate">
+                <div className="min-w-0">
+                  <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider truncate">Status</p>
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-xs sm:text-sm font-black text-white truncate">
                       {selectedLorry.statusLabel}
                     </p>
                     <span
@@ -1063,206 +1046,222 @@ export function Overview() {
                       style={{ backgroundColor: selectedLorry.statusColor }}
                     />
                   </div>
-                  <p className="text-[10px] text-neutral-500 truncate">
-                    {selectedLorry.route || 'Depot — Ramapuram'}
-                  </p>
                 </div>
               </div>
             </div>
 
             {/* 2. Vehicle Total Trips */}
-            <div className="rounded-2xl border border-white/10 bg-[#0D1218]/90 p-3.5 sm:p-4 shadow-md backdrop-blur-xl">
-              <div className="flex items-start sm:items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/15 text-blue-400 border border-blue-500/20">
-                  <FileTextIcon className="h-4 w-4" />
+            <div className="group relative overflow-hidden rounded-2xl border border-white/[0.12] bg-white/[0.04] p-3 backdrop-blur-2xl backdrop-saturate-180 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_8px_24px_rgba(0,0,0,0.3)] hover:border-blue-400/30 transition-all">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl border border-blue-400/30 bg-blue-500/15 text-blue-400 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-xl">
+                  <FileTextIcon className="h-4 w-4 drop-shadow-[0_2px_6px_rgba(59,130,246,0.4)]" />
                 </div>
-                <div className="min-w-0 space-y-0.5">
-                  <p className="text-[11px] text-neutral-400 font-medium">Vehicle Trips</p>
+                <div className="min-w-0">
+                  <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider truncate">Trips</p>
                   <div className="flex items-baseline gap-1.5">
-                    <p className="text-base sm:text-lg font-black text-white">{vehicleTrips.length}</p>
-                    <span className="text-[10px] font-bold text-emerald-400">
+                    <p className="font-mono text-xs sm:text-sm font-black text-white">{vehicleTrips.length}</p>
+                    <span className="text-[9.5px] font-bold text-emerald-400">
                       {vehicleTrips.filter((t) => t.status === 'in-transit' || t.status === 'loading').length > 0
-                        ? '↗ Active'
+                        ? 'Active'
                         : 'Done'}
                     </span>
                   </div>
-                  <p className="text-[10px] text-neutral-500">{timePeriod.toLowerCase()} trips</p>
                 </div>
               </div>
             </div>
 
             {/* 3. Vehicle Revenue */}
-            <div className="rounded-2xl border border-white/10 bg-[#0D1218]/90 p-3.5 sm:p-4 shadow-md backdrop-blur-xl">
-              <div className="flex items-start sm:items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F5B82E]/15 text-[#F5B82E] border border-[#F5B82E]/20">
-                  <CoinsIcon className="h-4 w-4" />
+            <div className="group relative overflow-hidden rounded-2xl border border-white/[0.12] bg-white/[0.04] p-3 backdrop-blur-2xl backdrop-saturate-180 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_8px_24px_rgba(0,0,0,0.3)] hover:border-[#F5B82E]/35 transition-all">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl border border-[#F5B82E]/35 bg-[#F5B82E]/15 text-[#F5B82E] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-xl">
+                  <CoinsIcon className="h-4 w-4 drop-shadow-[0_2px_6px_rgba(245,184,46,0.4)]" />
                 </div>
-                <div className="min-w-0 space-y-0.5">
-                  <p className="text-[11px] text-neutral-400 font-medium">Vehicle Revenue</p>
-                  <div className="flex items-baseline gap-1.5">
-                    <p className="text-sm sm:text-base font-black text-[#F5B82E] font-mono truncate">
-                      {formatINR(vehicleRevenue)}
-                    </p>
-                  </div>
-                  <p className="text-[10px] text-neutral-500 truncate">Total earnings</p>
+                <div className="min-w-0">
+                  <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider truncate">Earnings</p>
+                  <p className="font-mono text-xs sm:text-sm font-black text-[#F5B82E] truncate">
+                    {formatINR(vehicleRevenue)}
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* 4. Payload Capacity & Driver */}
-            <div className="rounded-2xl border border-white/10 bg-[#0D1218]/90 p-3.5 sm:p-4 shadow-md backdrop-blur-xl">
-              <div className="flex items-start sm:items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-500/15 text-purple-400 border border-purple-500/20">
-                  <WrenchIcon className="h-4 w-4" />
+            <div className="group relative overflow-hidden rounded-2xl border border-white/[0.12] bg-white/[0.04] p-3 backdrop-blur-2xl backdrop-saturate-180 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_8px_24px_rgba(0,0,0,0.3)] hover:border-purple-400/30 transition-all">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl border border-purple-400/30 bg-purple-500/15 text-purple-400 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-xl">
+                  <WrenchIcon className="h-4 w-4 drop-shadow-[0_2px_6px_rgba(168,85,247,0.4)]" />
                 </div>
-                <div className="min-w-0 space-y-0.5">
-                  <p className="text-[11px] text-neutral-400 font-medium">Rated Capacity</p>
-                  <div className="flex items-baseline gap-1.5">
-                    <p className="text-sm sm:text-base font-black text-white truncate">
-                      {selectedLorry.capacity || '1,805 sqft'}
-                    </p>
-                  </div>
-                  <p className="text-[10px] text-neutral-500 truncate">
-                    Driver: {selectedLorry.driver || 'Assigned'}
+                <div className="min-w-0">
+                  <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider truncate">Capacity</p>
+                  <p className="font-mono text-xs sm:text-sm font-black text-white truncate">
+                    {selectedLorry.capacity || '1,805 sqft'}
                   </p>
                 </div>
               </div>
             </div>
 
             {/* 5. Vehicle Fuel Usage */}
-            <div className="col-span-2 sm:col-span-1 rounded-2xl border border-white/10 bg-[#0D1218]/90 p-3.5 sm:p-4 shadow-md backdrop-blur-xl">
-              <div className="flex items-start sm:items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-yellow-500/15 text-yellow-400 border border-yellow-500/20">
-                  <FuelIcon className="h-4 w-4" />
+            <div className="group relative overflow-hidden rounded-2xl border border-white/[0.12] bg-white/[0.04] p-3 backdrop-blur-2xl backdrop-saturate-180 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_8px_24px_rgba(0,0,0,0.3)] hover:border-amber-400/30 transition-all">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl border border-amber-400/30 bg-amber-500/15 text-amber-400 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-xl">
+                  <FuelIcon className="h-4 w-4 drop-shadow-[0_2px_6px_rgba(245,158,11,0.4)]" />
                 </div>
-                <div className="min-w-0 space-y-0.5">
-                  <p className="text-[11px] text-neutral-400 font-medium">Vehicle Fuel</p>
-                  <div className="flex items-baseline gap-1.5">
-                    <p className="text-base sm:text-lg font-black text-white">
-                      {vehicleFuelLiters > 0
-                        ? `${vehicleFuelLiters.toLocaleString('en-IN')} L`
-                        : vehicleFuelAmount > 0
-                          ? `₹${vehicleFuelAmount.toLocaleString('en-IN')}`
-                          : '0 L'}
-                    </p>
-                    <span className="text-[10px] font-bold text-amber-400">Live</span>
-                  </div>
-                  <p className="text-[10px] text-neutral-500 truncate">
-                    {vehicleFuelAmount > 0 ? `₹${vehicleFuelAmount.toLocaleString('en-IN')}` : 'Diesel consumption'}
+                <div className="min-w-0">
+                  <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider truncate">Fuel</p>
+                  <p className="font-mono text-xs sm:text-sm font-black text-white truncate">
+                    {vehicleFuelLiters > 0
+                      ? `${vehicleFuelLiters.toLocaleString('en-IN')} L`
+                      : vehicleFuelAmount > 0
+                        ? `₹${vehicleFuelAmount.toLocaleString('en-IN')}`
+                        : '0 L'}
                   </p>
                 </div>
               </div>
             </div>
+
+            {/* 6. Trip Breakdown (Added inside Fleet Statistics) */}
+            <div className="group relative overflow-hidden rounded-2xl border border-[#F5B82E]/30 bg-gradient-to-br from-[#F5B82E]/[0.08] to-white/[0.03] p-3 backdrop-blur-2xl backdrop-saturate-180 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_8px_24px_rgba(0,0,0,0.3)]">
+              <div className="flex items-center justify-between gap-1 mb-1.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#F5B82E] truncate">
+                  Trip Breakdown
+                </span>
+                <span className="font-mono text-[10px] font-black text-white">{vehicleTrips.length}</span>
+              </div>
+              <div className="flex h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+                {displayPieData.map((d) => (
+                  <div
+                    key={d.name}
+                    style={{
+                      width: d.percentage === '0%' ? '33%' : d.percentage,
+                      backgroundColor: d.color
+                    }}
+                  />
+                ))}
+              </div>
+              <div className="mt-2 flex items-center justify-between gap-1 text-[9.5px] text-neutral-300">
+                {displayPieData.map((d) => (
+                  <span key={d.name} className="inline-flex items-center gap-1 truncate">
+                    <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
+                    <strong className="font-mono text-white">{d.value}</strong>
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3.5 sm:gap-4 sm:grid-cols-3 lg:grid-cols-5">
-            {/* Total Lorries */}
-            <div className="rounded-2xl border border-white/10 bg-[#0D1218]/90 p-3.5 sm:p-4 shadow-md backdrop-blur-xl">
-              <div className="flex items-start sm:items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F5B82E]/15 text-[#F5B82E] border border-[#F5B82E]/20">
-                  <TruckIcon className="h-4 w-4" />
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-3 sm:grid-cols-3 xl:grid-cols-6">
+            {/* 1. Total Lorries */}
+            <div className="group relative overflow-hidden rounded-2xl border border-white/[0.12] bg-white/[0.04] p-3 backdrop-blur-2xl backdrop-saturate-180 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_8px_24px_rgba(0,0,0,0.3)] hover:border-[#F5B82E]/30 transition-all">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl border border-[#F5B82E]/30 bg-[#F5B82E]/15 text-[#F5B82E] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-xl">
+                  <TruckIcon className="h-4 w-4 drop-shadow-[0_2px_6px_rgba(245,184,46,0.4)]" />
                 </div>
-                <div className="min-w-0 space-y-0.5">
-                  <p className="text-[11px] text-neutral-400 font-medium">Total Lorries</p>
-                  <div className="flex items-baseline gap-1.5">
-                    <p className="text-base sm:text-lg font-black text-white">{totalLorriesCount}</p>
-                    <span className="text-[10px] font-bold text-emerald-400">↗ Active</span>
-                  </div>
-                  <p className="text-[10px] text-neutral-500">In fleet registry</p>
+                <div className="min-w-0">
+                  <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider truncate">Total Fleet</p>
+                  <p className="font-mono text-xs sm:text-sm font-black text-white">{totalLorriesCount}</p>
                 </div>
               </div>
             </div>
 
-            {/* On Trip */}
-            <div className="rounded-2xl border border-white/10 bg-[#0D1218]/90 p-3.5 sm:p-4 shadow-md backdrop-blur-xl">
-              <div className="flex items-start sm:items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">
-                  <TruckIcon className="h-4 w-4" />
+            {/* 2. On Trip */}
+            <div className="group relative overflow-hidden rounded-2xl border border-white/[0.12] bg-white/[0.04] p-3 backdrop-blur-2xl backdrop-saturate-180 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_8px_24px_rgba(0,0,0,0.3)] hover:border-emerald-400/30 transition-all">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl border border-emerald-400/30 bg-emerald-500/15 text-emerald-400 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-xl">
+                  <TruckIcon className="h-4 w-4 drop-shadow-[0_2px_6px_rgba(16,185,129,0.4)]" />
                 </div>
-                <div className="min-w-0 space-y-0.5">
-                  <p className="text-[11px] text-neutral-400 font-medium">On Trip</p>
-                  <div className="flex items-baseline gap-1.5">
-                    <p className="text-base sm:text-lg font-black text-white">{onTripCount}</p>
-                    <span className="text-[10px] font-bold text-emerald-400">
-                      {totalLorriesCount > 0 ? `${Math.round((onTripCount / totalLorriesCount) * 100)}%` : '0%'}
-                    </span>
-                  </div>
-                  <p className="text-[10px] text-neutral-500">Currently running</p>
+                <div className="min-w-0">
+                  <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider truncate">On Trip</p>
+                  <p className="font-mono text-xs sm:text-sm font-black text-emerald-400">{onTripCount}</p>
                 </div>
               </div>
             </div>
 
-            {/* Idle */}
-            <div className="rounded-2xl border border-white/10 bg-[#0D1218]/90 p-3.5 sm:p-4 shadow-md backdrop-blur-xl">
-              <div className="flex items-start sm:items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/15 text-blue-400 border border-blue-500/20">
-                  <PauseCircleIcon className="h-4 w-4" />
+            {/* 3. Idle */}
+            <div className="group relative overflow-hidden rounded-2xl border border-white/[0.12] bg-white/[0.04] p-3 backdrop-blur-2xl backdrop-saturate-180 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_8px_24px_rgba(0,0,0,0.3)] hover:border-blue-400/30 transition-all">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl border border-blue-400/30 bg-blue-500/15 text-blue-400 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-xl">
+                  <PauseCircleIcon className="h-4 w-4 drop-shadow-[0_2px_6px_rgba(59,130,246,0.4)]" />
                 </div>
-                <div className="min-w-0 space-y-0.5">
-                  <p className="text-[11px] text-neutral-400 font-medium">Idle</p>
-                  <div className="flex items-baseline gap-1.5">
-                    <p className="text-base sm:text-lg font-black text-white">{idleCount}</p>
-                    <span className="text-[10px] font-bold text-blue-400">
-                      {totalLorriesCount > 0 ? `${Math.round((idleCount / totalLorriesCount) * 100)}%` : '0%'}
-                    </span>
-                  </div>
-                  <p className="text-[10px] text-neutral-500">Not assigned</p>
+                <div className="min-w-0">
+                  <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider truncate">Idle</p>
+                  <p className="font-mono text-xs sm:text-sm font-black text-blue-400">{idleCount}</p>
                 </div>
               </div>
             </div>
 
-            {/* Under Maintenance */}
-            <div className="rounded-2xl border border-white/10 bg-[#0D1218]/90 p-3.5 sm:p-4 shadow-md backdrop-blur-xl">
-              <div className="flex items-start sm:items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-500/15 text-red-400 border border-red-500/20">
-                  <WrenchIcon className="h-4 w-4" />
+            {/* 4. Maintenance */}
+            <div className="group relative overflow-hidden rounded-2xl border border-white/[0.12] bg-white/[0.04] p-3 backdrop-blur-2xl backdrop-saturate-180 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_8px_24px_rgba(0,0,0,0.3)] hover:border-rose-400/30 transition-all">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl border border-rose-400/30 bg-rose-500/15 text-rose-400 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-xl">
+                  <WrenchIcon className="h-4 w-4 drop-shadow-[0_2px_6px_rgba(244,63,94,0.4)]" />
                 </div>
-                <div className="min-w-0 space-y-0.5">
-                  <p className="text-[11px] text-neutral-400 font-medium">Under Maintenance</p>
-                  <div className="flex items-baseline gap-1.5">
-                    <p className="text-base sm:text-lg font-black text-white">{maintenanceCount}</p>
-                    <span className="text-[10px] font-bold text-amber-400">
-                      {totalLorriesCount > 0 ? `${Math.round((maintenanceCount / totalLorriesCount) * 100)}%` : '0%'}
-                    </span>
-                  </div>
-                  <p className="text-[10px] text-neutral-500">In service/repair</p>
+                <div className="min-w-0">
+                  <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider truncate">Service</p>
+                  <p className="font-mono text-xs sm:text-sm font-black text-amber-400">{maintenanceCount}</p>
                 </div>
               </div>
             </div>
 
-            {/* Total Fuel Usage */}
-            <div className="col-span-2 sm:col-span-1 rounded-2xl border border-white/10 bg-[#0D1218]/90 p-3.5 sm:p-4 shadow-md backdrop-blur-xl">
-              <div className="flex items-start sm:items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-yellow-500/15 text-yellow-400 border border-yellow-500/20">
-                  <FuelIcon className="h-4 w-4" />
+            {/* 5. Total Fuel Usage */}
+            <div className="group relative overflow-hidden rounded-2xl border border-white/[0.12] bg-white/[0.04] p-3 backdrop-blur-2xl backdrop-saturate-180 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_8px_24px_rgba(0,0,0,0.3)] hover:border-amber-400/30 transition-all">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl border border-amber-400/30 bg-amber-500/15 text-amber-400 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-xl">
+                  <FuelIcon className="h-4 w-4 drop-shadow-[0_2px_6px_rgba(245,158,11,0.4)]" />
                 </div>
-                <div className="min-w-0 space-y-0.5">
-                  <p className="text-[11px] text-neutral-400 font-medium">Total Fuel Usage</p>
-                  <div className="flex items-baseline gap-1.5">
-                    <p className="text-base sm:text-lg font-black text-white">
-                      {fuelMetrics.liters > 0
-                        ? `${fuelMetrics.liters.toLocaleString('en-IN')} L`
-                        : (fuelMetrics.amount > 0 ? `₹${fuelMetrics.amount.toLocaleString('en-IN')}` : '0 L')}
-                    </p>
-                    <span className="text-[10px] font-bold text-emerald-400">Live</span>
-                  </div>
-                  <p className="text-[10px] text-neutral-500">{timePeriod.toLowerCase()}</p>
+                <div className="min-w-0">
+                  <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider truncate">Fuel</p>
+                  <p className="font-mono text-xs sm:text-sm font-black text-white truncate">
+                    {fuelMetrics.liters > 0
+                      ? `${fuelMetrics.liters.toLocaleString('en-IN')} L`
+                      : fuelMetrics.amount > 0
+                        ? `₹${fuelMetrics.amount.toLocaleString('en-IN')}`
+                        : '0 L'}
+                  </p>
                 </div>
+              </div>
+            </div>
+
+            {/* 6. Trip Breakdown (Added inside Fleet Statistics) */}
+            <div className="group relative overflow-hidden rounded-2xl border border-[#F5B82E]/30 bg-gradient-to-br from-[#F5B82E]/[0.08] to-white/[0.03] p-3 backdrop-blur-2xl backdrop-saturate-180 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_8px_24px_rgba(0,0,0,0.3)]">
+              <div className="flex items-center justify-between gap-1 mb-1.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#F5B82E] truncate">
+                  Trip Breakdown
+                </span>
+                <span className="font-mono text-[10px] font-black text-white">{filteredTrips.length}</span>
+              </div>
+              <div className="flex h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+                {displayPieData.map((d) => (
+                  <div
+                    key={d.name}
+                    style={{
+                      width: d.percentage === '0%' ? '33%' : d.percentage,
+                      backgroundColor: d.color
+                    }}
+                  />
+                ))}
+              </div>
+              <div className="mt-2 flex items-center justify-between gap-1 text-[9.5px] text-neutral-300">
+                {displayPieData.map((d) => (
+                  <span key={d.name} className="inline-flex items-center gap-1 truncate">
+                    <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
+                    <strong className="font-mono text-white">{d.value}</strong>
+                  </span>
+                ))}
               </div>
             </div>
           </div>
         )}
       </div>
 
-      {/* 5. Bottom 3-Column Analytics Grid */}
-      <div className="grid grid-cols-1 gap-5 sm:gap-6 lg:grid-cols-3">
-        {/* Column 1: Recent Trips */}
-        <div className="flex flex-col justify-between rounded-2xl border border-white/10 bg-[#0D1218]/95 p-4 sm:p-5 shadow-xl backdrop-blur-2xl">
+      {/* 5. Bottom Analytics Grid: Recent Trips (5 cols) + Expanded Trip Expenses (7 cols) */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+        {/* Left Panel (5 cols): Recent Trips */}
+        <div className="lg:col-span-5 flex flex-col justify-between rounded-2xl border border-white/[0.08] bg-white/[0.025] p-3.5 sm:p-4 shadow-xl backdrop-blur-2xl">
           <div>
-            <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-3">
+            <div className="flex items-center justify-between gap-2 border-b border-white/[0.08] pb-2.5">
               <div className="flex items-center gap-2 min-w-0">
-                <TruckIcon className="h-4 w-4 shrink-0 text-[#F5B82E]" />
-                <h3 className="text-xs sm:text-sm font-bold text-white tracking-wide truncate">
+                <TruckIcon className="h-3.5 w-3.5 shrink-0 text-[#F5B82E]" />
+                <h3 className="text-xs font-black uppercase tracking-[0.15em] text-white truncate">
                   {fleetScope === 'vehicle' && selectedLorry
                     ? `Recent Trips (${selectedLorry.plate})`
                     : 'Recent Trips'}
@@ -1272,51 +1271,40 @@ export function Overview() {
                 to="/trips"
                 className="flex items-center gap-1 text-[11px] font-semibold text-[#F5B82E] hover:underline shrink-0"
               >
-                <span>View All</span>
+                <span>All</span>
                 <ArrowRightIcon className="h-3 w-3" />
               </Link>
             </div>
 
-            <div className="mt-3.5 overflow-x-auto">
+            <div className="mt-2.5 overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="border-b border-white/5 text-[10px] uppercase font-bold text-neutral-500 tracking-wider">
-                    <th className="py-2.5 px-1.5">Lorry No.</th>
-                    <th className="py-2.5 px-1.5">Driver</th>
-                    <th className="py-2.5 px-1.5">Route</th>
-                    <th className="py-2.5 px-1.5 text-right">Status</th>
+                  <tr className="border-b border-white/5 text-[9.5px] uppercase font-bold text-neutral-500 tracking-wider">
+                    <th className="py-2 px-1.5">Lorry</th>
+                    <th className="py-2 px-1.5">Driver</th>
+                    <th className="py-2 px-1.5">Route</th>
+                    <th className="py-2 px-1.5 text-right">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {displayTripsList.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="py-8 text-center text-xs text-neutral-500">
-                        {fleetScope === 'vehicle' && selectedLorry ? (
-                          <>
-                            No trips recorded for <strong className="text-neutral-300">{selectedLorry.plate}</strong> in this period.{' '}
-                            <Link to="/trips" className="text-[#F5B82E] hover:underline font-semibold">
-                              Assign or create a trip
-                            </Link>
-                          </>
-                        ) : (
-                          <>
-                            No trips recorded yet.{' '}
-                            <Link to="/trips" className="text-[#F5B82E] hover:underline font-semibold">
-                              Create or view trips
-                            </Link>
-                          </>
-                        )}
+                      <td colSpan={4} className="py-6 text-center text-xs text-neutral-500">
+                        No trips in this period.{' '}
+                        <Link to="/trips" className="text-[#F5B82E] hover:underline font-semibold">
+                          View Trips
+                        </Link>
                       </td>
                     </tr>
                   ) : (
                     displayTripsList.map((t, i) => (
                       <tr key={t.id || i} className="hover:bg-white/5 transition-colors">
-                        <td className="py-2.5 px-1.5 font-mono font-bold text-white text-[11px] whitespace-nowrap">{t.plate}</td>
-                        <td className="py-2.5 px-1.5 text-neutral-300 font-medium text-[11px] whitespace-nowrap">{t.driver}</td>
-                        <td className="py-2.5 px-1.5 text-neutral-400 text-[11px] truncate max-w-[125px]">{t.route}</td>
-                        <td className="py-2.5 px-1.5 text-right whitespace-nowrap">
+                        <td className="py-2 px-1.5 font-mono font-bold text-white text-[11px] whitespace-nowrap">{t.plate}</td>
+                        <td className="py-2 px-1.5 text-neutral-300 font-medium text-[11px] whitespace-nowrap">{t.driver}</td>
+                        <td className="py-2 px-1.5 text-neutral-400 text-[11px] truncate max-w-[110px]">{t.route}</td>
+                        <td className="py-2 px-1.5 text-right whitespace-nowrap">
                           <span
-                            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9.5px] font-bold border ${t.bgClass}`}
+                            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold border ${t.bgClass}`}
                           >
                             <span
                               className="h-1.5 w-1.5 rounded-full"
@@ -1334,95 +1322,13 @@ export function Overview() {
           </div>
         </div>
 
-        {/* Column 2: Fleet Status Overview / Vehicle Status Breakdown (Donut Chart) */}
-        <div className="flex flex-col justify-between rounded-2xl border border-white/10 bg-[#0D1218]/95 p-4 sm:p-5 shadow-xl backdrop-blur-2xl">
+        {/* Right Panel (7 cols): Expanded Trip Expenses */}
+        <div className="lg:col-span-7 flex flex-col justify-between rounded-2xl border border-white/[0.08] bg-white/[0.025] p-3.5 sm:p-4 shadow-xl backdrop-blur-2xl">
           <div>
-            <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-3">
+            <div className="flex items-center justify-between gap-2 border-b border-white/[0.08] pb-2.5">
               <div className="flex items-center gap-2 min-w-0">
-                <TruckIcon className="h-4 w-4 shrink-0 text-[#F5B82E]" />
-                <h3 className="text-xs sm:text-sm font-bold text-white tracking-wide truncate">
-                  {fleetScope === 'vehicle' && selectedLorry
-                    ? `Trip Breakdown (${selectedLorry.plate})`
-                    : 'Fleet Status Overview'}
-                </h3>
-              </div>
-              <Link
-                to="/fleet"
-                className="flex items-center gap-1 text-[11px] font-semibold text-[#F5B82E] hover:underline shrink-0"
-              >
-                <span>View All</span>
-                <ArrowRightIcon className="h-3 w-3" />
-              </Link>
-            </div>
-
-            {/* Donut Chart with Center Text & Legend */}
-            <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-5">
-              <div className="relative h-36 w-36 sm:h-40 sm:w-40 shrink-0">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={displayPieData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={44}
-                      outerRadius={60}
-                      paddingAngle={3}
-                      dataKey="value"
-                    >
-                      {displayPieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} stroke="#0D1218" strokeWidth={2} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        background: '#0B1117',
-                        border: '1px solid rgba(255,255,255,0.15)',
-                        borderRadius: 8,
-                        fontSize: 11
-                      }}
-                      itemStyle={{ color: '#fff' }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-                {/* Center Stats */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none px-2 text-center">
-                  <span className="text-xl font-black text-white leading-none">
-                    {fleetScope === 'vehicle' ? vehicleTrips.length : totalLorriesCount}
-                  </span>
-                  <span className="text-[9.5px] font-semibold text-neutral-400 mt-1 leading-tight">
-                    {fleetScope === 'vehicle' ? 'Vehicle Trips' : 'Total Lorries'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Legend Breakdown */}
-              <div className="flex-1 space-y-2.5 text-xs w-full">
-                {displayPieData.map((item) => (
-                  <div key={item.name} className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span
-                        className="h-2.5 w-2.5 shrink-0 rounded-full"
-                        style={{ backgroundColor: item.color }}
-                      />
-                      <span className="text-neutral-300 font-medium truncate">{item.name}</span>
-                    </div>
-                    <span className="font-mono font-bold text-white text-xs shrink-0">
-                      {item.value} <span className="text-neutral-500 font-normal text-[10px]">({item.percentage})</span>
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Column 3: Trip Expenses / Vehicle Expenses */}
-        <div className="flex flex-col justify-between rounded-2xl border border-white/10 bg-[#0D1218]/95 p-4 sm:p-5 shadow-xl backdrop-blur-2xl">
-          <div>
-            <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-3">
-              <div className="flex items-center gap-2 min-w-0">
-                <WalletIcon className="h-4 w-4 shrink-0 text-[#F5B82E]" />
-                <h3 className="text-xs sm:text-sm font-bold text-white tracking-wide truncate">
+                <WalletIcon className="h-3.5 w-3.5 shrink-0 text-[#F5B82E]" />
+                <h3 className="text-xs font-black uppercase tracking-[0.15em] text-white truncate">
                   {fleetScope === 'vehicle' && selectedLorry
                     ? `Expenses (${selectedLorry.plate})`
                     : 'Trip Expenses'}
@@ -1432,29 +1338,44 @@ export function Overview() {
                 to={`/expenses?lorry=${encodeURIComponent(selectedLorry?.plate || (lorries.find(l => l.plate.toUpperCase().includes('KL'))?.plate || lorries[0]?.plate || 'KL 03BH 3333'))}`}
                 className="flex items-center gap-1 text-[11px] font-semibold text-[#F5B82E] hover:underline shrink-0"
               >
-                <span>View Ledger</span>
+                <span>Ledger</span>
                 <ArrowRightIcon className="h-3 w-3" />
               </Link>
             </div>
 
-            {/* Expense Categories List */}
-            <div className="mt-3.5 space-y-2 text-xs">
+            {/* Expanded 2-Column Glassy Expense Categories Grid */}
+            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
               {displayExpensesList.map((exp) => {
                 const Icon = exp.icon;
+                const sharePct =
+                  displayTotalExpenses > 0
+                    ? Math.min(100, Math.round((exp.amount / displayTotalExpenses) * 100))
+                    : 0;
                 return (
                   <div
                     key={exp.label}
-                    className="flex items-center justify-between gap-2 rounded-xl border border-white/5 bg-[#121822]/60 p-2 px-3 hover:bg-[#161F2C] transition-colors"
+                    className="rounded-xl border border-white/[0.07] bg-white/[0.03] p-2.5 hover:border-[#F5B82E]/30 transition-all"
                   >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${exp.bg} ${exp.color}`}>
-                        <Icon className="h-3.5 w-3.5" />
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${exp.bg} ${exp.color}`}>
+                          <Icon className="h-3.5 w-3.5" />
+                        </div>
+                        <div className="min-w-0">
+                          <span className="font-semibold text-neutral-200 text-xs block truncate">{exp.label}</span>
+                          <span className="text-[9.5px] text-neutral-500">{sharePct}% of total</span>
+                        </div>
                       </div>
-                      <span className="font-medium text-neutral-300 text-xs truncate">{exp.label}</span>
+                      <span className="font-mono font-bold text-white text-xs shrink-0">
+                        ₹{exp.amount.toLocaleString('en-IN')}
+                      </span>
                     </div>
-                    <span className="font-mono font-bold text-white text-xs shrink-0">
-                      ₹ {exp.amount.toLocaleString('en-IN')}
-                    </span>
+                    <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-white/[0.06]">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-[#F5B82E] to-amber-400 transition-all duration-500"
+                        style={{ width: `${sharePct}%` }}
+                      />
+                    </div>
                   </div>
                 );
               })}
@@ -1462,19 +1383,17 @@ export function Overview() {
           </div>
 
           {/* Bottom Total Expenses Highlight Bar */}
-          <div className="mt-4 rounded-xl border border-[#F5B82E]/40 bg-gradient-to-r from-amber-500/20 via-[#F5B82E]/15 to-amber-500/10 p-3 shadow-sm">
+          <div className="mt-3 rounded-xl border border-[#F5B82E]/35 bg-gradient-to-r from-amber-500/15 via-[#F5B82E]/10 to-transparent px-3.5 py-2.5 shadow-sm">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 min-w-0">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#F5B82E]/20 text-[#F5B82E] border border-[#F5B82E]/30">
-                  <CoinsIcon className="h-3.5 w-3.5" />
-                </div>
+                <CoinsIcon className="h-4 w-4 text-[#F5B82E] shrink-0" />
                 <span className="text-xs font-bold text-neutral-200 truncate">
                   {fleetScope === 'vehicle' && selectedLorry
-                    ? `${selectedLorry.plate} Total`
+                    ? `${selectedLorry.plate} Total Expenses`
                     : 'Total Expenses'}
                 </span>
               </div>
-              <span className="font-mono text-base font-black text-[#F5B82E] shrink-0">
+              <span className="font-mono text-sm sm:text-base font-black text-[#F5B82E] shrink-0">
                 ₹ {displayTotalExpenses.toLocaleString('en-IN')}
               </span>
             </div>
@@ -1482,355 +1401,195 @@ export function Overview() {
         </div>
       </div>
 
-      {/* 6. Dedicated Kerala Fleet Delivery & Unloading Audit Module */}
-      <div className="space-y-4 sm:space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
-          <div className="flex items-start sm:items-center gap-3 min-w-0">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gold/20 text-gold border border-gold/40 shadow-md">
-              <ShieldCheckIcon className="h-5 w-5" />
-            </div>
-            <div className="min-w-0 space-y-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-base sm:text-lg font-black tracking-tight text-white">
-                  Kerala Delivery &amp; Unloading Audit
-                </h2>
-                <span className="text-[10px] sm:text-[11px] font-mono text-gold border border-gold/30 bg-gold/10 px-2.5 py-0.5 rounded-full font-bold">
-                  OWNER AUDIT HUB
-                </span>
-                <span className="rounded-full bg-emerald-500/15 text-emerald-300 text-[10px] font-bold px-2.5 py-0.5 border border-emerald-500/30">
-                  {fleetScope === 'vehicle' && selectedLorry ? `${selectedLorry.plate}` : 'All Fleets'}
-                </span>
-              </div>
-              <p className="text-xs text-neutral-400">
-                Audit where the fleet unloaded in Kerala, stone pieces, damages, cash to driver, PhonePe to owner, and amount lessened.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            <Link
-              to="/unloading-parties"
-              className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-[#0F141A] px-3.5 py-2 text-xs font-bold text-neutral-300 hover:border-gold hover:text-gold transition-all cursor-pointer shadow-sm"
-            >
-              <span>Buyer Parties</span>
-              <ArrowRightIcon className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-        </div>
-
-        {/* Audit Quick KPI Summary Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4">
-          <div className="rounded-2xl border border-emerald-500/20 bg-emerald-950/20 p-3.5 sm:p-4 space-y-1">
-            <span className="text-[10px] uppercase font-bold text-emerald-400 block truncate">Sound Unloaded</span>
-            <span className="font-mono text-sm sm:text-base font-black text-white block truncate">
-              {unloadingAuditKPIs.totalUnloaded.toLocaleString('en-IN')} pcs
+      {/* 6. Kerala Delivery & Unloading Audit (Always Visible, Streamlined Necessary Info) */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#F5B82E]" />
+            <h2 className="text-xs sm:text-sm font-black uppercase tracking-[0.18em] text-white">
+              Kerala Delivery &amp; Unloading Audit
+            </h2>
+            <span className="rounded-full bg-[#F5B82E]/15 border border-[#F5B82E]/30 px-2 py-0.5 text-[10px] font-mono font-bold text-[#F5B82E]">
+              {unloadingDetailsList.length}
             </span>
-            <span className="text-[10px] text-neutral-400 block truncate">of {unloadingAuditKPIs.totalLoaded.toLocaleString('en-IN')} loaded</span>
           </div>
-
-          <div
-            className={`rounded-2xl p-3.5 sm:p-4 space-y-1 border ${
-              unloadingAuditKPIs.totalDamaged > 0
-                ? 'border-red-500/40 bg-red-950/30 text-red-300'
-                : 'border-white/10 bg-black/40 text-neutral-400'
-            }`}
+          <Link
+            to="/unloading-parties"
+            className="flex items-center gap-1 text-[11px] font-semibold text-[#F5B82E] hover:underline"
           >
-            <span className="text-[10px] uppercase font-bold block truncate">Damaged Stones</span>
-            <span className="font-mono text-sm sm:text-base font-black text-red-300 block truncate">
-              {unloadingAuditKPIs.totalDamaged > 0 ? `⚠ ${unloadingAuditKPIs.totalDamaged} pcs` : '0 pcs'}
-            </span>
-            <span className="text-[10px] text-neutral-400 block truncate">
-              {unloadingAuditKPIs.totalDamaged > 0 ? 'Transit / site breakages' : '✓ Zero damages'}
-            </span>
-          </div>
-
-          <div className="rounded-2xl border border-emerald-500/20 bg-emerald-950/20 p-3.5 sm:p-4 space-y-1">
-            <span className="text-[10px] uppercase font-bold text-emerald-400 block truncate">💵 Cash to Driver</span>
-            <span className="font-mono text-sm sm:text-base font-black text-emerald-300 block truncate">
-              {formatINR(unloadingAuditKPIs.totalCash)}
-            </span>
-            <span className="text-[10px] text-neutral-400 block truncate">Collected at site</span>
-          </div>
-
-          <div className="rounded-2xl border border-blue-500/20 bg-blue-950/20 p-3.5 sm:p-4 space-y-1">
-            <span className="text-[10px] uppercase font-bold text-blue-400 block truncate">📱 PhonePe to Owner</span>
-            <span className="font-mono text-sm sm:text-base font-black text-blue-300 block truncate">
-              {formatINR(unloadingAuditKPIs.totalPhonePe)}
-            </span>
-            <span className="text-[10px] text-neutral-400 block truncate">Direct owner account</span>
-          </div>
-
-          <div className="rounded-2xl border border-red-500/20 bg-red-950/20 p-3.5 sm:p-4 space-y-1">
-            <span className="text-[10px] uppercase font-bold text-red-400 block truncate">✂ Amount Lessened</span>
-            <span className="font-mono text-sm sm:text-base font-black text-red-300 block truncate">
-              − {formatINR(unloadingAuditKPIs.totalLessened)}
-            </span>
-            <span className="text-[10px] text-neutral-400 block truncate">Damage &amp; shortage cuts</span>
-          </div>
-
-          <div className="rounded-2xl border border-gold/30 bg-gold/5 p-3.5 sm:p-4 space-y-1">
-            <span className="text-[10px] uppercase font-bold text-gold block truncate">Active Deliveries</span>
-            <span className="font-mono text-sm sm:text-base font-black text-gold block truncate">
-              {unloadingAuditKPIs.count} Consignments
-            </span>
-            <span className="text-[10px] text-neutral-400 block truncate">Kerala buyers</span>
-          </div>
+            <span>Buyers</span>
+            <ArrowRightIcon className="h-3 w-3" />
+          </Link>
         </div>
 
-        {/* Mobile Luxury Audit Cards (iPhone / <768px) */}
-        <div className="space-y-4 md:hidden">
-                                                                          {unloadingDetailsList.length === 0 ? (
-                                                                            <div className="rounded-2xl border border-white/10 bg-[#0D1218]/95 p-6 text-center text-xs text-neutral-500">
-                                                                              No unloading delivery records found for this view.{' '}
-                                                                              <Link to="/trips" className="text-gold hover:underline font-bold">
-                                                                                View all trips
-                                                                              </Link>
-                                                                            </div>
-                                                                          ) : (
-                                                                            unloadingDetailsList.map((item) => {
-                                                                              const matchTrip = trips.find((t) => t.id === item.tripId);
-                                                                              return (
-                                                                                <div
-                                                                                  key={item.tripId}
-                                                                                  className="rounded-2xl border border-white/10 bg-[#0D1218]/95 p-3.5 shadow-xl space-y-3"
-                                                                                >
-                                                                                  <div className="flex items-start justify-between gap-2 border-b border-white/10 pb-2.5">
-                                                                                    <div>
-                                                                                      <div className="flex items-center gap-2">
-                                                                                        <Link
-                                                                                          to={`/trips/${item.tripId}`}
-                                                                                          className="font-mono font-bold text-gold hover:underline text-xs"
-                                                                                        >
-                                                                                          #{item.tripCode}
-                                                                                        </Link>
-                                                                                        <span className="font-mono text-xs font-black text-white flex items-center gap-1">
-                                                                                          <TruckIcon className="h-3 w-3 text-gold" />
-                                                                                          {item.lorryPlate}
-                                                                                        </span>
-                                                                                      </div>
-                                                                                      <p className="text-[10px] text-neutral-400 mt-0.5">
-                                                                                        Driver: <span className="text-neutral-200 font-semibold">{item.driverName}</span>
-                                                                                      </p>
-                                                                                    </div>
-                                                                                    <span
-                                                                                      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9.5px] font-bold border shrink-0 ${item.statusBadge.bg}`}
-                                                                                    >
-                                                                                      <span
-                                                                                        className="h-1 w-1 rounded-full"
-                                                                                        style={{ backgroundColor: item.statusBadge.color }}
-                                                                                      />
-                                                                                      {item.statusBadge.label}
-                                                                                    </span>
-                                                                                  </div>
+        {/* Mobile Compact Audit Cards (<768px) */}
+        <div className="space-y-2.5 md:hidden">
+          {unloadingDetailsList.length === 0 ? (
+            <div className="rounded-xl border border-white/[0.08] bg-white/[0.025] p-5 text-center text-xs text-neutral-500">
+              No unloading delivery records for this view.{' '}
+              <Link to="/trips" className="text-[#F5B82E] hover:underline font-bold">
+                View Trips
+              </Link>
+            </div>
+          ) : (
+            unloadingDetailsList.map((item) => {
+              const matchTrip = trips.find((t) => t.id === item.tripId);
+              const isCompletedAudit =
+                item.auditStatus === 'audited' || Boolean(item.auditedAt) || item.statusBadge.label === 'Delivered & Unloaded';
+              return (
+                <div
+                  key={item.tripId}
+                  className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-3 backdrop-blur-xl space-y-2"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Link
+                        to={`/trips/${item.tripId}`}
+                        className="font-mono font-bold text-gold hover:underline text-xs"
+                      >
+                        #{item.tripCode}
+                      </Link>
+                      <span className="font-mono text-xs font-black text-white truncate">
+                        {item.lorryPlate}
+                      </span>
+                    </div>
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold border shrink-0 ${item.statusBadge.bg}`}
+                    >
+                      {item.statusBadge.label}
+                    </span>
+                  </div>
 
-                                                                                  {/* Destination & Pieces */}
-                                                                                  <div className="grid grid-cols-2 gap-2.5 text-xs">
-                                                                                    <div className="rounded-xl bg-white/[0.03] border border-white/5 p-2.5">
-                                                                                      <span className="text-[9.5px] uppercase font-bold text-neutral-500 block">Kerala Buyer</span>
-                                                                                      <p className="font-bold text-white truncate mt-0.5">{item.partyName}</p>
-                                                                                      <p className="text-[10px] text-emerald-300 font-semibold truncate">📍 {item.district}</p>
-                                                                                    </div>
-                                                                                    <div className="rounded-xl bg-white/[0.03] border border-white/5 p-2.5">
-                                                                                      <span className="text-[9.5px] uppercase font-bold text-neutral-500 block">Stone Pieces</span>
-                                                                                      <p className="font-mono font-bold text-white mt-0.5">
-                                                                                        {item.unloadedPieces} <span className="text-neutral-400 font-normal">/ {item.totalPieces} pcs</span>
-                                                                                      </p>
-                                                                                      {item.damagedPieces > 0 ? (
-                                                                                        <p className="text-[10px] font-bold text-red-400">⚠ {item.damagedPieces} damaged</p>
-                                                                                      ) : (
-                                                                                        <p className="text-[10px] font-semibold text-emerald-400">✓ 0 damages</p>
-                                                                                      )}
-                                                                                    </div>
-                                                                                  </div>
+                  <div className="flex items-center justify-between gap-2 text-xs text-neutral-300">
+                    <span className="truncate font-semibold">{item.partyName} ({item.district})</span>
+                    <span className="font-mono text-white shrink-0">
+                      {item.unloadedPieces}/{item.totalPieces} pcs
+                    </span>
+                  </div>
 
-                                                                                  {/* Payment Breakdown */}
-                                                                                  <div className="grid grid-cols-3 gap-2 rounded-xl bg-black/40 border border-white/5 p-2.5 text-[10px]">
-                                                                                    <div>
-                                                                                      <span className="text-neutral-500 block">💵 Driver Cash</span>
-                                                                                      <span className="font-mono font-bold text-emerald-300 text-xs">{formatINR(item.cashToDriver)}</span>
-                                                                                    </div>
-                                                                                    <div>
-                                                                                      <span className="text-neutral-500 block">📱 PhonePe</span>
-                                                                                      <span className="font-mono font-bold text-blue-300 text-xs">{formatINR(item.phonePeToOwner)}</span>
-                                                                                    </div>
-                                                                                    <div>
-                                                                                      <span className="text-neutral-500 block">✂ Lessened</span>
-                                                                                      <span className="font-mono font-bold text-red-300 text-xs">
-                                                                                        {item.totalLessened > 0 ? `−${formatINR(item.totalLessened)}` : '₹0'}
-                                                                                      </span>
-                                                                                    </div>
-                                                                                  </div>
+                  <div className="flex items-center justify-between gap-2 pt-1 border-t border-white/5">
+                    <span className="font-mono text-xs font-bold text-emerald-400">
+                      Paid: {formatINR(item.totalPaid)}
+                    </span>
+                    {isCompletedAudit ? (
+                      <span className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-bold text-emerald-400">
+                        ✓ Audited
+                      </span>
+                    ) : (
+                      matchTrip && (
+                        <button
+                          onClick={() => setAuditingTrip(matchTrip)}
+                          className="inline-flex items-center gap-1 rounded-lg bg-[#F5B82E] px-2.5 py-1 text-[11px] font-black text-black cursor-pointer"
+                        >
+                          <ShieldCheckIcon className="h-3 w-3" />
+                          <span>Audit</span>
+                        </button>
+                      )
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
 
-                                                                                  {matchTrip && (
-                                                                                    <button
-                                                                                      onClick={() => setAuditingTrip(matchTrip)}
-                                                                                      className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#F5B82E] to-[#E5A81E] py-2 text-xs font-black text-black shadow-md active:scale-[0.98] transition-all cursor-pointer"
-                                                                                    >
-                                                                                      <ShieldCheckIcon className="h-3.5 w-3.5" />
-                                                                                      <span>Audit Unloading &amp; Payments</span>
-                                                                                    </button>
-                                                                                  )}
-                                                                                </div>
-                                                                              );
-                                                                            })
-                                                                          )}
-                                                                        </div>
+        {/* Desktop Compact Audit Table (>=768px) */}
+        <div className="hidden md:block rounded-2xl border border-white/[0.08] bg-white/[0.025] p-3 shadow-xl backdrop-blur-2xl">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-white/10 text-[10px] uppercase font-bold text-neutral-400 tracking-wider">
+                  <th className="py-2 px-3">Trip / Lorry</th>
+                  <th className="py-2 px-3">Kerala Buyer</th>
+                  <th className="py-2 px-3">Pieces</th>
+                  <th className="py-2 px-3">Collected</th>
+                  <th className="py-2 px-3">Status</th>
+                  <th className="py-2 px-3 text-right">Audit</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {unloadingDetailsList.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="py-6 text-center text-xs text-neutral-500">
+                      No unloading delivery records for this view.{' '}
+                      <Link to="/trips" className="text-[#F5B82E] hover:underline font-bold">
+                        View Trips
+                      </Link>
+                    </td>
+                  </tr>
+                ) : (
+                  unloadingDetailsList.map((item) => {
+                    const matchTrip = trips.find((t) => t.id === item.tripId);
+                    const isCompletedAudit =
+                      item.auditStatus === 'audited' || Boolean(item.auditedAt) || item.statusBadge.label === 'Delivered & Unloaded';
+                    return (
+                      <tr key={item.tripId} className="hover:bg-white/5 transition-colors">
+                        <td className="py-2.5 px-3">
+                          <div className="flex items-center gap-2">
+                            <Link
+                              to={`/trips/${item.tripId}`}
+                              className="font-mono font-bold text-gold hover:underline text-xs"
+                            >
+                              #{item.tripCode}
+                            </Link>
+                            <span className="font-mono font-bold text-white text-xs">
+                              {item.lorryPlate}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="py-2.5 px-3">
+                          <span className="font-bold text-white text-xs">{item.partyName}</span>
+                          <span className="text-[10.5px] text-emerald-300 ml-1.5">({item.district})</span>
+                        </td>
+                        <td className="py-2.5 px-3 font-mono text-xs text-white">
+                          {item.unloadedPieces} <span className="text-neutral-500">/ {item.totalPieces} pcs</span>
+                        </td>
+                        <td className="py-2.5 px-3 font-mono font-bold text-emerald-400 text-xs">
+                          {formatINR(item.totalPaid)}
+                        </td>
+                        <td className="py-2.5 px-3">
+                          <span
+                            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9.5px] font-bold border ${item.statusBadge.bg}`}
+                          >
+                            {item.statusBadge.label}
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 text-right">
+                          {isCompletedAudit ? (
+                            <span className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-bold text-emerald-400">
+                              ✓ Audited
+                            </span>
+                          ) : (
+                            matchTrip && (
+                              <button
+                                onClick={() => setAuditingTrip(matchTrip)}
+                                className="inline-flex items-center gap-1 rounded-lg bg-[#F5B82E] px-2.5 py-1 text-[11px] font-black text-black hover:brightness-110 transition-all cursor-pointer"
+                              >
+                                <ShieldCheckIcon className="h-3 w-3" />
+                                <span>Audit</span>
+                              </button>
+                            )
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-                                                                        {/* Detailed Kerala Unloading & Delivery Audit Table (Desktop >=768px) */}
-                                                                        <div className="hidden md:block rounded-2xl border border-white/10 bg-[#0D1218]/95 p-3.5 sm:p-4 shadow-xl backdrop-blur-2xl">
-                                                                          <div className="overflow-x-auto">
-                                                                            <table className="w-full text-left text-xs border-collapse">
-                                                                              <thead>
-                                                                                <tr className="border-b border-white/10 text-[10px] uppercase font-bold text-neutral-400 tracking-wider">
-                                                                                  <th className="py-3 px-3">Trip / Fleet</th>
-                                                                                  <th className="py-3 px-3">Where Unloading in Kerala</th>
-                                                                                  <th className="py-3 px-3">Pieces &amp; Damage Audit</th>
-                                                                                  <th className="py-3 px-3">Buyer Payments</th>
-                                                                                  <th className="py-3 px-3">Amount Lessened</th>
-                                                                                  <th className="py-3 px-3">Audit Notes &amp; Status</th>
-                                                                                  <th className="py-3 px-3 text-right">Owner Action</th>
-                                                                                </tr>
-                                                                              </thead>
-                                                                              <tbody className="divide-y divide-white/5">
-                                                                                {unloadingDetailsList.length === 0 ? (
-                                                                                  <tr>
-                                                                                    <td colSpan={7} className="py-8 text-center text-xs text-neutral-500">
-                                                                                      No unloading delivery records found for this view.{' '}
-                                                                                      <Link to="/trips" className="text-gold hover:underline font-bold">
-                                                                                        View all trips
-                                                                                      </Link>
-                                                                                    </td>
-                                                                                  </tr>
-                                                                                ) : (
-                                                                                  unloadingDetailsList.map((item) => {
-                                                                                    const matchTrip = trips.find((t) => t.id === item.tripId);
-                                                                                    return (
-                                                                                      <tr key={item.tripId} className="hover:bg-white/5 transition-colors">
-                                                                                        {/* 1. Trip / Fleet */}
-                                                                                        <td className="py-3 px-3">
-                                                                                          <Link
-                                                                                            to={`/trips/${item.tripId}`}
-                                                                                            className="font-mono font-bold text-gold hover:underline text-xs"
-                                                                                          >
-                                                                                            #{item.tripCode}
-                                                                                          </Link>
-                                                                                          <div className="text-[10px] font-bold text-white flex items-center gap-1 mt-0.5">
-                                                                                            <TruckIcon className="h-3 w-3 text-gold" />
-                                                                                            <span>{item.lorryPlate}</span>
-                                                                                          </div>
-                                                                                          <div className="text-[9.5px] text-neutral-400">
-                                                                                            Driver: {item.driverName}
-                                                                                          </div>
-                                                                                        </td>
-
-                                                                                        {/* 2. Where Unloading in Kerala */}
-                                                                                        <td className="py-3 px-3">
-                                                                                          <div className="font-bold text-white text-xs flex items-center gap-1.5">
-                                                                                            <MapPinIcon className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
-                                                                                            <span>{item.partyName}</span>
-                                                                                          </div>
-                                                                                          <p className="text-[10px] text-emerald-300 font-semibold mt-0.5">
-                                                                                            📍 {item.district}
-                                                                                          </p>
-                                                                                          {item.phone && (
-                                                                                            <p className="text-[9.5px] text-neutral-400">{item.phone}</p>
-                                                                                          )}
-                                                                                        </td>
-
-                                                                                        {/* 3. Pieces & Damage Audit */}
-                                                                                        <td className="py-3 px-3">
-                                                                                          <div className="font-mono text-xs">
-                                                                                            <span className="font-bold text-white">{item.unloadedPieces}</span>
-                                                                                            <span className="text-neutral-400"> / {item.totalPieces} pcs</span>
-                                                                                          </div>
-                                                                                          {item.damagedPieces > 0 ? (
-                                                                                            <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-red-400 bg-red-950/40 border border-red-500/30 px-1.5 py-0.5 rounded mt-0.5">
-                                                                                              ⚠ {item.damagedPieces} damaged
-                                                                                            </span>
-                                                                                          ) : (
-                                                                                            <span className="text-[9.5px] text-emerald-400 font-semibold block mt-0.5">
-                                                                                              ✓ 0 damages
-                                                                                            </span>
-                                                                                          )}
-                                                                                        </td>
-
-                                                                                        {/* 4. Buyer Payments */}
-                                                                                        <td className="py-3 px-3">
-                                                                                          <div className="font-mono font-bold text-emerald-400 text-xs">
-                                                                                            {formatINR(item.totalPaid)}
-                                                                                          </div>
-                                                                                          <div className="text-[9.5px] text-neutral-400 mt-0.5 space-y-0.5">
-                                                                                            <div>💵 Driver Cash: <strong className="text-neutral-200">{formatINR(item.cashToDriver)}</strong></div>
-                                                                                            <div>📱 PhonePe: <strong className="text-neutral-200">{formatINR(item.phonePeToOwner)}</strong></div>
-                                                                                          </div>
-                                                                                        </td>
-
-                                                                                        {/* 5. Amount Lessened / Deducted */}
-                                                                                        <td className="py-3 px-3">
-                                                                                          {item.totalLessened > 0 ? (
-                                                                                            <div>
-                                                                                              <span className="font-mono font-bold text-red-300 text-xs">
-                                                                                                − {formatINR(item.totalLessened)}
-                                                                                              </span>
-                                                                                              <div className="text-[9px] text-neutral-400 mt-0.5">
-                                                                                                {item.damageDeduction > 0 && `Damage: ${formatINR(item.damageDeduction)} `}
-                                                                                                {item.shortageDeduction > 0 && `Shortage: ${formatINR(item.shortageDeduction)}`}
-                                                                                              </div>
-                                                                                            </div>
-                                                                                          ) : (
-                                                                                            <span className="text-[10px] text-neutral-500">₹0 (Full Pay)</span>
-                                                                                          )}
-                                                                                        </td>
-
-                                                                                        {/* 6. Audit Notes & Status */}
-                                                                                        <td className="py-3 px-3">
-                                                                                          <span
-                                                                                            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9.5px] font-bold border ${item.statusBadge.bg}`}
-                                                                                          >
-                                                                                            <span
-                                                                                              className="h-1 w-1 rounded-full"
-                                                                                              style={{ backgroundColor: item.statusBadge.color }}
-                                                                                            />
-                                                                                            {item.statusBadge.label}
-                                                                                          </span>
-                                                                                          {item.auditNote && (
-                                                                                            <p className="text-[9.5px] text-neutral-300 italic mt-1 truncate max-w-[160px]" title={item.auditNote}>
-                                                                                              &ldquo;{item.auditNote}&rdquo;
-                                                                                            </p>
-                                                                                          )}
-                                                                                        </td>
-
-                                                                                        {/* 7. Action Button */}
-                                                                                        <td className="py-3 px-3 text-right">
-                                                                                          {matchTrip && (
-                                                                                            <button
-                                                                                              onClick={() => setAuditingTrip(matchTrip)}
-                                                                                              className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#F5B82E] to-[#E5A81E] px-3 py-1.5 text-xs font-black text-black shadow-md hover:scale-105 hover:shadow-gold/30 transition-all cursor-pointer"
-                                                                                            >
-                                                                                              <ShieldCheckIcon className="h-3.5 w-3.5" />
-                                                                                              <span>Audit Unloading</span>
-                                                                                            </button>
-                                                                                          )}
-                                                                                        </td>
-                                                                                      </tr>
-                                                                                    );
-                                                                                  })
-                                                                                )}
-                                                                              </tbody>
-                                                                            </table>
-                                                                          </div>
-                                                                        </div>
-                                                                      </div>
-
-                                                                      {/* Owner Kerala Delivery Audit Modal */}
-                                                                      {auditingTrip && (
-                                                                        <KeralaDeliveryAuditModal
-                                                                          trip={auditingTrip}
-                                                                          isOpen={Boolean(auditingTrip)}
-                                                                          onClose={() => setAuditingTrip(null)}
-                                                                          onSuccess={fetchDashboard}
-                                                                        />
-                                                                      )}
-                                                                  </div>
-                                                                  );
+      {/* Owner Kerala Delivery Audit Modal */}
+      {auditingTrip && (
+        <KeralaDeliveryAuditModal
+          trip={auditingTrip}
+          isOpen={Boolean(auditingTrip)}
+          onClose={() => setAuditingTrip(null)}
+          onSuccess={fetchDashboard}
+        />
+      )}
+    </div>
+  );
 }

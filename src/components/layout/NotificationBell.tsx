@@ -20,12 +20,12 @@ export function NotificationBell() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="relative flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-neutral-300 transition-all hover:border-[#F5B82E]/50 hover:text-white active:scale-95 cursor-pointer"
+        className="relative flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-white/[0.14] bg-white/[0.06] text-neutral-200 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-2xl backdrop-saturate-150 transition-all hover:border-[#F5B82E]/50 hover:bg-white/[0.1] hover:text-white active:scale-95 cursor-pointer"
         aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ''}`}>
 
-        <BellIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+        <BellIcon className="h-4 w-4" />
         {unreadCount > 0 &&
-        <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] sm:h-5 sm:min-w-[20px] items-center justify-center rounded-full bg-gold px-1 text-[10px] sm:text-[11px] font-bold text-ink-950 shadow">
+        <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#F5B82E] px-1 text-[10px] font-black text-[#05090D] shadow-md">
             {unreadCount}
           </span>
         }

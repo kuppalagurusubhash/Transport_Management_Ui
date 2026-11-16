@@ -116,101 +116,62 @@ export function DashboardLayout() {
 
       {/* Main Content Area */}
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden bg-gradient-to-b from-[#0B1117] via-[#080D12] to-[#05090D]">
-        {/* Top Header Bar with Smooth Glassmorphic Effect */}
-          <header className="sticky top-0 z-40 flex h-14 sm:h-16 shrink-0 items-center justify-between bg-[#080D12]/90 px-4 sm:px-6 lg:px-8 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_4px_30px_rgba(0,0,0,0.5)] pt-safe">
-            {/* Smooth Glassmorphic Bottom Divider Line & Ambient Light Ribbon */}
-            <div className="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none" />
-            <div className="absolute inset-x-8 sm:inset-x-16 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-[#F5B82E]/40 to-transparent blur-[1px] pointer-events-none" />
-            <div className="absolute inset-x-16 sm:inset-x-32 -bottom-2 h-4 bg-gradient-to-r from-transparent via-[#F5B82E]/10 to-transparent blur-md pointer-events-none" />
-
-            {/* Live Backend Sync Shimmer Bar */}
-            {isSyncing && (
-              <div className="absolute inset-x-0 bottom-0 h-[2px] overflow-hidden bg-[#F5B82E]/15 pointer-events-none">
-                <div className="h-full w-1/3 bg-gradient-to-r from-transparent via-[#F5B82E] to-amber-300 animate-pulse" />
-              </div>
-            )}
-
-            {/* Left: Mobile Menu Toggle & Brand Monogram */}
-            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-              <button
-                onClick={() => setMenuOpen(true)}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-neutral-300 hover:border-[#F5B82E]/50 hover:text-[#F5B82E] active:scale-95 lg:hidden cursor-pointer transition-all backdrop-blur-md"
-                aria-label="Open menu"
-              >
-                <MenuIcon className="h-5 w-5" />
-              </button>
-
-              {/* Brand Logo for Mobile or Header */}
-              <Link to="/" className="flex items-center gap-2 sm:gap-2.5 min-w-0">
-                <img
-                  src="/app-logo.jpg"
-                  alt="Trans IA Logo"
-                  className="h-8 w-8 sm:h-9 sm:w-9 shrink-0 rounded-xl object-cover border border-[#F5B82E]/50 shadow-md shadow-[#F5B82E]/25"
-                />
-                <div className="leading-tight min-w-0">
-                  <p className="truncate text-xs sm:text-sm font-black tracking-wide text-white">
-                    SRI SAI BABA
-                  </p>
-                  <p className="truncate text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.15em] sm:tracking-[0.2em] text-[#F5B82E]/85">
-                    Transport &amp; Stone Logistics
-                  </p>
-                </div>
-              </Link>
+        {/* Top Header Bar: Minimal iPhone Frosted-Glass Style (Exact h-16 to align 1:1 with Sidebar Header) */}
+        <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between gap-3 bg-[#060A0F]/65 px-4 sm:px-6 lg:px-8 backdrop-blur-2xl backdrop-saturate-150 border-b border-white/[0.02] shadow-[0_4px_24px_rgba(0,0,0,0.3)] pt-safe">
+          {/* Live Backend Sync Shimmer Bar */}
+          {isSyncing && (
+            <div className="absolute inset-x-0 bottom-0 h-[2px] overflow-hidden bg-[#F5B82E]/15 pointer-events-none">
+              <div className="h-full w-1/3 bg-gradient-to-r from-transparent via-[#F5B82E] to-amber-300 animate-pulse" />
             </div>
+          )}
 
-            {/* Center: Global Search Bar with Frosted Glass */}
-            <div className="relative mx-4 hidden max-w-md flex-1 md:block">
-              <div
-                onClick={() => {
-                  setSearchOpen(true);
-                  setTimeout(() => searchInputRef.current?.focus(), 50);
-                }}
-                className="flex h-10 w-full cursor-pointer items-center justify-between rounded-xl border border-white/10 bg-white/[0.035] px-3.5 text-xs text-neutral-400 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] backdrop-blur-md transition-all hover:border-[#F5B82E]/50 hover:bg-white/[0.06] hover:text-neutral-200"
-              >
-                <div className="flex items-center gap-2.5">
-                  <SearchIcon className="h-4 w-4 text-neutral-400" />
-                  <span>Search trips, lorries, drivers, parties...</span>
-                </div>
-                <kbd className="inline-flex h-5 items-center rounded border border-white/15 bg-white/5 px-1.5 font-mono text-[10px] text-neutral-400">
-                  ⌘K
-                </kbd>
+          {/* Left: Mobile Menu Button (Mobile Only) / Desktop Balance Spacer */}
+          <div className="flex items-center shrink-0 lg:w-20">
+            <button
+              onClick={() => setMenuOpen(true)}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/[0.14] bg-white/[0.06] text-neutral-200 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_4px_16px_rgba(0,0,0,0.35)] backdrop-blur-2xl hover:border-[#F5B82E]/50 hover:text-[#F5B82E] active:scale-95 lg:hidden cursor-pointer transition-all"
+              aria-label="Open menu"
+            >
+              <MenuIcon className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Center: iPhone Spotlight-Style Frosted Glass Search Bar */}
+          <div className="flex flex-1 items-center justify-center min-w-0">
+            <button
+              type="button"
+              onClick={() => {
+                setSearchOpen(true);
+                setTimeout(() => searchInputRef.current?.focus(), 50);
+              }}
+              className="group flex h-9 sm:h-10 w-full max-w-md cursor-pointer items-center justify-between gap-2.5 rounded-full border border-white/[0.14] bg-white/[0.06] px-3.5 sm:px-4 text-xs text-neutral-300 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-2xl backdrop-saturate-150 transition-all hover:border-[#F5B82E]/45 hover:bg-white/[0.09] hover:text-white active:scale-[0.99]"
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <SearchIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 text-neutral-300 group-hover:text-[#F5B82E] transition-colors" />
+                <span className="truncate text-neutral-400 group-hover:text-neutral-200 transition-colors">
+                  Search trips, lorries, drivers, parties...
+                </span>
               </div>
-            </div>
+              <kbd className="hidden sm:inline-flex h-5 shrink-0 items-center rounded-full border border-white/15 bg-white/[0.07] px-2 font-mono text-[10px] text-neutral-300">
+                ⌘K
+              </kbd>
+            </button>
+          </div>
 
-            {/* Right Header Controls */}
-            <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
-              {/* Mobile Quick Search Button */}
-              <button
-                onClick={() => {
-                  setSearchOpen(true);
-                  setTimeout(() => searchInputRef.current?.focus(), 50);
-                }}
-                className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-neutral-300 hover:border-[#F5B82E]/50 hover:text-[#F5B82E] active:scale-95 md:hidden cursor-pointer transition-all"
-                aria-label="Search"
-              >
-                <SearchIcon className="h-4 w-4" />
-              </button>
+          {/* Right: Notification Bell & Logout Button (iPhone Frosted Glass Pills) */}
+          <div className="flex items-center gap-2.5 shrink-0">
+            <NotificationBell />
 
-              {/* Live Date & Time Widget with Frosted Glass */}
-              <div className="hidden items-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-1.5 text-xs text-neutral-300 shadow-sm backdrop-blur-md sm:flex">
-                <CalendarIcon className="h-4 w-4 text-[#F5B82E]" />
-                <span className="font-semibold tracking-tight">{currentTime || '11 Sep 2025, 04:32 PM'}</span>
-              </div>
-
-              {/* Notification Bell */}
-              <NotificationBell />
-
-              {/* Logout Button with Frosted Glass */}
-              <button
-                onClick={handleLogout}
-                className="flex h-9 sm:h-auto items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.04] px-2.5 sm:px-3 py-2 text-xs font-semibold text-neutral-300 backdrop-blur-md transition-all hover:border-red-500/50 hover:bg-red-500/10 hover:text-red-400 active:scale-95 cursor-pointer"
-                title="Logout"
-              >
-                <LogOutIcon className="h-4 w-4" />
-                <span className="hidden sm:inline">Logout</span>
-              </button>
-            </div>
-          </header>
+            <button
+              onClick={handleLogout}
+              className="group flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-white/[0.14] bg-white/[0.06] text-neutral-200 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-2xl backdrop-saturate-150 transition-all hover:border-red-500/50 hover:bg-red-500/15 hover:text-red-400 active:scale-95 cursor-pointer"
+              title="Logout"
+              aria-label="Logout"
+            >
+              <LogOutIcon className="h-4 w-4 shrink-0" />
+            </button>
+          </div>
+        </header>
 
           {/* Global Search Modal Drawer */}
           {searchOpen && (
@@ -344,11 +305,11 @@ export function DashboardLayout() {
         )}
 
               {/* Scrollable Page Outlet */}
-                <main className="ti-scroll relative z-10 flex-1 overflow-y-auto overflow-x-hidden pb-28 sm:pb-32 lg:pb-10">
-                  <Outlet />
-              {/* Extra mobile bottom spacer so content never hides behind fixed bottom navigation */}
-              <div className="h-16 lg:hidden shrink-0 pointer-events-none" aria-hidden="true" />
-            </main>
+              <main className="ti-scroll relative flex-1 overflow-y-auto overflow-x-hidden pb-28 sm:pb-32 lg:pb-10">
+                <Outlet />
+                {/* Extra mobile bottom spacer so content never hides behind fixed bottom navigation */}
+                <div className="h-16 lg:hidden shrink-0 pointer-events-none" aria-hidden="true" />
+              </main>
 
         {/* Luxury Mobile Bottom Navigation Dock (iPhone 12 Pro Max / iOS Optimized) */}
           <nav
