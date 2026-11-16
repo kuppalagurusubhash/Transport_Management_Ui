@@ -115,14 +115,14 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       {/* Mobile backdrop */}
       {open && (
         <div
-          className="fixed inset-0 z-40 bg-black/75 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm lg:hidden"
           onClick={onClose}
           aria-hidden="true"
         />
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-72 sm:w-64 flex-col bg-[#06090D] border-r border-white/[0.06] text-neutral-100 transition-transform duration-300 lg:static lg:translate-x-0 shadow-[4px_0_30px_rgba(0,0,0,0.6)] pt-safe pb-safe ${
+        className={`fixed inset-y-0 left-0 z-[60] flex w-72 sm:w-64 flex-col bg-[#06090D] border-r border-white/[0.06] text-neutral-100 transition-transform duration-300 lg:static lg:z-auto lg:translate-x-0 shadow-[4px_0_30px_rgba(0,0,0,0.6)] pt-safe pb-safe ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
         style={{
@@ -192,8 +192,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                     <div className="flex items-center gap-3">
                       <div
                         className={`flex h-6 w-6 items-center justify-center rounded-lg transition-colors ${isActive
-                            ? 'text-[#F5B82E]'
-                            : 'text-neutral-400 group-hover:text-[#F5B82E]'
+                          ? 'text-[#F5B82E]'
+                          : 'text-neutral-400 group-hover:text-[#F5B82E]'
                           }`}
                       >
                         <Icon className="h-4 w-4 shrink-0" />
@@ -203,8 +203,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                     <div className="flex items-center gap-1.5">
                       {badgeNum > 0 && (
                         <span className={`inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-extrabold rounded-full ${item.badgeKey === 'loading'
-                            ? 'bg-amber-400/20 text-amber-300 border border-amber-400/40'
-                            : 'bg-gold/20 text-gold border border-gold/40'
+                          ? 'bg-amber-400/20 text-amber-300 border border-amber-400/40'
+                          : 'bg-gold/20 text-gold border border-gold/40'
                           }`}>
                           {badgeNum}
                         </span>
@@ -233,30 +233,30 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       {/* User Account Footer Profile */}
       <div className="border-t border-white/10 p-3.5 bg-[#040608]/80 backdrop-blur-md pb-safe">
         <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#F5B82E]/20 to-[#C98A14]/30 border border-[#F5B82E]/40 text-[#F5B82E] text-sm font-bold shadow-inner">
-                👑
-              </div>
-              <div className="min-w-0 leading-tight">
-                <p className="truncate text-xs font-bold text-white">
-                  Owner Account
-                </p>
-                <p className="text-[10px] text-neutral-400 font-medium">
-                  Admin
-                </p>
-              </div>
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#F5B82E]/20 to-[#C98A14]/30 border border-[#F5B82E]/40 text-[#F5B82E] text-sm font-bold shadow-inner">
+              👑
             </div>
-
-            <button
-              onClick={handleLogout}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 text-neutral-400 hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-400 transition-colors cursor-pointer"
-              title="Logout"
-            >
-              <LogOutIcon className="h-4 w-4" />
-            </button>
+            <div className="min-w-0 leading-tight">
+              <p className="truncate text-xs font-bold text-white">
+                Owner Account
+              </p>
+              <p className="text-[10px] text-neutral-400 font-medium">
+                Admin
+              </p>
+            </div>
           </div>
+
+          <button
+            onClick={handleLogout}
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 text-neutral-400 hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-400 transition-colors cursor-pointer"
+            title="Logout"
+          >
+            <LogOutIcon className="h-4 w-4" />
+          </button>
         </div>
-      </aside>
+      </div>
+    </aside >
     </>
   );
 }

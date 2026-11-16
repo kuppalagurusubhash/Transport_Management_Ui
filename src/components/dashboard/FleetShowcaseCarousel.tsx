@@ -229,301 +229,301 @@ export function FleetShowcaseCarousel({ onSelectLorry }: FleetShowcaseCarouselPr
     if (touchStart !== null) {
       const touchEnd = e.changedTouches[0].clientX;
       const totalDiff = touchStart - touchEnd;
-        if (totalDiff > 45) {
-          handleNext();
-        } else if (totalDiff < -45) {
-          handlePrev();
-        }
+      if (totalDiff > 45) {
+        handleNext();
+      } else if (totalDiff < -45) {
+        handlePrev();
       }
-      setTouchStart(null);
-    };
+    }
+    setTouchStart(null);
+  };
 
-    return (
-      <section
-        aria-label="Our Fleet Showroom"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        className="relative overflow-hidden rounded-2xl border border-[#F5B82E]/30 bg-gradient-to-b from-[#0F141A] via-[#0B0F14] to-[#07090C] shadow-[0_12px_40px_rgba(0,0,0,0.6)]"
-      >
-        {/* 1. Header Bar: Vehicle identity & live telemetry pill */}
-              <div className="relative z-30 flex flex-wrap items-center justify-between gap-2 px-3 pt-3 sm:px-6 sm:pt-4">
-                <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0">
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="h-2 w-2 rounded-full bg-[#F5B82E] shadow-[0_0_8px_#F5B82E]" />
-                      <span className="text-[9.5px] sm:text-[10px] font-black tracking-[0.18em] sm:tracking-[0.22em] text-[#F5B82E] uppercase">
-                        OUR FLEET
-                      </span>
-                  </div>
-                      <span className="text-white/20 text-xs shrink-0">|</span>
-                      <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-                        <span className="font-mono text-xs sm:text-sm font-black tracking-wider text-white truncate">
-                          {currentVehicle.vehicleNumber}
-                        </span>
-                          <span className="hidden xs:inline-block sm:inline-block rounded-md bg-white/10 px-1.5 py-0.5 text-[9px] sm:text-[9.5px] font-semibold text-neutral-300 truncate">
-                            {currentVehicle.model}
-                          </span>
+        return (
+        <section
+          aria-label="Our Fleet Showroom"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          className="relative isolate overflow-hidden rounded-2xl border border-[#F5B82E]/30 bg-gradient-to-b from-[#0F141A] via-[#0B0F14] to-[#07090C] shadow-[0_12px_40px_rgba(0,0,0,0.6)]"
+        >
+          {/* 1. Header Bar: Vehicle identity & live telemetry pill */}
+          <div className="relative z-20 flex flex-wrap items-center justify-between gap-2.5 px-4 pt-4 pb-2 sm:px-6 sm:pt-5 sm:pb-2.5">
+            <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+              <div className="flex items-center gap-1.5 shrink-0">
+                <span className="h-2 w-2 rounded-full bg-[#F5B82E] shadow-[0_0_8px_#F5B82E]" />
+                <span className="text-[10px] font-black tracking-[0.18em] sm:tracking-[0.22em] text-[#F5B82E] uppercase">
+                  OUR FLEET
+                </span>
+              </div>
+              <span className="text-white/20 text-xs shrink-0">|</span>
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="font-mono text-xs sm:text-sm font-black tracking-wider text-white truncate">
+                  {currentVehicle.vehicleNumber}
+                </span>
+                <span className="hidden sm:inline-block rounded-md bg-white/10 px-2 py-0.5 text-[10px] font-semibold text-neutral-300 truncate">
+                  {currentVehicle.model}
+                </span>
+              </div>
+            </div>
+
+              {/* Status Pill & Assigned Trip Badge */}
+              <div className="flex items-center gap-2 shrink-0">
+                <div className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 bg-black/60 border border-white/10 backdrop-blur-md">
+                  <span
+                    className="h-1.5 w-1.5 rounded-full animate-pulse"
+                    style={{ backgroundColor: currentVehicle.statusColor }}
+                  />
+                  <span className="text-[10.5px] sm:text-[11px] font-bold" style={{ color: currentVehicle.statusColor }}>
+                    {currentVehicle.statusLabel}
+                  </span>
+                </div>
+
+            {loadSummary?.tripCode && (
+              <div className="hidden sm:inline-flex items-center gap-1 rounded-full px-2.5 py-1 bg-[#F5B82E]/10 border border-[#F5B82E]/30 text-[#F5B82E] text-[11px] font-bold">
+                <BoxIcon className="h-3 w-3" />
+                <span>{loadSummary.tripCode}</span>
+              </div>
+            )}
+          </div>
+      </div>
+
+        {/* 2. Main Center Stage: Compact & Sleek Hero Vehicle Showcase */}
+        <div className="relative min-h-[185px] sm:min-h-[235px] md:min-h-[260px] w-full overflow-hidden select-none flex flex-col items-center justify-center px-12 sm:px-16 py-3 sm:py-5">
+          {/* Layer 1: Dark Cinematic Mountain Pass Sunset Backdrop */}
+          <div className="absolute inset-0 z-0 pointer-events-none">
+            <img
+              src="/fleet_stage_backdrop.jpg"
+              alt="Scenic mountain pass highway at sunset"
+              className="h-full w-full object-cover object-bottom filter brightness-[0.45] contrast-[1.15]"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/fleet_showcase_bg.png';
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#07090C] via-[#07090C]/60 to-[#07090C]/35" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#07090C]/90 via-transparent to-[#07090C]/90" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 h-48 w-[600px] bg-[radial-gradient(ellipse_at_top,rgba(245,184,46,0.18)_0%,transparent_70%)] blur-2xl" />
+          </div>
+
+                {/* Center Stage Vehicle */}
+                <div className="relative z-10 w-full max-w-3xl flex flex-col items-center justify-center">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={currentVehicle.vehicleNumber}
+                      initial={{ opacity: 0, scale: 0.98, x: 20 }}
+                      animate={{ opacity: 1, scale: 1, x: 0 }}
+                      exit={{ opacity: 0, scale: 0.98, x: -20 }}
+                      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                      className="relative w-full flex flex-col items-center justify-center"
+                    >
+                      {/* Ultra-Smooth HD Vehicle Side Profile */}
+                      <div className="relative w-full flex items-center justify-center py-1.5">
+                        <img
+                          src={currentVehicle.sideImage || currentVehicle.image}
+                          alt={`Sri Sai Baba Transport Lorry - ${currentVehicle.vehicleNumber}`}
+                          className="max-h-[135px] sm:max-h-[175px] md:max-h-[200px] w-auto object-contain filter drop-shadow-[0_16px_30px_rgba(0,0,0,0.95)] select-none transition-transform duration-300 hover:scale-[1.01]"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/fleet/ashok_leyland_hd.png';
+                          }}
+                        />
                       </div>
+
+                {/* Showroom Ground Reflection Stage */}
+                <div className="w-full max-w-2xl h-4 -mt-1 relative flex items-center justify-center pointer-events-none">
+                  <div className="w-4/5 h-2 rounded-full bg-gradient-to-r from-transparent via-[#F5B82E]/35 to-transparent blur-md" />
+                  <div className="absolute inset-x-8 top-0.5 h-[1px] bg-gradient-to-r from-transparent via-[#F5B82E]/55 to-transparent" />
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Circular Left Navigation Arrow */}
+          {len > 1 && (
+            <button
+              onClick={handlePrev}
+              aria-label="Previous fleet vehicle"
+              className="group absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-[#F5B82E]/30 bg-[#0B1117]/90 text-white shadow-[0_0_15px_rgba(0,0,0,0.6)] backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-[#F5B82E] hover:bg-[#F5B82E]/20 hover:text-[#F5B82E] hover:shadow-[0_0_20px_rgba(245,184,46,0.4)] cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#F5B82E]/50"
+            >
+              <ChevronLeftIcon className="h-4 w-4 sm:h-5 sm:w-5 transition-transform duration-200 group-hover:-translate-x-0.5" />
+            </button>
+          )}
+
+          {/* Circular Right Navigation Arrow */}
+          {len > 1 && (
+            <button
+              onClick={handleNext}
+              aria-label="Next fleet vehicle"
+              className="group absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-[#F5B82E]/30 bg-[#0B1117]/90 text-white shadow-[0_0_15px_rgba(0,0,0,0.6)] backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-[#F5B82E] hover:bg-[#F5B82E]/20 hover:text-[#F5B82E] hover:shadow-[0_0_20px_rgba(245,184,46,0.4)] cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#F5B82E]/50"
+            >
+              <ChevronRightIcon className="h-4 w-4 sm:h-5 sm:w-5 transition-transform duration-200 group-hover:translate-x-0.5" />
+            </button>
+          )}
+
+        {/* Pagination Indicators */}
+        {len > 1 && (
+          <div className="relative z-20 flex items-center justify-center gap-2 pt-3">
+            {enrichedFleet.map((item: ShowcaseFleetItem, i: number) => {
+              const isActive = i === activeIndex;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => selectIndex(i)}
+                  aria-label={`Select vehicle ${item.vehicleNumber}`}
+                  className={`transition-all duration-300 cursor-pointer rounded-full ${isActive
+                      ? 'h-1.5 w-6 bg-[#F5B82E] shadow-[0_0_10px_#F5B82E]'
+                      : 'h-1.5 w-1.5 bg-white/25 hover:bg-white/50'
+                    }`}
+                />
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+            {/* 3. Docked Glassmorphism Telemetry Cockpit */}
+            <div className="relative z-10 border-t border-white/10 bg-[#0A0F14]/95 backdrop-blur-xl p-3.5 sm:p-4 lg:p-5">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentVehicle.vehicleNumber}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.2 }}
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5"
+                >
+                  {/* Box 1: Vehicle & Driver */}
+                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 sm:p-3.5 space-y-1.5 min-w-0">
+                    <div className="flex items-center gap-2 text-xs font-bold text-neutral-300">
+                      <TruckIcon className="h-3.5 w-3.5 shrink-0 text-[#F5B82E]" />
+                      <span className="truncate">Vehicle &amp; Driver</span>
+                    </div>
+                    <div className="space-y-1 text-xs">
+                      <p className="font-mono text-xs font-black text-white truncate">{currentVehicle.vehicleNumber}</p>
+                      <div className="flex items-center justify-between gap-2 text-neutral-400">
+                        <span>Driver:</span>
+                        <span className="font-semibold text-neutral-200 capitalize truncate">{currentVehicle.driver}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-2 text-neutral-400">
+                        <span>Capacity:</span>
+                        <span className="font-mono font-bold text-amber-400 truncate">{currentVehicle.capacity || '1,805 sqft'}</span>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Status Pill & Assigned Trip Badge */}
-                      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                        <div className="inline-flex items-center gap-1.5 rounded-full px-2 sm:px-2.5 py-0.5 bg-black/50 border border-white/10 backdrop-blur-md">
-                          <span
-                            className="h-1.5 w-1.5 rounded-full animate-pulse"
-                            style={{ backgroundColor: currentVehicle.statusColor }}
-                          />
-                            <span className="text-[10px] sm:text-[11px] font-bold" style={{ color: currentVehicle.statusColor }}>
+            {/* Box 2: Live Location & Status */}
+                      <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 sm:p-3.5 space-y-1.5 min-w-0">
+                        <div className="flex items-center gap-2 text-xs font-bold text-neutral-300">
+                          <ActivityIcon className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
+                          <span className="truncate">Status &amp; Position</span>
+                        </div>
+                        <div className="space-y-1 text-xs">
+                          <div className="flex items-center gap-1.5">
+                            <span
+                              className="h-1.5 w-1.5 shrink-0 rounded-full animate-pulse"
+                              style={{ backgroundColor: currentVehicle.statusColor }}
+                            />
+                            <span className="font-bold text-white text-xs truncate" style={{ color: currentVehicle.statusColor }}>
                               {currentVehicle.statusLabel}
                             </span>
-                        </div>
-
-                        {loadSummary?.tripCode && (
-                          <div className="hidden sm:inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 bg-[#F5B82E]/10 border border-[#F5B82E]/30 text-[#F5B82E] text-[11px] font-bold">
-                            <BoxIcon className="h-3 w-3" />
-                            <span>{loadSummary.tripCode}</span>
                           </div>
-                        )}
+                          <div className="flex items-start gap-1.5 text-neutral-300 text-[11px]">
+                            <MapPinIcon className="h-3.5 w-3.5 text-[#F5B82E] shrink-0 mt-0.5" />
+                            <span className="truncate">{currentVehicle.route}</span>
+                          </div>
+                          {activeVehicleTrip?.date && (
+                            <p className="text-[10.5px] text-neutral-400 truncate">
+                              Date: <span className="text-neutral-200">{activeVehicleTrip.date}</span>
+                            </p>
+                          )}
                       </div>
                     </div>
 
-                    {/* 2. Main Center Stage: Compact & Sleek Hero Vehicle Showcase */}
-                      <div className="relative min-h-[165px] sm:min-h-[220px] md:min-h-[250px] w-full overflow-hidden select-none flex flex-col items-center justify-center px-3 sm:px-4 py-1.5 sm:py-2">
-                        {/* Layer 1: Dark Cinematic Mountain Pass Sunset Backdrop */}
-                        <div className="absolute inset-0 z-0 pointer-events-none">
-                          <img
-                            src="/fleet_stage_backdrop.jpg"
-                            alt="Scenic mountain pass highway at sunset"
-                            className="h-full w-full object-cover object-bottom filter brightness-[0.45] contrast-[1.15]"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = '/fleet_showcase_bg.png';
-                            }}
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-[#07090C] via-[#07090C]/60 to-[#07090C]/35" />
-                          <div className="absolute inset-0 bg-gradient-to-r from-[#07090C]/90 via-transparent to-[#07090C]/90" />
-                          <div className="absolute top-0 left-1/2 -translate-x-1/2 h-48 w-[600px] bg-[radial-gradient(ellipse_at_top,rgba(245,184,46,0.18)_0%,transparent_70%)] blur-2xl" />
+            {/* Box 3: Loaded Consignment Details */}
+                        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 sm:p-3.5 space-y-1.5 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-1.5 text-xs font-bold text-neutral-300 min-w-0">
+                              <BoxIcon className="h-3.5 w-3.5 shrink-0 text-cyan-400" />
+                              <span className="truncate">Stone Cargo</span>
+                            </div>
+                            {loadSummary && (
+                              <span className="font-mono text-[11px] font-black text-emerald-400 shrink-0">
+                                {loadSummary.totalSqft > 0 ? `${loadSummary.totalSqft.toLocaleString('en-IN')} sqft` : `${loadSummary.totalPieces} pcs`}
+                              </span>
+                            )}
                         </div>
-
-                        {/* Center Stage Vehicle */}
-                        <div className="relative z-20 w-full max-w-3xl flex flex-col items-center justify-center">
-                          <AnimatePresence mode="wait">
-                            <motion.div
-                              key={currentVehicle.vehicleNumber}
-                              initial={{ opacity: 0, scale: 0.98, x: 20 }}
-                              animate={{ opacity: 1, scale: 1, x: 0 }}
-                              exit={{ opacity: 0, scale: 0.98, x: -20 }}
-                              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                              className="relative w-full flex flex-col items-center justify-center"
-                            >
-                              {/* Ultra-Smooth HD Vehicle Side Profile */}
-                              <div className="relative w-full flex items-center justify-center py-1">
-                                <img
-                                  src={currentVehicle.sideImage || currentVehicle.image}
-                                  alt={`Sri Sai Baba Transport Lorry - ${currentVehicle.vehicleNumber}`}
-                                  className="max-h-[140px] sm:max-h-[175px] md:max-h-[200px] w-auto object-contain filter drop-shadow-[0_16px_30px_rgba(0,0,0,0.95)] select-none transition-transform duration-300 hover:scale-[1.01]"
-                                  onError={(e) => {
-                                    (e.target as HTMLImageElement).src = '/fleet/ashok_leyland_hd.png';
-                                  }}
-                                />
-                              </div>
-
-                              {/* Showroom Ground Reflection Stage */}
-                              <div className="w-full max-w-2xl h-4 -mt-1.5 relative flex items-center justify-center pointer-events-none">
-                                <div className="w-4/5 h-2 rounded-full bg-gradient-to-r from-transparent via-[#F5B82E]/35 to-transparent blur-md" />
-                                <div className="absolute inset-x-8 top-0.5 h-[1px] bg-gradient-to-r from-transparent via-[#F5B82E]/55 to-transparent" />
-                              </div>
-                            </motion.div>
-                          </AnimatePresence>
-                        </div>
-
-                        {/* Circular Left Navigation Arrow */}
-                        {len > 1 && (
-                          <button
-                            onClick={handlePrev}
-                            aria-label="Previous fleet vehicle"
-                            className="group absolute left-2.5 sm:left-4 top-1/2 -translate-y-1/2 z-40 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-[#F5B82E]/30 bg-[#0B1117]/85 text-white shadow-[0_0_15px_rgba(0,0,0,0.6)] backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-[#F5B82E] hover:bg-[#F5B82E]/20 hover:text-[#F5B82E] hover:shadow-[0_0_20px_rgba(245,184,46,0.4)] cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#F5B82E]/50"
-                          >
-                            <ChevronLeftIcon className="h-4 w-4 sm:h-5 sm:w-5 transition-transform duration-200 group-hover:-translate-x-0.5" />
-                          </button>
-                        )}
-
-                        {/* Circular Right Navigation Arrow */}
-                        {len > 1 && (
-                          <button
-                            onClick={handleNext}
-                            aria-label="Next fleet vehicle"
-                            className="group absolute right-2.5 sm:right-4 top-1/2 -translate-y-1/2 z-40 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-[#F5B82E]/30 bg-[#0B1117]/85 text-white shadow-[0_0_15px_rgba(0,0,0,0.6)] backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-[#F5B82E] hover:bg-[#F5B82E]/20 hover:text-[#F5B82E] hover:shadow-[0_0_20px_rgba(245,184,46,0.4)] cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#F5B82E]/50"
-                          >
-                            <ChevronRightIcon className="h-4 w-4 sm:h-5 sm:w-5 transition-transform duration-200 group-hover:translate-x-0.5" />
-                          </button>
-                        )}
-
-                        {/* Pagination Indicators */}
-                        {len > 1 && (
-                          <div className="relative z-30 flex items-center justify-center gap-1.5 pt-1.5">
-                            {enrichedFleet.map((item: ShowcaseFleetItem, i: number) => {
-                              const isActive = i === activeIndex;
-                              return (
-                                <button
-                                  key={item.id}
-                                  onClick={() => selectIndex(i)}
-                                  aria-label={`Select vehicle ${item.vehicleNumber}`}
-                                  className={`transition-all duration-300 cursor-pointer rounded-full ${isActive
-                                      ? 'h-1.5 w-6 bg-[#F5B82E] shadow-[0_0_10px_#F5B82E]'
-                                      : 'h-1.5 w-1.5 bg-white/25 hover:bg-white/50'
-                                    }`}
-                                />
-                              );
-                            })}
+                        {loadSummary && loadSummary.stoneLines.length > 0 ? (
+                <div className="space-y-1 text-[11px]">
+                  {loadSummary.stoneLines.slice(0, 2).map((line, idx) => (
+                    <div key={idx} className="flex items-center justify-between gap-2 bg-black/30 rounded-lg px-2 py-1 text-neutral-300">
+                      <span className="truncate">{line.size} ({line.thickness})</span>
+                      <span className="font-mono font-bold text-white shrink-0">{line.pieces}p</span>
+                    </div>
+                  ))}
+                            {loadSummary.stoneLines.length > 2 && (
+                              <p className="text-[10px] text-neutral-400 text-right">
+                                +{loadSummary.stoneLines.length - 2} more
+                              </p>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="py-1 text-center">
+                            <p className="text-xs text-neutral-400">Stationed at Depot</p>
+                            <p className="text-[10.5px] text-neutral-500">Ready for next load</p>
                           </div>
                         )}
-                      </div>
+                    </div>
 
-                        {/* 3. Docked Glassmorphism Telemetry Cockpit (Compact 2x2 Mobile / 4-Column Desktop Panel Below Truck) */}
-                        <div className="relative z-30 border-t border-white/10 bg-[#0A0F14]/90 backdrop-blur-xl p-2 sm:p-3.5">
-                          <AnimatePresence mode="wait">
-                            <motion.div
-                              key={currentVehicle.vehicleNumber}
-                              initial={{ opacity: 0, y: 6 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -6 }}
-                              transition={{ duration: 0.2 }}
-                              className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5"
-                            >
-                              {/* Box 1: Vehicle & Driver */}
-                                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 sm:p-2.5 space-y-1 sm:space-y-1.5 min-w-0">
-                                    <div className="flex items-center gap-1.5 text-[10.5px] sm:text-[11px] font-bold text-neutral-300">
-                                      <TruckIcon className="h-3.5 w-3.5 shrink-0 text-[#F5B82E]" />
-                                      <span className="truncate">Vehicle &amp; Driver</span>
-                                    </div>
-                                        <div className="space-y-0.5 text-[10.5px] sm:text-[11px]">
-                                          <p className="font-mono text-[11px] sm:text-xs font-black text-white truncate">{currentVehicle.vehicleNumber}</p>
-                                          <div className="flex items-center justify-between gap-1 text-neutral-400">
-                                            <span>Driver:</span>
-                                            <span className="font-semibold text-neutral-200 capitalize truncate">{currentVehicle.driver}</span>
-                                          </div>
-                                            <div className="flex items-center justify-between gap-1 text-neutral-400">
-                                              <span>Cap:</span>
-                                              <span className="font-mono font-bold text-amber-400 truncate">{currentVehicle.capacity || '1,805 sqft'}</span>
-                                            </div>
-                                          </div>
-                                        </div>
-
-                                        {/* Box 2: Live Location & Status */}
-                                            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 sm:p-2.5 space-y-1 sm:space-y-1.5 min-w-0">
-                                              <div className="flex items-center gap-1.5 text-[10.5px] sm:text-[11px] font-bold text-neutral-300">
-                                                <ActivityIcon className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
-                                                <span className="truncate">Status &amp; Position</span>
-                                              </div>
-                                                <div className="space-y-0.5 text-[10.5px] sm:text-[11px]">
-                                                  <div className="flex items-center gap-1.5">
-                                                    <span
-                                                      className="h-1.5 w-1.5 shrink-0 rounded-full animate-pulse"
-                                                      style={{ backgroundColor: currentVehicle.statusColor }}
-                                                    />
-                                                      <span className="font-bold text-white text-[10.5px] sm:text-[11px] truncate" style={{ color: currentVehicle.statusColor }}>
-                                                        {currentVehicle.statusLabel}
-                                                      </span>
-                                                  </div>
-                                                    <div className="flex items-start gap-1 text-neutral-300 text-[10px] sm:text-[10.5px]">
-                                                      <MapPinIcon className="h-3 w-3 text-[#F5B82E] shrink-0 mt-0.5" />
-                                                      <span className="truncate">{currentVehicle.route}</span>
-                                                    </div>
-                                                    {activeVehicleTrip?.date && (
-                                                        <p className="text-[9px] sm:text-[9.5px] text-neutral-400 truncate">
-                                                          Date: <span className="text-neutral-200">{activeVehicleTrip.date}</span>
-                                                        </p>
-                )}
-                                                      </div>
+            {/* Box 4: Trip & Financial Breakdown */}
+                        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 sm:p-3.5 space-y-1.5 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-xs font-bold text-neutral-300 truncate">Trip &amp; Costs</span>
+                            {loadSummary?.tripCode && (
+                              <span className="font-mono text-[11px] font-black text-[#F5B82E] shrink-0">
+                                #{loadSummary.tripCode}
+                              </span>
+                            )}
+                        </div>
+                        {loadSummary ? (
+                <div className="space-y-1 text-xs">
+                  <div className="flex items-center justify-between gap-2 text-neutral-400">
+                    <span className="truncate">Hamali:</span>
+                    <span className="font-mono font-bold text-amber-400 shrink-0">
+                      ₹{loadSummary.hamali.toLocaleString('en-IN')}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2 text-neutral-400">
+                    <span className="truncate">Diesel:</span>
+                    <span className="font-mono font-bold text-yellow-400 shrink-0">
+                      ₹{loadSummary.fuelExpense.toLocaleString('en-IN')}
+                    </span>
+                  </div>
+                  <div className="pt-0.5 flex items-center justify-end">
+                    <Link
+                      to="/trips"
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-[#F5B82E] hover:underline"
+                    >
+                      <span>Details</span>
+                      <ArrowRightIcon className="h-3 w-3" />
+                    </Link>
+                  </div>
+                </div>
+                        ) : (
+                        <div className="py-1 text-center space-y-1">
+                          <p className="text-xs text-neutral-400">No active trip</p>
+                          <Link
+                            to="/trips"
+                            className="inline-flex items-center gap-1 text-[11px] font-bold text-[#F5B82E] hover:underline"
+                          >
+                            <span>Assign Trip</span>
+                            <ArrowRightIcon className="h-3 w-3" />
+                          </Link>
+                        </div>
+              )}
             </div>
-
-                                                  {/* Box 3: Loaded Consignment Details */}
-                                                        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 sm:p-2.5 space-y-1 sm:space-y-1.5 min-w-0">
-                                                          <div className="flex items-center justify-between gap-1">
-                                                            <div className="flex items-center gap-1 sm:gap-1.5 text-[10.5px] sm:text-[11px] font-bold text-neutral-300 min-w-0">
-                                                              <BoxIcon className="h-3.5 w-3.5 shrink-0 text-cyan-400" />
-                                                              <span className="truncate">Stone Cargo</span>
-                                                            </div>
-                                                            {loadSummary && (
-                                                                <span className="font-mono text-[9.5px] sm:text-[10.5px] font-black text-emerald-400 shrink-0">
-                                                                  {loadSummary.totalSqft > 0 ? `${loadSummary.totalSqft.toLocaleString('en-IN')} sqft` : `${loadSummary.totalPieces} pcs`}
-                                                                </span>
-                )}
-                                                              </div>
-              {loadSummary && loadSummary.stoneLines.length > 0 ? (
-                                                                <div className="space-y-0.5 text-[9.5px] sm:text-[10px]">
-                                                                  {loadSummary.stoneLines.slice(0, 2).map((line, idx) => (
-                                                                      <div key={idx} className="flex items-center justify-between gap-1 bg-black/30 rounded px-1.5 py-0.5 text-neutral-300">
-                                                                        <span className="truncate">{line.size} ({line.thickness})</span>
-                                                                        <span className="font-mono font-bold text-white shrink-0">{line.pieces}p</span>
-                                                                      </div>
-                  ))}
-                                                                      {loadSummary.stoneLines.length > 2 && (
-                                                                        <p className="text-[9px] text-neutral-400 text-right">
-                                                                          +{loadSummary.stoneLines.length - 2} more
-                                                                        </p>
-                                                                      )}
-                                                                    </div>
-                                                                  ) : (
-                                                                  <div className="py-0.5 text-center">
-                                                                    <p className="text-[10px] sm:text-[10.5px] text-neutral-400">Stationed at Depot</p>
-                                                                    <p className="text-[9px] sm:text-[9.5px] text-neutral-500">Ready for next load</p>
-                                                                  </div>
-              )}
-                                                                </div>
-
-                                                                {/* Box 4: Trip & Financial Breakdown */}
-                                                                    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 sm:p-2.5 space-y-1 sm:space-y-1.5 min-w-0">
-                                                                      <div className="flex items-center justify-between gap-1">
-                                                                        <span className="text-[10.5px] sm:text-[11px] font-bold text-neutral-300 truncate">Trip &amp; Costs</span>
-                                                                        {loadSummary?.tripCode && (
-                                                                            <span className="font-mono text-[10px] sm:text-[11px] font-black text-[#F5B82E] shrink-0">
-                                                                              #{loadSummary.tripCode}
-                                                                            </span>
-                )}
-                                                                          </div>
-              {loadSummary ? (
-                                                                                <div className="space-y-0.5 text-[10px] sm:text-[11px]">
-                                                                                  <div className="flex items-center justify-between gap-1 text-neutral-400">
-                                                                                    <span className="truncate">Hamali:</span>
-                                                                                    <span className="font-mono font-bold text-amber-400 shrink-0">
-                                                                                      ₹{loadSummary.hamali.toLocaleString('en-IN')}
-                                                                                    </span>
-                                                                                  </div>
-                                                                                      <div className="flex items-center justify-between gap-1 text-neutral-400">
-                                                                                        <span className="truncate">Diesel:</span>
-                                                                                        <span className="font-mono font-bold text-yellow-400 shrink-0">
-                                                                                          ₹{loadSummary.fuelExpense.toLocaleString('en-IN')}
-                                                                                        </span>
-                                                                                      </div>
-                                                                                      <div className="pt-0.5 flex items-center justify-end">
-                                                                                        <Link
-                                                                                          to="/trips"
-                                                                                          className="inline-flex items-center gap-1 text-[9.5px] sm:text-[10px] font-bold text-[#F5B82E] hover:underline"
-                                                                                        >
-                                                                                          <span>Details</span>
-                                                                                          <ArrowRightIcon className="h-2.5 w-2.5" />
-                                                                                        </Link>
-                                                                                      </div>
-                                                                                  </div>
-                                                                                  ) : (
-                                                                                  <div className="py-0.5 text-center space-y-0.5">
-                                                                                    <p className="text-[9.5px] text-neutral-400">No active trip</p>
-                                                                                    <Link
-                                                                                      to="/trips"
-                                                                                      className="inline-flex items-center gap-1 text-[10px] font-bold text-[#F5B82E] hover:underline"
-                                                                                    >
-                                                                                      <span>Assign Trip</span>
-                                                                                      <ArrowRightIcon className="h-2.5 w-2.5" />
-                                                                                    </Link>
-                                                                                  </div>
-              )}
-                                                                                </div>
-                                                                              </motion.div>
-                                                                            </AnimatePresence>
-                                                                          </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </section>
-                                                                      );
+  );
 }
 
