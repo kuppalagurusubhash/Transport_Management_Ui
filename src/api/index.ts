@@ -84,7 +84,11 @@ export const ordersApi = {
   getAll: () => api.get<Order[]>('/orders'),
   create: (data: Partial<Order>) => api.post<Order>('/orders', data),
   updateStatus: (id: string, status: OrderStatus, amountPaid?: number) =>
-    api.put<Order>(`/orders/${id}/status`, { status, amountPaid })
+    api.put<Order>(`/orders/${id}/status`, { status, amountPaid }),
+  delete: (id: string, customToken?: string) =>
+    api.delete<{ success: boolean; message: string }>(`/orders/${id}`, {
+      ...(customToken ? { headers: { Authorization: `Bearer ${customToken}` } } : {})
+    })
 };
 
 // â”€â”€â”€ Trips â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

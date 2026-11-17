@@ -48,11 +48,11 @@ export function LuxuryLoader({ fullScreen = false, label }: LuxuryLoaderProps) {
         <div className="absolute h-20 w-20 sm:h-22 sm:w-22 rounded-2xl bg-[#F5B82E]/15 animate-ping opacity-30" />
 
         {/* App Logo */}
-        <div className="absolute flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl border-2 border-[#F5B82E]/60 bg-[#070B10] p-0.5 shadow-[0_0_35px_rgba(245,184,46,0.35)] overflow-hidden">
+        <div className="absolute flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl border-2 border-[#F5B82E]/60 bg-[#070B10] p-1.5 shadow-[0_0_35px_rgba(245,184,46,0.35)] overflow-hidden">
           <img
-            src="/app-logo.jpg"
-            alt="Trans IA Logo"
-            className="h-full w-full rounded-xl object-cover"
+            src="/app-logo.png"
+            alt="SGSP Trans IA Logo"
+            className="h-full w-full object-contain filter drop-shadow-[0_2px_10px_rgba(245,184,46,0.45)]"
           />
         </div>
       </div>
@@ -61,11 +61,11 @@ export function LuxuryLoader({ fullScreen = false, label }: LuxuryLoaderProps) {
       <div className="relative z-10 mt-6 text-center space-y-1.5 max-w-sm">
         <div className="inline-flex items-center gap-1.5 rounded-full border border-[#F5B82E]/30 bg-[#F5B82E]/10 px-3 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.22em] text-[#F5B82E]">
           <SparklesIcon className="h-3 w-3" />
-          <span>SRI SAI BABA LOGISTICS</span>
+          <span>SRI SAI BABA • SGSP LOGISTICS</span>
         </div>
 
         <h2 className="text-lg sm:text-xl font-black tracking-wide text-white">
-          TRANS <span className="text-[#F5B82E]">IA</span> COMMAND CENTER
+          <span className="text-white">SG</span><span className="text-[#F5B82E]">SP</span> TRANS <span className="text-[#F5B82E]">IA</span>
         </h2>
 
         <p className="text-xs font-medium text-neutral-400 min-h-[1.25rem] transition-all duration-300">

@@ -36,11 +36,13 @@ export function NotFound() {
         {/* Logo + Radar Badge */}
         <div className="relative mx-auto flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center">
           <div className="absolute inset-0 rounded-2xl bg-[#F5B82E]/20 blur-xl animate-pulse" />
-          <img
-            src="/app-logo.jpg"
-            alt="Trans IA Logo"
-            className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-2xl object-cover border-2 border-[#F5B82E]/60 shadow-[0_8px_30px_rgba(245,184,46,0.35)]"
-          />
+          <div className="relative flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center rounded-2xl border-2 border-[#F5B82E]/60 bg-[#070B10] p-2 shadow-[0_8px_30px_rgba(245,184,46,0.35)]">
+            <img
+              src="/app-logo.png"
+              alt="SGSP Trans IA Logo"
+              className="h-full w-full object-contain filter drop-shadow-[0_2px_8px_rgba(245,184,46,0.4)]"
+            />
+          </div>
           <span className="absolute -bottom-2 -right-2 flex h-8 w-8 items-center justify-center rounded-xl border border-amber-400/50 bg-[#0B1017] text-[#F5B82E] shadow-lg">
             <CompassIcon className="h-4 w-4 animate-spin" style={{ animationDuration: '8s' }} />
           </span>
@@ -63,7 +65,7 @@ export function NotFound() {
 
         <p className="mt-2 text-xs sm:text-sm text-neutral-400 leading-relaxed max-w-md mx-auto">
           The logistics route or module you requested doesn&apos;t exist or has been relocated in the{' '}
-          <strong className="text-neutral-200">Sri Sai Baba — Trans IA</strong> command center.
+          <strong className="text-neutral-200">SGSP — Sri Sai Baba Transport &amp; Logistics</strong> command center.
         </p>
 
         {/* Requested Route Readout Box */}

@@ -247,6 +247,17 @@ export interface Trip {
   auditedAt?: string;
   auditedBy?: string;
   orderId?: string;
+  orderIds?: string[];
+  isConsolidated?: boolean;
+  dropStops?: Array<{
+    orderId: string;
+    unloadingPartyId: string;
+    buyerName?: string;
+    district: string;
+    pieces: number;
+    sqft: number;
+    status?: string;
+  }>;
 
   // Driver Balance Rollover / Cash Settlement
   driverOpeningBalance?: number;

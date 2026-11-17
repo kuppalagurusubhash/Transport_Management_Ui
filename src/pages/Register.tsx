@@ -201,19 +201,23 @@ export function Register() {
 
           {/* Header */}
           <div className="text-center pt-5">
-            <motion.img
-              src="/app-logo.jpg"
-              alt="Trans IA Logo"
+            <motion.div
               initial={{ scale: 0.8, rotate: 5 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-              className="mx-auto h-16 w-16 rounded-2xl object-cover border-2 border-gold/50 mb-3 shadow-[0_6px_24px_rgba(212,175,55,0.35)] hover:scale-105 transition-transform"
-            />
-            <h2 className="text-2xl font-extrabold tracking-tight bg-gradient-to-b from-white to-neutral-400 bg-clip-text text-transparent">
-              Create Profile
+              className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl border-2 border-gold/50 bg-[#070B10] p-1.5 shadow-[0_6px_24px_rgba(212,175,55,0.35)] hover:scale-105 transition-transform"
+            >
+              <img
+                src="/app-logo.png"
+                alt="SGSP Logo"
+                className="h-full w-full object-contain filter drop-shadow-[0_2px_8px_rgba(245,184,46,0.4)]"
+              />
+            </motion.div>
+            <h2 className="text-2xl font-extrabold tracking-tight">
+              <span className="text-white">SG</span><span className="text-[#F5B82E]">SP</span> Profile Portal
             </h2>
-            <p className="mt-1 text-[11px] uppercase tracking-wider text-neutral-500 font-semibold">
-              Join the TRANS IA Management Network
+            <p className="mt-1 text-[11px] uppercase tracking-wider text-neutral-400 font-semibold">
+              SRI SAI BABA <span className="text-[#F5B82E]">•</span> TRANS IA NETWORK
             </p>
           </div>
 

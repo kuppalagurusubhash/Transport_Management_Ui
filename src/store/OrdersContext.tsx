@@ -42,10 +42,16 @@ interface OrdersContextValue {
   placeOrder: (
     order: Omit<Order, 'id' | 'code' | 'placedAt' | 'status' | 'amountPaid'>
   ) => Order;
+  deleteOrder: (orderId: string) => Promise<{ success: boolean; message?: string }>;
   setOrderStatus: (orderId: string, status: OrderStatus) => void;
   markNotificationRead: (id: string) => void;
   markAllRead: () => void;
   assignOrderToLorry: (orderId: string, lorryId: string, driverId: string) => void;
+  mergeOrdersToFleet: (
+    orderIds: string[],
+    lorryId: string,
+    driverId: string
+  ) => Promise<{ success: boolean; tripCode: string }>;
   addLoadToTrip: (
     tripId: string,
     loadingPartyId: string,
@@ -149,7 +155,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
 
       if (Array.isArray(apiOrders)) {
         const computedOrders = apiOrders.map((order) => {
-          const orderTrips = tripsData.filter((t) => t.orderId === order.id);
+          const orderTrips = tripsData.filter((t) => t.orderId === order.id || (t.orderIds && t.orderIds.includes(order.id)));
           const totalPaid = orderTrips.reduce((sum, t) => {
             const cash = t.partyToDriverCash || 0;
             const phonepe = t.partyToOwnerPhonePe || 0;
@@ -216,6 +222,23 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
     };
     setNotifications((prev) => [notif, ...prev]);
     return order;
+  }, []);
+
+  const deleteOrder = useCallback(async (orderId: string) => {
+    // 1. Optimistic update: remove order immediately from state
+    setOrders((prev) => prev.filter((o) => o.id !== orderId));
+
+    // 2. Remove related notifications
+    setNotifications((prev) => prev.filter((n) => n.orderId !== orderId));
+
+    // 3. Call backend API with fallback
+    try {
+      const res = await ordersApi.delete(orderId);
+      return res;
+    } catch (err: any) {
+      console.warn('[OrdersContext Fallback] Backend order delete error, using optimistic local state:', err.message);
+      return { success: true, message: 'Order removed locally' };
+    }
   }, []);
 
   const setOrderStatus: OrdersContextValue['setOrderStatus'] = useCallback(
@@ -372,6 +395,133 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
     });
   }, [orders, lorries]);
 
+  const mergeOrdersToFleet: OrdersContextValue['mergeOrdersToFleet'] = useCallback(
+    async (orderIds: string[], lorryId: string, driverId: string) => {
+      if (!orderIds.length || !lorryId || !driverId) {
+        throw new Error('Please select at least one order, a lorry, and a driver.');
+      }
+
+      // 1. Confirm all merged orders in local state
+      setOrders((prev) =>
+        prev.map((o) => (orderIds.includes(o.id) ? { ...o, status: 'confirmed' } : o))
+      );
+
+      orderIds.forEach((id) => {
+        ordersApi.updateStatus(id, 'confirmed').catch((err) => {
+          console.warn('[OrdersContext Fallback] Could not confirm order:', err.message);
+        });
+      });
+
+      // 2. Update Lorry status to active and location to Ramapuram yard
+      setLorries((prev) =>
+        prev.map((l) =>
+          l.id === lorryId
+            ? { ...l, driverId, status: 'active', location: 'Loading — Ramapuram yard' }
+            : l
+        )
+      );
+      lorriesApi.update(lorryId, {
+        driverId,
+        status: 'active',
+        location: 'Loading — Ramapuram yard'
+      }).catch((err) => {
+        console.warn('[OrdersContext Fallback] Could not update lorry status:', err.message);
+      });
+
+      // 3. Update Driver
+      setDrivers((prev) =>
+        prev.map((d) => (d.id === driverId ? { ...d, status: 'active', lorryId } : d))
+      );
+      driversApi.update(driverId, {
+        status: 'active',
+        lorryId
+      }).catch((err) => {
+        console.warn('[OrdersContext Fallback] Could not update driver status:', err.message);
+      });
+
+      // 4. Build Multi-Drop Consignment Route Stops
+      const selectedOrders = orders.filter((o) => orderIds.includes(o.id));
+      const dropStops = selectedOrders.map((ord) => {
+        const buyer = unloadingParties.find((up) => up.id === ord.unloadingPartyId);
+        const pieces = ord.lines.reduce((acc, l) => acc + l.pieces, 0);
+        const sqft = ord.lines.reduce((acc, l) => acc + l.sqft, 0);
+        return {
+          orderId: ord.id,
+          unloadingPartyId: ord.unloadingPartyId,
+          buyerName: buyer?.name || 'Buyer',
+          district: ord.district,
+          pieces,
+          sqft,
+          status: 'pending'
+        };
+      });
+
+      const uniqueUnloadingParties = Array.from(new Set(selectedOrders.map((o) => o.unloadingPartyId)));
+      const primaryOrder = selectedOrders[0];
+      let createdCode = '';
+
+      setTrips((prev) => {
+        const prevDriverTrip = prev.find(
+          (t) =>
+            (t.driverId === driverId || t.lorryId === lorryId) &&
+            (t.status === 'completed' || t.status === 'delivered' || t.status === 'returned_to_base' || !!t.finalAudit)
+        );
+        const openingBalance =
+          prevDriverTrip?.driverClosingBalanceForwarded ??
+          prevDriverTrip?.finalAudit?.driverClosingBalanceForwarded ??
+          0;
+
+        const tripCode = `TRP-${1043 + prev.length}`;
+        createdCode = tripCode;
+
+        const newTrip: Trip = {
+          id: `t-${Date.now()}`,
+          code: tripCode,
+          lorryId,
+          driverId,
+          origin: 'Ramapuram',
+          unloadingPartyId: primaryOrder?.unloadingPartyId || '',
+          unloadingPartyIds: uniqueUnloadingParties,
+          status: 'loading',
+          date: new Date().toISOString().split('T')[0],
+          stoneLines: [],
+          workerPayments: [],
+          expenses: [],
+          amountPaid: 0,
+          driverOpeningBalance: openingBalance,
+          orderId: primaryOrder?.id,
+          orderIds,
+          isConsolidated: true,
+          dropStops
+        };
+
+        tripsApi.create(newTrip).catch((err) => {
+          console.warn('[OrdersContext Fallback] Could not persist consolidated trip:', err.message);
+        });
+
+        const lorryPlate = lorries.find((l) => l.id === lorryId)?.plate || 'Lorry';
+        const driverName = drivers.find((d) => d.id === driverId)?.name || 'Driver';
+        const districtsText = Array.from(new Set(selectedOrders.map((o) => o.district))).join(' & ');
+
+        const notif: AppNotification = {
+          id: `n${notifSeq++}`,
+          kind: 'trip',
+          title: `Consolidated Trip · ${tripCode}`,
+          body: `Merged ${orderIds.length} orders for ${districtsText} into ${lorryPlate} (${driverName}). Multi-drop delivery route scheduled.`,
+          time: 'just now',
+          read: false,
+          orderId: primaryOrder?.id
+        };
+        setNotifications((prevNotifs) => [notif, ...prevNotifs]);
+
+        return [newTrip, ...prev];
+      });
+
+      return { success: true, tripCode: createdCode };
+    },
+    [orders, lorries, drivers, unloadingParties]
+  );
+
   const addLoadToTrip = useCallback((
     tripId: string,
     loadingPartyId: string,
@@ -471,7 +621,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
         prevOrders.map((o) => {
           if (o.id !== targetOrderId) return o;
 
-          const orderTrips = nextTrips.filter((t) => t.orderId === targetOrderId);
+          const orderTrips = nextTrips.filter((t) => t.orderId === targetOrderId || (t.orderIds && t.orderIds.includes(targetOrderId)));
           const totalOrdered = o.lines.reduce((sum, line) => sum + line.pieces, 0);
           const totalLoaded = orderTrips.reduce((sum, t) => {
             return sum + t.stoneLines.reduce((s, line) => s + line.pieces, 0);
@@ -1007,7 +1157,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
         prevOrders.map((o) => {
           if (o.id !== targetOrderId) return o;
 
-          const orderTrips = nextTrips.filter((t) => t.orderId === targetOrderId);
+          const orderTrips = nextTrips.filter((t) => t.orderId === targetOrderId || (t.orderIds && t.orderIds.includes(targetOrderId)));
           const totalOrderPaid = orderTrips.reduce((sum, t) => {
             const cash = t.id === tripId ? partyToDriverCash : (t.partyToDriverCash || 0);
             const phonepe = t.id === tripId ? partyToOwnerPhonePe : (t.partyToOwnerPhonePe || 0);
@@ -1137,7 +1287,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
         prevOrders.map((o) => {
           if (o.id !== targetOrderId) return o;
 
-          const orderTrips = nextTrips.filter((t) => t.orderId === targetOrderId);
+          const orderTrips = nextTrips.filter((t) => t.orderId === targetOrderId || (t.orderIds && t.orderIds.includes(targetOrderId)));
           const totalOrderPaid = orderTrips.reduce((sum, t) => {
             const c = t.id === tripId ? cash : (t.partyToDriverCash || 0);
             const p = t.id === tripId ? phonepe : (t.partyToOwnerPhonePe || 0);
@@ -1287,7 +1437,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
         prevOrders.map((o) => {
           if (o.id !== targetOrderId) return o;
 
-          const orderTrips = nextTrips.filter((t) => t.orderId === targetOrderId);
+          const orderTrips = nextTrips.filter((t) => t.orderId === targetOrderId || (t.orderIds && t.orderIds.includes(targetOrderId)));
           const totalOrdered = o.lines.reduce((sum, line) => sum + line.pieces, 0);
           const totalLoaded = orderTrips.reduce((sum, t) => {
             return sum + t.stoneLines.reduce((s, line) => s + line.pieces, 0);
@@ -1484,10 +1634,12 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
         loadingParties,
         unloadingParties,
         placeOrder,
+        deleteOrder,
         setOrderStatus,
         markNotificationRead,
         markAllRead,
         assignOrderToLorry,
+        mergeOrdersToFleet,
         addLoadToTrip,
         dispatchTrip,
         addLorry,
